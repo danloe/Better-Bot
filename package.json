@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "A discord bot better than the last one.",
   "main": "index.js",
-  "deploy": "deploy-commands.js",
   "scripts": {
-    "test": "test"
+    
   },
   "repository": {
     "type": "git",
