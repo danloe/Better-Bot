@@ -1,30 +1,31 @@
-// Require the necessary discord.js classes
-const { Client, Intents } = require('discord.js');
+const fs = require('node:fs');
+const { Client, Collection, Intents } = require('discord.js');
 require('dotenv').config();
 
-// Create a new client instance
+// CLIENT
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-// When the client is ready, run this code (only once)
-client.once('ready', () => {
-	console.log('Ready!');
-});
+// COMMANDS
+client.commands = new Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-client.on('interactionCreate', async interaction => {
-	if (!interaction.isCommand()) return;
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	client.commands.set(command.data.name, command);
+}
 
-	const { commandName } = interaction;
+// EVENTS
+const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
-	if (commandName === 'ping') {
-		await interaction.reply('Pong!');
+for (const file of eventFiles) {
+	const event = require(`./events/${file}`);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
 	}
-	else if (commandName === 'server') {
-		await interaction.reply(`Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`);
+	else {
+		client.on(event.name, (...args) => event.execute(...args));
 	}
-	else if (commandName === 'user') {
-		await interaction.reply('User info.');
-	}
-});
+}
 
-// Login to Discord with your client's token
+// LOGIN
 client.login(process.env.BOT_TOKEN);

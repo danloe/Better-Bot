@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "A discord bot better than the last one.",
   "main": "index.js",
-  "scripts": {
-    
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/danloe/Better-Bot.git"
