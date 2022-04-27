@@ -1,6 +1,6 @@
 module.exports = {
 	name: 'interactionCreate',
-	async execute(interaction) {
+	async execute(interaction : any) {
 		console.log(`${interaction.user.tag} in #${interaction.channel.name} triggered an interaction (${interaction.commandName}).`);
 		// COMMAND
 		if (interaction.isCommand()) {
