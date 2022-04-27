@@ -1,12 +1,12 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { Modal, TextInputComponent, showModal } = require('discord-modals');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { Modal, TextInputComponent, showModal } from 'discord-modals';
 // const wait = require('node:timers/promises').setTimeout;
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ping')
 		.setDescription('Replies with Pong!'),
-	async execute(interaction) {
+	async execute(interaction : any) {
 		// await interaction.deferReply();
 		// await wait(4000);
 		// await interaction.editReply('Pong! 🏓');
