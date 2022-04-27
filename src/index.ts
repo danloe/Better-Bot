@@ -5,12 +5,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // CLIENT
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
 discordModals(client);
 
 // COMMANDS
-export const commands = new Collection();
+const commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter((file: string) => file.endsWith('.js'));
 
 for (const file of commandFiles) {
