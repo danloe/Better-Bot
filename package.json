@@ -4,8 +4,8 @@
   "description": "A discord bot better than the last one.",
   "main": "src/index.js",
   "scripts": {
-    "startOLD": "node -r dotenv/config ./dist/index.js",
-    "start": "ts-node-dev --respawn --transpile-only --poll ./src/index.ts",
+    "start": "tsc && node -r dotenv/config ./dist/index.js",
+    "startauto": "ts-node-dev --respawn --transpile-only --poll ./src/index.ts",
     "reg-g1": "ts-node-dev --respawn --transpile-only --poll ./src/deploy/g1.ts",
     "reg-g2": "ts-node-dev --respawn --transpile-only --poll ./src/deploy/g2.ts",
     "reg-global": "ts-node-dev --respawn --transpile-only --poll ./src/deploy/global.ts",

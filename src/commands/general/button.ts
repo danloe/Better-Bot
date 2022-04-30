@@ -1,11 +1,13 @@
 import { Command } from "../../interfaces";
 import {
+  ButtonInteraction,
   CommandInteraction,
   Message,
   MessageActionRow,
   MessageButton,
 } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
+import { time } from "console";
 // const wait = require('node:timers/promises').setTimeout;
 
 export const command: Command = {
@@ -26,10 +28,21 @@ export const command: Command = {
 
     if (interaction) {
       await interaction.reply({ content: " ", components: [row] });
+      
+      const collector = interaction.channel!.createMessageComponentCollector();
+      collector.on("collect", async (ButtonInteraction) => {
+        ButtonInteraction.reply(`${interaction.client.ws.ping}ms ping. 🏓`);
+      })
     }
 
     if (message) {
       await message.reply({ content: " ", components: [row] });
+            
+      const collector = message.channel!.createMessageComponentCollector();
+      collector.on("collect", async (ButtonInteraction) => {
+        ButtonInteraction.reply(`${message.client.ws.ping}ms ping. 🏓`);
+      })
     }
+
   },
 };

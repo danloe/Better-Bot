@@ -1,29 +1,32 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const builders_1 = require("@discordjs/builders");
+exports.command = void 0;
 const discord_js_1 = require("discord.js");
+const builders_1 = require("@discordjs/builders");
 // const wait = require('node:timers/promises').setTimeout;
-module.exports = {
+exports.command = {
     data: new builders_1.SlashCommandBuilder()
-        .setName('button')
-        .setDescription('Replies with Pong!'),
-    execute(interaction) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const row = new discord_js_1.MessageActionRow()
-                .addComponents(new discord_js_1.MessageButton()
-                .setCustomId('ping')
-                .setLabel('Ping! 🏓')
-                .setStyle('PRIMARY'));
-            yield interaction.reply({ content: ' ', components: [row] });
-        });
+        .setName("button")
+        .setDescription("Responds with a button."),
+    run: async (interaction, message, args) => {
+        const row = new discord_js_1.MessageActionRow().addComponents(new discord_js_1.MessageButton()
+            .setCustomId("ping_button")
+            .setLabel("Ping! 🏓")
+            .setStyle("PRIMARY"));
+        if (interaction) {
+            await interaction.reply({ content: " ", components: [row] });
+            const collector = interaction.channel.createMessageComponentCollector();
+            collector.on("collect", async (ButtonInteraction) => {
+                ButtonInteraction.reply(`${interaction.client.ws.ping}ms ping. 🏓`);
+            });
+        }
+        if (message) {
+            await message.reply({ content: " ", components: [row] });
+            const collector = message.channel.createMessageComponentCollector();
+            collector.on("collect", async (ButtonInteraction) => {
+                ButtonInteraction.reply(`${message.client.ws.ping}ms ping. 🏓`);
+            });
+        }
     },
 };
+//# sourceMappingURL=button.js.map
