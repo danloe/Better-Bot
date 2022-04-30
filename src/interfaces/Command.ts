@@ -6,7 +6,7 @@ interface Run {
 }
 
 export interface Command {
-  data: SlashCommandBuilder;
+  data: any;
   aliases?: string[];
   run: Run;
 }
