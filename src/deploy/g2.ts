@@ -31,3 +31,4 @@ rest
   )
   .then(() => console.log("Successfully registered guild commands."))
   .catch(console.error);
+  console.log("🚀 ~ file: g2.ts ~ line 31 ~ commands", commands);
