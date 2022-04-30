@@ -1,31 +1,24 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { Modal, TextInputComponent, showModal } from 'discord-modals';
+import { Command } from "../../interfaces";
+import { CommandInteraction, Message } from "discord.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
 // const wait = require('node:timers/promises').setTimeout;
 
-module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('ping')
-		.setDescription('Replies with Pong!'),
-	async execute(interaction : any) {
-		// await interaction.deferReply();
-		// await wait(4000);
-		// await interaction.editReply('Pong! 🏓');
+export const command: Command = {
+  data: new SlashCommandBuilder()
+    .setName("ping")
+    .setDescription("Returns the ping. pong."),
+  aliases: ["pong"],
+  run: async (
+    interaction?: CommandInteraction,
+    message?: Message,
+    args?: string[]
+  ) => {
+    if (interaction) {
+      interaction!.reply(`${interaction.client.ws.ping}ms ping. 🏓`);
+    }
 
-		const modal = new Modal()
-			.setCustomId('modal-customid')
-			.setTitle('Play music.')
-			.addComponents(
-				new TextInputComponent()
-					.setCustomId('textinput-customid1')
-					.setLabel('YouTube 🔗/🔎  |  SoundCloud/Newgrounds 🔗')
-					.setStyle('SHORT')
-					.setPlaceholder('URL or Search Keywords...')
-					.setRequired(true),
-			);
-
-		showModal(modal, {
-			client: interaction.client,
-			interaction: interaction,
-		});
-	},
+    if (message) {
+      message!.reply(`${message!.client.ws.ping}ms ping. 🏓`);
+    }
+  },
 };

@@ -1,43 +1,60 @@
-module.exports = {
-	name: 'interactionCreate',
-	async execute(interaction : any) {
-		console.log(`${interaction.user.tag} in #${interaction.channel.name} triggered an interaction (${interaction.commandName}).`);
-		// COMMAND
-		if (interaction.isCommand()) {
-			const command = interaction.client.commands.get(interaction.commandName);
+import { Command, Event } from "../interfaces";
+import Client from "../client";
+import { Interaction } from "discord.js";
 
-			if (!command) return;
+export const event: Event = {
+  name: "interactionCreate",
+  run: async (client: Client, interaction: Interaction) => {
+    console.log(
+      `${interaction.user.tag} in #${
+        (interaction.channel! as any).name
+      } triggered an interaction.`
+    );
 
-			try {
-				await command.execute(interaction);
-			}
-			catch (error) {
-				console.error(error);
-				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-			}
-		}
-		// BUTTON
-		else if (interaction.isButton()) {
-			try {
-				// await command.execute(interaction);
-			}
-			catch (error) {
-				console.error(error);
-				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-			}
-		}
-		// SELECT MENU
-		else if (interaction.isSelectMenu()) {
-			try {
-				// await command.execute(interaction);
-			}
-			catch (error) {
-				console.error(error);
-				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-			}
-		}
-		else {
-			return;
-		}
-	},
+    // COMMAND
+    if (interaction.isCommand()) {
+      const command =
+        client.commands.get(interaction.commandName) ||
+        client.aliases.get(interaction.commandName);
+      if (!command) return;
+
+      try {
+        (command as Command).run(interaction);
+      } catch (error) {
+        console.error(error);
+        await interaction.reply({
+          content: "There was an error while executing this command!",
+          ephemeral: true,
+        });
+      }
+    }
+
+    // BUTTON
+    else if (interaction.isButton()) {
+      try {
+        // TODO
+      } catch (error) {
+        console.error(error);
+        await interaction.reply({
+          content: "There was an error while executing this command!",
+          ephemeral: true,
+        });
+      }
+    }
+
+    // SELECT MENU
+    else if (interaction.isSelectMenu()) {
+      try {
+        // TODO
+      } catch (error) {
+        console.error(error);
+        await interaction.reply({
+          content: "There was an error while executing this command!",
+          ephemeral: true,
+        });
+      }
+    } else {
+      return;
+    }
+  },
 };
