@@ -17,10 +17,11 @@ const commandPath = path_1.default.join(__dirname, "..", "commands");
         const { command } = require(`${commandPath}\\${dir}\\${file}`);
         commands.push(command.data.toJSON());
     }
-    const rest = new rest_1.REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
-    rest
-        .put(v9_1.Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD2_ID), { body: commands })
-        .then(() => console.log("Successfully registered guild commands."))
-        .catch(console.error);
 });
+const rest = new rest_1.REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
+rest
+    .put(v9_1.Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD2_ID), { body: commands })
+    .then(() => console.log("Successfully registered guild commands."))
+    .catch(console.error);
+console.log("🚀 ~ file: g2.ts ~ line 31 ~ commands", commands);
 //# sourceMappingURL=g2.js.map

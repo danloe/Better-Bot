@@ -92,25 +92,10 @@ exports.command = {
             });
         }
         if (message) {
-            let author = message.author.username;
+            let author = message.author;
             if (args.length > 0) {
-                console.log("🚀 ~ file: roast.ts ~ line 105 ~ args", args);
-                let arg = args[0];
-                if (arg.startsWith("<") ||
-                    arg.includes("@everyone") ||
-                    arg.includes("here") ||
-                    arg.toLowerCase().startsWith("me")) {
-                    if (arg.toLowerCase().startsWith("me")) {
-                        author = message.author.username;
-                    }
-                    else {
-                        author = arg;
-                    }
-                }
-                else {
-                    await message.channel.send(`${author} You need to mention someone with *@[name]*`);
-                    return;
-                }
+                if (args[0].toLowerCase() != "me")
+                    author = args[0];
                 let i = Math.floor(Math.random() * answers.length);
                 await message.channel.send({
                     content: `${author} ${answers[i]}`,
@@ -118,6 +103,10 @@ exports.command = {
                         tts: true,
                     },
                 });
+            }
+            else {
+                await message.channel.send(`${author} You need to mention someone with *@[name]*`);
+                return;
             }
         }
     },
