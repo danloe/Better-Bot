@@ -15,15 +15,15 @@ readdirSync(commandPath).forEach((dir) => {
     const { command } = require(`${commandPath}\\${dir}\\${file}`);
     commands.push(command.data.toJSON());
   }
-
-  const rest = new REST({ version: "9" }).setToken(
-    process.env.BOT_TOKEN as string
-  );
-
-  rest
-    .put(Routes.applicationCommands(process.env.CLIENT_ID as string), {
-      body: commands,
-    })
-    .then(() => console.log("Successfully registered guild commands."))
-    .catch(console.error);
 });
+
+const rest = new REST({ version: "9" }).setToken(
+  process.env.BOT_TOKEN as string
+);
+
+rest
+  .put(Routes.applicationCommands(process.env.CLIENT_ID as string), {
+    body: commands,
+  })
+  .then(() => console.log("Successfully registered guild commands."))
+  .catch(console.error);

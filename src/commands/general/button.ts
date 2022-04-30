@@ -1,13 +1,11 @@
 import { Command } from "../../interfaces";
 import {
-  ButtonInteraction,
   CommandInteraction,
   Message,
   MessageActionRow,
   MessageButton,
 } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { time } from "console";
 // const wait = require('node:timers/promises').setTimeout;
 
 export const command: Command = {
