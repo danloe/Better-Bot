@@ -75,7 +75,7 @@ const answers = [
 exports.command = {
     data: new builders_1.SlashCommandBuilder()
         .setName("roast")
-        .setDescription("Returns the ping. pong.")
+        .setDescription("Roast you or someone else.")
         .addUserOption((option) => option
         .setName("user")
         .setDescription("The user to roast")
@@ -84,8 +84,8 @@ exports.command = {
         if (interaction) {
             let i = Math.floor(Math.random() * answers.length);
             let user = interaction.options.getUser("user");
-            await interaction.channel?.send({
-                content: `${user.username} ${answers[i]}`,
+            await interaction.reply({
+                content: `${user} ${answers[i]}`,
                 options: {
                     tts: true,
                 },
