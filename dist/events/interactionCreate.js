@@ -4,7 +4,7 @@ exports.event = void 0;
 exports.event = {
     name: "interactionCreate",
     run: async (client, interaction) => {
-        console.log(`${interaction.user.tag} triggered an interaction.${interaction.isCommand() ? ' [' + interaction.commandName + ']' : ''}`);
+        console.log(`${interaction.user.tag} triggered an interaction.${interaction.isCommand() ? " [" + interaction.commandName + "]" : ""}`);
         // COMMAND
         if (interaction.isCommand()) {
             const command = client.commands.get(interaction.commandName) ||

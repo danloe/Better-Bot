@@ -4,7 +4,10 @@ exports.event = void 0;
 exports.event = {
     name: "ready",
     run: async (client) => {
-        client.user.setPresence({ activities: [{ name: 'BEEP BOOP', type: 4 }], status: 'dnd' });
+        client.user.setPresence({
+            activities: [{ name: "PEW POW!", type: 5 /* COMPETING */ }],
+            status: "online",
+        });
         console.log(`${client.user.tag} is ready.`);
     },
 };

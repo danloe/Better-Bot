@@ -4,8 +4,7 @@ exports.event = void 0;
 exports.event = {
     name: "messageCreate",
     run: async (client, message) => {
-        if (message.author.bot ||
-            !message.content.startsWith(client.config.prefix))
+        if (message.author.bot || !message.content.startsWith(client.config.prefix))
             return;
         const args = message.content
             .slice(client.config.prefix.length)
@@ -15,8 +14,10 @@ exports.event = {
         if (!cmd)
             return;
         const command = client.commands.get(cmd) || client.aliases.get(cmd);
-        if (command)
+        if (command) {
+            console.log(`${message.author.username} triggered an interaction. [${command.data.name}]`);
             command.run(undefined, message, args);
+        }
     },
 };
 //# sourceMappingURL=messageCreate.js.map
