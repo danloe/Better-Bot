@@ -1,10 +1,9 @@
-/*import { IRhythmBotConfig } from '../bot/bot-config';
-import { BotStatus } from '../bot/bot-status';
-import { Queue } from '../classes/queue';
-import { Track, TrackType } from "../interfaces/Track";
-import { createEmbed, createErrorEmbed, createInfoEmbed } from '../helpers';
-import { Logger, TextChannel, DMChannel, NewsChannel, VoiceConnection, StreamDispatcher } from 'discord-bot-quickstart';
+import { Queue } from '../classes/Queue';
+/*import { Track, TrackType } from '../interfaces/Track';
+import { createEmbed, createErrorEmbed } from '../helpers';
 import { Readable } from 'stream';
+import { AudioPlayer, VoiceConnection } from '@discordjs/voice';
+import { DMChannel, NewsChannel, TextChannel } from 'discord.js';
 
 export class MediaPlayer {
     typeRegistry: Map<string, TrackType> = new Map<string, TrackType>();
@@ -12,19 +11,11 @@ export class MediaPlayer {
     playing: boolean = false;
     paused: boolean = false;
     stopping: boolean = false;
-    config: IRhythmBotConfig;
-    status: BotStatus;
-    logger: Logger;
+    status: PlayerStatus = PlayerStatus.Empty;
     channel: TextChannel | DMChannel | NewsChannel;
     connection?: VoiceConnection;
-    dispatcher?: StreamDispatcher;
+    player?: AudioPlayer;
 
-    constructor(config: IRhythmBotConfig, status: BotStatus, logger: Logger) {
-        this.config = config;
-        this.status = status;
-        this.logger = logger;
-    }
-    
     addMedia(item: TrackType): Promise<void> {
         return new Promise((done, error) => {
             let type = this.typeRegistry.get(item.type);
@@ -52,12 +43,12 @@ export class MediaPlayer {
                                 {
                                     name: 'Position:',
                                     value: `${this.queue.indexOf(item) + 1}`,
-                                    inline: true,
+                                    inline: true
                                 },
                                 {
                                     name: 'Requested By:',
                                     value: item.requestor,
-                                    inline: true,
+                                    inline: true
                                 }
                             )
                     );
@@ -106,7 +97,7 @@ export class MediaPlayer {
             bitrate: this.config.stream.bitrate,
             fec: this.config.stream.forwardErrorCorrection,
             plp: this.config.stream.packetLossPercentage,
-            highWaterMark: 1 << 25,
+            highWaterMark: 1 << 25
         });
         this.dispatcher.on('start', async () => {
             this.playing = true;
@@ -302,4 +293,9 @@ export class MediaPlayer {
     }
 }
 
-*/
+export enum PlayerStatus {
+    Playing,
+    Paused,
+    Stopped,
+    Empty
+}*/

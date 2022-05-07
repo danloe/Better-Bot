@@ -8,9 +8,7 @@
     "start": "tsc && ts-node-dev ./src/index.ts",
     "startdev": "nodemon",
     "startauto": "ts-node-dev --respawn --transpile-only --poll ./src/index.ts",
-    "reg1": "ts-node-dev --respawn --transpile-only --poll ./src/deploy/g1.ts",
-    "reg2": "ts-node-dev --respawn --transpile-only --poll ./src/deploy/g2.ts",
-    "regg": "ts-node-dev --respawn --transpile-only --poll ./src/deploy/global.ts",
+    "deploy": "ts-node-dev --respawn --transpile-only --poll ./src/deploy/global.ts",
     "build": "tsc"
   },
   "repository": {
