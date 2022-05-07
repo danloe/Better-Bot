@@ -6,6 +6,5 @@ interface Run {
 
 export interface Command {
   data: any;
-  aliases?: string[];
   run: Run;
 }

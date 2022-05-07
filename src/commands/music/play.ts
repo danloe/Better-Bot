@@ -7,7 +7,6 @@ export const command: Command = {
   data: new SlashCommandBuilder()
     .setName("play")
     .setDescription("Plays a song."),
-  aliases: ["p"],
   run: async (
     interaction?: CommandInteraction,
     message?: Message,

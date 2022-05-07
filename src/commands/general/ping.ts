@@ -8,7 +8,6 @@ export const command: Command = {
   data: new SlashCommandBuilder()
     .setName("ping")
     .setDescription("Returns the ping. pong."),
-  aliases: ["pong"],
   run: async (
     interaction?: CommandInteraction,
     message?: Message,
