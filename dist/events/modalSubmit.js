@@ -5,9 +5,10 @@ const discord_js_1 = require("discord.js");
 exports.event = {
     name: "modalSubmit",
     run: async (client, modal) => {
-        if (modal.customId === "modal-customid") {
-            const firstResponse = modal.getTextInputValue("textinput-customid1");
-            modal.reply(discord_js_1.Formatters.codeBlock("markdown", firstResponse));
+        if (modal.customId === "modal-play") {
+            const input = modal.getTextInputValue("input");
+            //play input
+            modal.reply(discord_js_1.Formatters.codeBlock("markdown", input));
         }
     },
 };

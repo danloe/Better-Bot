@@ -3,12 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.command = void 0;
 const builders_1 = require("@discordjs/builders");
 const helpers_1 = require("../../helpers");
-// const wait = require('node:timers/promises').setTimeout;
 exports.command = {
     data: new builders_1.SlashCommandBuilder()
         .setName("ping")
         .setDescription("Returns the ping. pong."),
-    aliases: ["pong"],
     run: async (interaction, message, args) => {
         if (interaction) {
             interaction.reply((0, helpers_1.createEmbed)("🏓", `${interaction.client.ws.ping}ms`));
