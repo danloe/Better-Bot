@@ -1,6 +1,6 @@
 export interface Config {
-  prefix: string;
-  activity: string;
-  bitrate: string;
-  volume: number;
+    prefix: string;
+    activity: string;
+    bitrate: string;
+    volume: number;
 }
