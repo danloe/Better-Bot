@@ -103,7 +103,7 @@ export const command: Command = {
       let author: any = message.author;
 
       if (args!.length > 0) {
-        if(args![0].toLowerCase() != "me") author = args![0];
+        if (args![0].toLowerCase() != "me") author = args![0];
 
         let i = Math.floor(Math.random() * answers.length);
         await message.channel.send({

@@ -1,14 +1,14 @@
 import { Command, Event } from "../interfaces";
 import Client from "../client";
-import { Interaction } from "discord.js";
+import { CommandInteraction, Interaction } from "discord.js";
 
 export const event: Event = {
   name: "interactionCreate",
-  run: async (client: Client, interaction: Interaction) => {
+  run: async (client: Client, interaction: any) => {
     console.log(
-      `${interaction.user.tag} in #${
-        (interaction.channel! as any).name
-      } triggered an interaction.`
+      `${interaction.user.tag} triggered an interaction.${
+        interaction.isCommand() ? " [" + interaction.commandName + "]" : ""
+      }`
     );
 
     // COMMAND

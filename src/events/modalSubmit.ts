@@ -4,7 +4,7 @@ import { ModalSubmitInteraction } from "discord-modals";
 import { Formatters } from "discord.js";
 
 export const event: Event = {
-	name: "modalSubmit",
+  name: "modalSubmit",
   run: async (client: Client, modal: ModalSubmitInteraction) => {
     if (modal.customId === "modal-customid") {
       const firstResponse = modal.getTextInputValue("textinput-customid1");

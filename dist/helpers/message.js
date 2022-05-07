@@ -1,17 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createInfoEmbed = exports.createErrorEmbed = exports.createEmbed = void 0;
+exports.createErrorEmbed = exports.createEmbed = void 0;
 const discord_js_1 = require("discord.js");
-function createEmbed() {
-    return new discord_js_1.MessageEmbed().setColor('#a600ff');
+function createEmbed(title, message) {
+    return { embeds: [new discord_js_1.MessageEmbed().setColor('#1e81b0').setTitle(title).setDescription(message)] };
 }
 exports.createEmbed = createEmbed;
 function createErrorEmbed(message) {
-    return new discord_js_1.MessageEmbed().setColor('#ff3300').setTitle('Error').setDescription(message);
+    return { embeds: [new discord_js_1.MessageEmbed().setColor('#951020').setTitle('Error').setDescription(message)] };
 }
 exports.createErrorEmbed = createErrorEmbed;
-function createInfoEmbed(title, message = '') {
-    return new discord_js_1.MessageEmbed().setColor('#0099ff').setTitle(title).setDescription(message);
-}
-exports.createInfoEmbed = createInfoEmbed;
 //# sourceMappingURL=message.js.map

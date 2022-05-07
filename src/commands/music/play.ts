@@ -14,11 +14,11 @@ export const command: Command = {
     args?: string[]
   ) => {
     if (interaction) {
-      interaction!.reply(`${interaction.client.ws.ping}ms ping. 🏓`);
+      //interaction!.reply(`${interaction.client.ws.ping}ms ping. 🏓`);
     }
 
     if (message) {
-      message!.channel.send(`${message!.client.ws.ping}ms ping. 🏓`);
+      //message!.channel.send(`${message!.client.ws.ping}ms ping. 🏓`);
     }
   },
 };
