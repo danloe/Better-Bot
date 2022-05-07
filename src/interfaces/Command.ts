@@ -1,10 +1,10 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, Message } from 'discord.js';
 
 interface Run {
-  (interaction?: CommandInteraction, message?: Message, args?: string[]): void;
+    (interaction?: CommandInteraction, message?: Message, args?: string[]): void;
 }
 
 export interface Command {
-  data: any;
-  run: Run;
+    data: any;
+    run: Run;
 }
