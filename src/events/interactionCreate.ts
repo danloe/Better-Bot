@@ -23,7 +23,7 @@ export const event: Event = {
             } catch (error) {
                 console.error(error);
                 await interaction.reply({
-                    content: 'There was an error while executing this command!',
+                    content: 'There was an error. My brain froze while executing this command!',
                     ephemeral: true
                 });
             }
@@ -36,7 +36,7 @@ export const event: Event = {
             } catch (error) {
                 console.error(error);
                 await interaction.reply({
-                    content: 'There was an error while executing this command!',
+                    content: 'There was an error. Did you press the button too hard?',
                     ephemeral: true
                 });
             }
@@ -49,7 +49,7 @@ export const event: Event = {
             } catch (error) {
                 console.error(error);
                 await interaction.reply({
-                    content: 'There was an error while executing this command!',
+                    content: 'There was an error. The selector seems to be undecided.',
                     ephemeral: true
                 });
             }
