@@ -1,7 +1,8 @@
 import { CommandInteraction, Message } from 'discord.js';
+import BetterClient from '../client';
 
 interface Run {
-    (interaction?: CommandInteraction, message?: Message, args?: string[]): void;
+    (client: BetterClient, interaction?: CommandInteraction, message?: Message, args?: string[]): void;
 }
 
 export interface Command {

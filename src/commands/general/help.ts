@@ -2,10 +2,11 @@ import { Command } from '../../interfaces';
 import { CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { readdir, readFile, readFileSync } from 'fs';
+import BetterClient from '../../client';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('help').setDescription('You need a hand?'),
-    run: async (interaction?: CommandInteraction, message?: Message, args?: string[]) => {
+    run: async (client: BetterClient, interaction?: CommandInteraction, message?: Message, args?: string[]) => {
         readdir('.', (err, files) => {
             files.forEach((file) => {
                 console.log(file);

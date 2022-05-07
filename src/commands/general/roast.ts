@@ -1,6 +1,7 @@
 import { Command } from '../../interfaces';
 import { CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
+import BetterClient from '../../client';
 
 const answers = [
     'My phone battery lasts longer than your relationships.',
@@ -80,7 +81,7 @@ export const command: Command = {
         .addUserOption((option) =>
             option.setName('user').setDescription('The user to roast').setRequired(true)
         ),
-    run: async (interaction?: CommandInteraction, message?: Message, args?: string[]) => {
+    run: async (client: BetterClient, interaction?: CommandInteraction, message?: Message, args?: string[]) => {
         if (interaction) {
             let i = Math.floor(Math.random() * answers.length);
             let user = interaction.options.getUser('user');
