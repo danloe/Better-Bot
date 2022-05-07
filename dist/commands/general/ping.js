@@ -11,10 +11,10 @@ exports.command = {
     aliases: ["pong"],
     run: async (interaction, message, args) => {
         if (interaction) {
-            interaction.reply((0, helpers_1.createEmbed)('Ping', `${interaction.client.ws.ping}ms 🏓`));
+            interaction.reply((0, helpers_1.createEmbed)("🏓", `${interaction.client.ws.ping}ms`));
         }
         if (message) {
-            message.reply((0, helpers_1.createEmbed)('Ping', `${message.client.ws.ping}ms 🏓`));
+            message.reply((0, helpers_1.createEmbed)("🏓", `${message.client.ws.ping}ms`));
         }
     },
 };

@@ -1,4 +1,4 @@
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed } from "discord.js";
 export declare function createEmbed(title: string, message: string): {
     embeds: MessageEmbed[];
 };
