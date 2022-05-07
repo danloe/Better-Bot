@@ -6,7 +6,6 @@ import {
   MessageButton,
 } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
-// const wait = require('node:timers/promises').setTimeout;
 
 export const command: Command = {
   data: new SlashCommandBuilder()

@@ -5,8 +5,8 @@ exports.event = {
     name: "ready",
     run: async (client) => {
         client.user.setPresence({
-            activities: [{ name: "PEW POW!", type: 5 /* COMPETING */ }],
-            status: "online",
+            activities: [{ name: "🦄", type: 3 /* WATCHING */ }],
+            status: "dnd",
         });
         console.log(`${client.user.tag} is ready.`);
     },

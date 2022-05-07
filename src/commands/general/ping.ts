@@ -2,7 +2,6 @@ import { Command } from "../../interfaces";
 import { CommandInteraction, Message } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { createEmbed } from "../../helpers";
-// const wait = require('node:timers/promises').setTimeout;
 
 export const command: Command = {
   data: new SlashCommandBuilder()

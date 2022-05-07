@@ -7,7 +7,7 @@ export const event: Event = {
   run: async (client: Client, interaction: any) => {
     console.log(
       `${interaction.user.tag} triggered an interaction.${
-        interaction.isCommand() ? " [" + interaction.commandName + "]" : ""
+        interaction.isCommand() ? ` [${interaction.commandName}]` : ''
       }`
     );
 

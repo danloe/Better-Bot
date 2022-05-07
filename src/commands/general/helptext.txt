@@ -1,0 +1,24 @@
+__Music Commands:__
+(`q`) `queue
+(`p`) `play [youtube search / youtube, soundcloud, newgrounds url / url to any audio file]
+(`sp`) `silent play. Same function as play but without announcement.
+(`ps`) `play skip [youtube search / youtube, soundcloud, newgrounds url / url to any audio file]
+(`pn`) `play next [youtube search / youtube, soundcloud, newgrounds url / url to any audio file]
+(`s`) `skip
+//(`res`) `resume`  -> resume playing with next track
+(`n`) `next [position]
+(`r`) `remove [position] [position]...
+(`c`) `clear
+`stop` / `disconnect
+
+__Other Commands:__
+`say (english) phrase
+`sag (deutsch) Phrase
+`zeg (nederlands) zin
+`dites (francais) phrase
+`uptime
+`roast @name/me
+`coin [side1] [side2]
+`decide option1 option2 [option3] [...]
+`ping
+`8ball question
