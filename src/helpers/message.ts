@@ -1,13 +1,23 @@
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed } from "discord.js";
 
-export function createEmbed() {
-    return new MessageEmbed().setColor('#a600ff');
+export function createEmbed(title: string, message: string) {
+  return {
+    embeds: [
+      new MessageEmbed()
+        .setColor("#1e81b0")
+        .setTitle(title)
+        .setDescription(message),
+    ],
+  };
 }
 
 export function createErrorEmbed(message: string) {
-    return new MessageEmbed().setColor('#ff3300').setTitle('Error').setDescription(message);
-}
-
-export function createInfoEmbed(title: string, message: string = '') {
-    return new MessageEmbed().setColor('#0099ff').setTitle(title).setDescription(message);
+  return {
+    embeds: [
+      new MessageEmbed()
+        .setColor("#951020")
+        .setTitle("Error")
+        .setDescription(message),
+    ],
+  };
 }

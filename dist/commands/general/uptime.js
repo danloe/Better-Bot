@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.command = void 0;
 const builders_1 = require("@discordjs/builders");
+const helpers_1 = require("../../helpers");
 exports.command = {
     data: new builders_1.SlashCommandBuilder()
         .setName("uptime")
@@ -22,10 +23,10 @@ exports.command = {
         let seconds = Math.floor(diff / 1000);
         diff -= seconds * 1000;
         if (interaction) {
-            interaction.reply(`${interaction.user.username} I am running for you since ${days} days, ${hours} hours, ${mins} mins and ${seconds} secs!`);
+            await interaction.reply((0, helpers_1.createEmbed)("Uptime", `I am running away from you since ${days} days, ${hours} hours, ${mins} mins and ${seconds} secs!`));
         }
         if (message) {
-            await message.channel.send(`${message.author} I am running for you since ${days} days, ${hours} hours, ${mins} mins and ${seconds} secs!`);
+            await message.channel.send(`${message.author} I am running away from you since ${days} days, ${hours} hours, ${mins} mins and ${seconds} secs!`);
         }
     },
 };

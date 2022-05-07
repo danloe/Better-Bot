@@ -26,21 +26,20 @@ export const command: Command = {
 
     if (interaction) {
       await interaction.reply({ content: " ", components: [row] });
-      
+
       const collector = interaction.channel!.createMessageComponentCollector();
       collector.on("collect", async (ButtonInteraction) => {
-        ButtonInteraction.reply(`${interaction.client.ws.ping}ms ping. 🏓`);
-      })
+        ButtonInteraction.reply(`${interaction.client.ws.ping}ms 🏓`);
+      });
     }
 
     if (message) {
       await message.reply({ content: " ", components: [row] });
-            
+
       const collector = message.channel!.createMessageComponentCollector();
       collector.on("collect", async (ButtonInteraction) => {
-        ButtonInteraction.reply(`${message.client.ws.ping}ms ping. 🏓`);
-      })
+        ButtonInteraction.reply(`${message.client.ws.ping}ms 🏓`);
+      });
     }
-
   },
 };

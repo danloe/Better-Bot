@@ -1,6 +1,7 @@
 import { Command } from "../../interfaces";
 import { CommandInteraction, Message } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
+import { createEmbed } from "../../helpers";
 // const wait = require('node:timers/promises').setTimeout;
 
 export const command: Command = {
@@ -14,11 +15,11 @@ export const command: Command = {
     args?: string[]
   ) => {
     if (interaction) {
-      interaction!.reply(`${interaction.client.ws.ping}ms ping. 🏓`);
+      interaction!.reply(createEmbed("🏓", `${interaction.client.ws.ping}ms`));
     }
 
     if (message) {
-      message!.reply(`${message!.client.ws.ping}ms ping. 🏓`);
+      message!.reply(createEmbed("🏓", `${message!.client.ws.ping}ms`));
     }
   },
 };

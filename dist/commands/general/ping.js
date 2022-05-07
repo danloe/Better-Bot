@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.command = void 0;
 const builders_1 = require("@discordjs/builders");
+const helpers_1 = require("../../helpers");
 // const wait = require('node:timers/promises').setTimeout;
 exports.command = {
     data: new builders_1.SlashCommandBuilder()
@@ -10,10 +11,10 @@ exports.command = {
     aliases: ["pong"],
     run: async (interaction, message, args) => {
         if (interaction) {
-            interaction.reply(`${interaction.client.ws.ping}ms ping. 🏓`);
+            interaction.reply((0, helpers_1.createEmbed)('Ping', `${interaction.client.ws.ping}ms 🏓`));
         }
         if (message) {
-            message.reply(`${message.client.ws.ping}ms ping. 🏓`);
+            message.reply((0, helpers_1.createEmbed)('Ping', `${message.client.ws.ping}ms 🏓`));
         }
     },
 };

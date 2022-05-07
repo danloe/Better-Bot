@@ -1,6 +1,7 @@
 import { Command } from "../../interfaces";
 import { CommandInteraction, Message } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
+import { createEmbed } from "../../helpers";
 
 export const command: Command = {
   data: new SlashCommandBuilder()
@@ -29,14 +30,17 @@ export const command: Command = {
     diff -= seconds * 1000;
 
     if (interaction) {
-      interaction!.reply(
-        `${interaction.user.username} I am running for you since ${days} days, ${hours} hours, ${mins} mins and ${seconds} secs!`
+      await interaction!.reply(
+        createEmbed(
+          "Uptime",
+          `I am running away from you since ${days} days, ${hours} hours, ${mins} mins and ${seconds} secs!`
+        )
       );
     }
 
     if (message) {
       await message.channel.send(
-        `${message.author} I am running for you since ${days} days, ${hours} hours, ${mins} mins and ${seconds} secs!`
+        `${message.author} I am running away from you since ${days} days, ${hours} hours, ${mins} mins and ${seconds} secs!`
       );
     }
   },

@@ -5,7 +5,6 @@ exports.event = {
     name: "messageCreate",
     run: async (client, message) => {
         if (message.author.bot ||
-            !message.guild ||
             !message.content.startsWith(client.config.prefix))
             return;
         const args = message.content

@@ -5,11 +5,7 @@ import { Message } from "discord.js";
 export const event: Event = {
   name: "messageCreate",
   run: async (client: Client, message: Message) => {
-    if (
-      message.author.bot ||
-      !message.guild ||
-      !message.content.startsWith(client.config.prefix)
-    )
+    if (message.author.bot || !message.content.startsWith(client.config.prefix))
       return;
 
     const args = message.content
@@ -21,6 +17,11 @@ export const event: Event = {
     if (!cmd) return;
 
     const command = client.commands.get(cmd) || client.aliases.get(cmd);
-    if (command) (command as Command).run(undefined, message, args);
+    if (command) {
+      console.log(
+        `${message.author.username} triggered an interaction. [${command.data.name}]`
+      );
+      (command as Command).run(undefined, message, args);
+    }
   },
 };
