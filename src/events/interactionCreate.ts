@@ -1,10 +1,9 @@
 import { Command, Event } from '../interfaces';
-import Client from '../client';
-import { CommandInteraction, Interaction } from 'discord.js';
+import BetterClient from '../client';
 
 export const event: Event = {
     name: 'interactionCreate',
-    run: async (client: Client, interaction: any) => {
+    run: async (client: BetterClient, interaction: any) => {
         console.log(
             `${interaction.user.tag} triggered an interaction.${
                 interaction.isCommand() ? ` [${interaction.commandName}]` : ''
@@ -13,13 +12,11 @@ export const event: Event = {
 
         // COMMAND
         if (interaction.isCommand()) {
-            const command =
-                client.commands.get(interaction.commandName) ||
-                client.aliases.get(interaction.commandName);
+            const command = client.commands.get(interaction.commandName);
             if (!command) return;
 
             try {
-                (command as Command).run(interaction);
+                (command as Command).run(client, interaction);
             } catch (error) {
                 console.error(error);
                 await interaction.reply({

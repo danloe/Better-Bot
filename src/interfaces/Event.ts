@@ -1,7 +1,7 @@
-import Client from '../client';
+import BetterClient from '../client';
 
 interface Run {
-    (client: Client, ...args: any[]): void;
+    (client: BetterClient, ...args: any[]): void;
 }
 
 export interface Event {

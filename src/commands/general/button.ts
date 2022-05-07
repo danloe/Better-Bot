@@ -1,10 +1,11 @@
 import { Command } from '../../interfaces';
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
+import BetterClient from '../../client';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('button').setDescription('Responds with a button.'),
-    run: async (interaction?: CommandInteraction, message?: Message, args?: string[]) => {
+    run: async (client: BetterClient, interaction?: CommandInteraction, message?: Message, args?: string[]) => {
         const row = new MessageActionRow().addComponents(
             new MessageButton().setCustomId('ping_button').setLabel('Ping! 🏓').setStyle('PRIMARY')
         );

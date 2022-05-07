@@ -6,9 +6,8 @@ import { Command, Config, Event } from '../interfaces';
 import ConfigJson from '../config.json';
 import discordModals from 'discord-modals';
 
-class ExtendedClient extends Client {
+class BetterClient extends Client {
     public commands: Collection<string, Command> = new Collection();
-    public aliases: Collection<string, Command> = new Collection();
     public events: Collection<string, Event> = new Collection();
     public config: Config = ConfigJson;
 
@@ -27,11 +26,6 @@ class ExtendedClient extends Client {
             for (const file of commands) {
                 const { command } = require(`${commandPath}\\${dir}\\${file}`);
                 this.commands.set(command.data.name, command);
-                if (command?.aliases?.length) {
-                    command.aliases.forEach((alias: string) => {
-                        this.aliases.set(alias, command);
-                    });
-                }
             }
         });
 
@@ -40,10 +34,9 @@ class ExtendedClient extends Client {
         readdirSync(eventPath).forEach(async (file) => {
             const { event } = await import(`${eventPath}/${file}`);
             this.events.set(event.name, event);
-            //console.log(event);
             this.on(event.name, event.run.bind(null, this));
         });
     }
 }
 
-export default ExtendedClient;
+export default BetterClient;
