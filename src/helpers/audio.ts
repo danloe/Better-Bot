@@ -4,12 +4,25 @@ import ytsr from 'ytsr';
 import { Track, TrackType } from '../classes/Track';
 import https from 'node:https';
 
-function getYouTubeTrack(query: string, requestor: string, announce: boolean) {
+export function determineTrackType(args: string): TrackType {
+    if (args.startsWith('http://') || args.startsWith('https://')) {
+        // URL, get type
+        if (isYouTubeURL(args)) return TrackType.YouTube;
+        if (isSoundCloudURL(args)) return TrackType.SoundCloud;
+        if (isNewgroundsURL(args)) return TrackType.Newgrounds;
+        return TrackType.DirectFile;
+    } else {
+        // YouTube search
+        return TrackType.YouTube;
+    }
+}
+
+export function getYouTubeTrack(query: string, requestor: string, announce: boolean) {
     return new Promise<Track>(async (resolve, reject) => {
         try {
             let info: any;
 
-            if (query.includes('://youtu') || query.includes('://www.youtu')) {
+            if (query.startsWith('http://') || query.startsWith('https://')) {
                 info = await ytdl.getInfo(query);
 
                 const track = new Track(
@@ -40,7 +53,7 @@ function getYouTubeTrack(query: string, requestor: string, announce: boolean) {
     });
 }
 
-function getSoundCloudTrack(url: string, requestor: string, announce: boolean) {
+export function getSoundCloudTrack(url: string, requestor: string, announce: boolean) {
     return new Promise<Track>(async (resolve, reject) => {
         try {
             let info: any = await scdl.getInfo(url);
@@ -64,7 +77,7 @@ function getSoundCloudTrack(url: string, requestor: string, announce: boolean) {
     });
 }
 
-function getNewgroundsTrack(url: string, requestor: string, announce: boolean) {
+export function getNewgroundsTrack(url: string, requestor: string, announce: boolean) {
     return new Promise<Track>((resolve, reject) => {
         //send http request
         https.get(url, (res: any) => {
@@ -100,4 +113,40 @@ function getNewgroundsTrack(url: string, requestor: string, announce: boolean) {
             });
         });
     });
+}
+
+function isYouTubeURL(url: string): boolean {
+    const urls = [
+        'http://youtube.com/',
+        'https://youtube.com/',
+        'http://www.youtube.com/',
+        'https://www.youtube.com/',
+        'http://m.youtube.com/',
+        'https://m.youtube.com/',
+        'http://youtu.be/',
+        'https://youtu.be/'
+    ];
+
+    for (let u of urls) {
+        if (url.startsWith(u)) return true;
+    }
+    return false;
+}
+
+function isSoundCloudURL(url: string): boolean {
+    const urls = ['http://soundcloud.com/', 'https://soundcloud.com/'];
+
+    for (let u of urls) {
+        if (url.startsWith(u)) return true;
+    }
+    return false;
+}
+
+function isNewgroundsURL(url: string): boolean {
+    const urls = ['https://www.newgrounds.com/audio/listen/'];
+
+    for (let u of urls) {
+        if (url.startsWith(u)) return true;
+    }
+    return false;
 }

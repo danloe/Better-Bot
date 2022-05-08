@@ -8,11 +8,11 @@ export class Track {
     name: string;
     requestor: string;
     announce: boolean;
-    duration: number | undefined;
-    artworkUrl: string | undefined;
-    description: string | undefined;
-    genre: string | undefined;
-    uploaded: string | undefined;
+    duration: number;
+    artworkUrl: string;
+    description: string;
+    genre: string;
+    uploaded: string;
 
     constructor(
         type: TrackType,
@@ -20,10 +20,11 @@ export class Track {
         name: string,
         requestor: string,
         announce: boolean,
-        duration?: number,
-        artworkUrl?: string,
-        genre?: string,
-        uploaded?: string
+        duration: number = 0,
+        artworkUrl: string = '',
+        description: string = '',
+        genre: string = '',
+        uploaded: string = ''
     ) {
         this.type = type;
         this.url = url;
@@ -32,6 +33,7 @@ export class Track {
         this.announce = announce;
         this.duration = duration;
         this.artworkUrl = artworkUrl;
+        this.description = description;
         this.genre = genre;
         this.uploaded = uploaded;
     }
