@@ -9,16 +9,15 @@ export const command: Command = {
         .setName('play')
         .setDescription('Play or Queue a Song.')
         .addStringOption((option) =>
-            option
-                .setName('input')
-                .setDescription('URL to a File or Search Text')
-                .setRequired(false)
+            option.setName('input').setDescription('URL to a File or Search Text').setRequired(false)
         ),
     run: async (client: BetterClient, interaction?: CommandInteraction, message?: Message, args?: string[]) => {
         if (interaction) {
             const input = interaction.options.getString('input');
-            if (input) {
-                //validate input
+
+            if (input) {                
+                await interaction.deferReply();
+                //client.player.addMedia()
             } else {
                 //open modal
                 const modal = new Modal()

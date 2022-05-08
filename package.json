@@ -37,7 +37,10 @@
     "dotenv": "^16.0.0",
     "libsodium-wrappers": "^0.7.10",
     "mongoose": "^6.3.1",
-    "sodium": "^3.0.2"
+    "sodium": "^3.0.2",
+    "soundcloud-downloader": "^1.0.0",
+    "ytdl-core": "^4.11.0",
+    "ytsr": "^3.8.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.27",

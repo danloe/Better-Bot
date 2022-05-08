@@ -1,22 +1,23 @@
-import { Queue } from '../classes/Queue';
-/*import { Track, TrackType } from '../interfaces/Track';
+import { Track, TrackType } from '../interfaces/Track';
 import { createEmbed, createErrorEmbed } from '../helpers';
 import { Readable } from 'stream';
-import { AudioPlayer, VoiceConnection } from '@discordjs/voice';
-import { DMChannel, NewsChannel, TextChannel } from 'discord.js';
+import { Snowflake } from 'discord.js';
+import BetterClient from '../client';
+import { MusicSubscription } from './MusicSubscription';
 
-export class MediaPlayer {
-    typeRegistry: Map<string, TrackType> = new Map<string, TrackType>();
-    queue: Queue = new Queue();
-    playing: boolean = false;
-    paused: boolean = false;
-    stopping: boolean = false;
-    status: PlayerStatus = PlayerStatus.Empty;
-    channel: TextChannel | DMChannel | NewsChannel;
-    connection?: VoiceConnection;
-    player?: AudioPlayer;
+export class MusicManager {
+    client: BetterClient;
+    subscriptions: Map<Snowflake, MusicSubscription> = new Map<Snowflake, MusicSubscription>();
 
-    addMedia(item: TrackType): Promise<void> {
+    constructor(client: BetterClient) {
+        this.client = client;
+    }
+
+    getSubscription(guildId: Snowflake) {
+        return this.subscriptions.get(guildId);
+    }
+
+    addMedia(guildId: Snowflake, item: Track): Promise<void> {
         return new Promise((done, error) => {
             let type = this.typeRegistry.get(item.type);
             if (type) {
@@ -270,7 +271,7 @@ export class MediaPlayer {
     getVolume() {
         return (this.config.stream.volume - 0.5) * 100 + '%';
     }
-
+/*
     determineStatus() {
         let item = this.queue.first;
         if (item) {
@@ -291,11 +292,11 @@ export class MediaPlayer {
             this.status.setBanner(`No Songs In Queue`);
         }
     }
-}
+}*/
 
 export enum PlayerStatus {
     Playing,
     Paused,
     Stopped,
     Empty
-}*/
+}
