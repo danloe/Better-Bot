@@ -1,4 +1,4 @@
-import { Track } from '../interfaces/Track';
+import { Track } from './Track';
 
 export class Queue extends Array<Track> {
     get first(): Track {

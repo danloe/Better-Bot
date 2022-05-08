@@ -1,15 +1,16 @@
 import { Client, Collection } from 'discord.js';
-import { connect } from 'mongoose';
 import path from 'path';
 import { readdirSync } from 'fs';
 import { Command, Config, Event } from '../interfaces';
 import ConfigJson from '../config.json';
 import discordModals from 'discord-modals';
+import { MusicManager } from '../classes/MusicManager';
 
 class BetterClient extends Client {
     public commands: Collection<string, Command> = new Collection();
     public events: Collection<string, Event> = new Collection();
     public config: Config = ConfigJson;
+    public musicManager: MusicManager = new MusicManager(this);
 
     public async init() {
         discordModals(this);
@@ -19,9 +20,7 @@ class BetterClient extends Client {
         // Commands
         const commandPath = path.join(__dirname, '..', 'commands');
         readdirSync(commandPath).forEach((dir) => {
-            const commands = readdirSync(`${commandPath}\\${dir}`).filter((file) =>
-                file.endsWith('.ts')
-            );
+            const commands = readdirSync(`${commandPath}\\${dir}`).filter((file) => file.endsWith('.ts'));
 
             for (const file of commands) {
                 const { command } = require(`${commandPath}\\${dir}\\${file}`);
