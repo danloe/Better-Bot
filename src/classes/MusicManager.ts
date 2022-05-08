@@ -1,13 +1,15 @@
-import { Track, TrackType } from '../interfaces/Track';
-import { createEmbed, createErrorEmbed } from '../helpers';
+import { createEmbed, createErrorEmbed, determineTrackType, getNewgroundsTrack, getSoundCloudTrack, getYouTubeTrack } from '../helpers';
 import { Readable } from 'stream';
-import { Snowflake } from 'discord.js';
+import { Channel, CommandInteraction, Interaction, Snowflake } from 'discord.js';
 import BetterClient from '../client';
 import { MusicSubscription } from './MusicSubscription';
+import { Queue } from './Queue';
+import { Track, TrackType } from './Track';
 
 export class MusicManager {
     client: BetterClient;
     subscriptions: Map<Snowflake, MusicSubscription> = new Map<Snowflake, MusicSubscription>();
+    queues: Map<Snowflake, Queue> = new Map<Snowflake, Queue>();
 
     constructor(client: BetterClient) {
         this.client = client;
@@ -17,47 +19,40 @@ export class MusicManager {
         return this.subscriptions.get(guildId);
     }
 
-    addMedia(guildId: Snowflake, item: Track): Promise<void> {
+    addMedia(interaction: CommandInteraction, args: string,announce:boolean) {
         return new Promise((done, error) => {
-            let type = this.typeRegistry.get(item.type);
-            if (type) {
-                type.getDetails(item)
-                    .then((media) => {
-                        item.name = media.name;
-                        item.duration = media.duration;
-                        this.determineStatus();
-                        this.queue.enqueue(item);
-                        done(item);
-                    })
-                    .catch((err) => error(err));
-            } else {
-                error('Unknown Media Type!');
+            let type = determineTrackType(args);
+
+            let track: Track;
+
+            switch(type) {
+                case TrackType.YouTube:
+                    track = await getYouTubeTrack(args,interaction.user.username,announce);
+                    break;
+
+                case TrackType.SoundCloud:
+                    track = await getSoundCloudTrack(args,interaction.user.username,announce);
+                    break;
+
+                case TrackType.Newgrounds:
+                    track = await getNewgroundsTrack(args,interaction.user.username,announce);
+                    break;
+
+                case TrackType.DirectFile:
+                    track = new Track(TrackType.DirectFile,args,'Unknown File', interaction.user.username, announce,0,'','The requestor provided a direct file link. No information available.');
+                    break;
             }
-        })
-            .then((item: MediaItem) => {
-                if (this.channel && item)
-                    this.channel.send(
-                        createEmbed()
-                            .setTitle('Track Added')
-                            .addFields(
-                                { name: 'Title:', value: item.name },
-                                {
-                                    name: 'Position:',
-                                    value: `${this.queue.indexOf(item) + 1}`,
-                                    inline: true
-                                },
-                                {
-                                    name: 'Requested By:',
-                                    value: item.requestor,
-                                    inline: true
-                                }
-                            )
-                    );
+
+            let queue = this.queues.get(interaction.guildId!);
+            if(!queue) this.queues.set(interaction.guildId!, new Queue);
+            queue = this.queues.get(interaction.guildId!);
+            queue!.queue(track);
+
+            await interaction.reply("`➕ " + track.name + " was added to the queue. [" + queue!.length + " total]`");
+
             })
             .catch((err) => {
-                if (this.channel) {
-                    this.channel.send(createErrorEmbed(`Error adding track: ${err}`));
-                }
+                    interaction.reply(createErrorEmbed(`Error adding track: ${err}`));
             });
     }
 

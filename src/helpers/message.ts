@@ -1,8 +1,8 @@
-import { MessageEmbed } from 'discord.js';
+import { ColorResolvable, MessageEmbed } from 'discord.js';
 
-export function createEmbed(title: string, message: string) {
+export function createEmbed(title: string, message: string, color: ColorResolvable = '#1e81b0') {
     return {
-        embeds: [new MessageEmbed().setColor('#1e81b0').setTitle(title).setDescription(message)]
+        embeds: [new MessageEmbed().setColor(color).setTitle(title).setDescription(message)]
     };
 }
 
