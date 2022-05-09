@@ -52,7 +52,7 @@ export class MusicManager {
                         interaction.user.username,
                         announce,
                         args,
-                        'unknown',
+                        0,
                         '',
                         'The requestor provided a direct file link. No information available.',
                         'unknown',

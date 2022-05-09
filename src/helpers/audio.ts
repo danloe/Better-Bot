@@ -3,7 +3,7 @@ import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import { Track, TrackType } from '../classes/Track';
 import https from 'node:https';
-import { secondsToDurationString } from './message';
+import { secondsToDurationString, timeStringToDurationString as timeStringToSecondsNumber } from './message';
 
 export function determineTrackType(args: string): TrackType {
     if (args.startsWith('http://') || args.startsWith('https://')) {
@@ -32,7 +32,7 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
                     requestor,
                     announce,
                     info.videoDetails.video_url,
-                    info.videoDetails.lengthSeconds,
+                    timeStringToSecondsNumber(info.videoDetails.lengthSeconds),
                     info.videoDetails.thumbnails[0].url,
                     info.videoDetails.description,
                     '',
@@ -44,6 +44,8 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
                 const filters1 = await ytsr.getFilters(query);
                 const filter1 = filters1.get('Type')!.get('Video');
                 const options = {
+
+                    safeSearch: false,
                     limit: 1
                 };
                 info = (await ytsr(filter1!.url!, options)).items[0];
@@ -55,7 +57,7 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
                     requestor,
                     announce,
                     info.url,
-                    secondsToDurationString(info.duration),
+                    timeStringToSecondsNumber(info.duration),
                     info.bestThumbnail.url,
                     info.description,
                     '',
@@ -74,18 +76,18 @@ export function getSoundCloudTrack(url: string, requestor: string, announce: boo
     return new Promise<Track>(async (resolve, reject) => {
         try {
             let info: any = await scdl.getInfo(url);
-
             const track = new Track(
                 TrackType.SoundCloud,
                 info.uri,
                 info.title,
                 requestor,
                 announce,
-                info.uri,
-                secondsToDurationString(info.duration),
+                url,
+                Math.ceil(info.duration / 1000),
                 info.artwork_url,
+                info.description,
                 info.genre,
-                info.created_at
+                String(info.created_at).split("T")[0]
             );
 
             resolve(track);
@@ -121,7 +123,7 @@ export function getNewgroundsTrack(url: string, requestor: string, announce: boo
                         requestor,
                         announce,
                         url,
-                        secondsToDurationString(info.duration),
+                        info.duration,
                         info.icon
                     );
 

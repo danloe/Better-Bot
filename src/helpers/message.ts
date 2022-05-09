@@ -7,6 +7,7 @@ import {
     MessageEmbed,
     MessagePayload
 } from 'discord.js';
+import { kStringMaxLength } from 'node:buffer';
 import { TrackType } from '../classes/Track';
 
 export function createEmbed(
@@ -20,7 +21,16 @@ export function createEmbed(
     footer: EmbedFooterData | null = null
 ) {
     return {
-        embeds: [new MessageEmbed().setColor(color).setTitle(title).setDescription(message).addFields(fieldData).setThumbnail(thumbnail).setURL(url).setFooter(footer)],
+        embeds: [
+            new MessageEmbed()
+                .setColor(color)
+                .setTitle(title)
+                .setDescription(message)
+                .addFields(fieldData)
+                .setThumbnail(thumbnail)
+                .setURL(url)
+                .setFooter(footer)
+        ],
         ephemeral: ephemeral
     };
 }
@@ -72,22 +82,55 @@ export async function replyDefer(interaction: CommandInteraction | ButtonInterac
     }
 }
 
+export function timeStringToDurationString(seconds: string): number {
+    var split = seconds.split(':');
+    var secs = 0;
+    if (split.length === 1) return parseInt(split[0]);
+    if (split.length === 2) {
+        secs = parseInt(split[0]) * 60;
+        secs = secs + parseInt(split[1]);
+        return secs;
+    }
+    if (split.length === 3) {
+        secs = parseInt(split[0]) * 60;
+        secs = secs + parseInt(split[1]) * 60;
+        secs = secs + parseInt(split[2]);
+        return secs;
+    }
+}
+
 export function secondsToDurationString(seconds: number): string {
-    var hours = Math.floor(seconds / 3600);
-    var minutes = Math.floor((seconds - hours * 3600) / 60);
-    var seconds = seconds - hours * 3600 - minutes * 60;
+    var hrs = Math.floor(seconds / 3600);
+    var mins = Math.floor((seconds - hrs * 3600) / 60);
+    var secs = seconds - hrs * 3600 - mins * 60;
     var hs, ms, ss: string;
-    if (hours < 10) {
-        hs = '0' + hours;
+    if (hrs < 10) {
+        hs = '0' + String(hrs);
+    } else {
+        hs = String(hrs);
     }
-    if (minutes < 10) {
-        ms = '0' + minutes;
+    if (mins < 10) {
+        ms = '0' + String(mins);
+    } else {
+        ms = String(mins);
     }
-    if (seconds < 10) {
-        ss = '0' + seconds;
+    if (secs < 10) {
+        ss = '0' + String(secs);
+    } else {
+        ss = String(secs);
     }
-    if (hours > 0) return hours + 'h : ' + minutes + 'm : ' + seconds + 's';
-    if (minutes > 0) return minutes + 'm : ' + seconds + 's';
-    if (seconds > 0) return seconds + 's';
+    if (hrs > 0) return hs + 'h:' + ms + 'm:' + ss + 's';
+    if (mins > 0) return ms + 'm:' + ss + 's';
+    if (secs > 0) return ss + 's';
     return 'live or unknown';
+}
+
+export function checkEmbedString(string: string): string {
+    try {
+        if (string === null || string === undefined || string === '') return 'Unknown';
+        if (string.length > 250) return string.substring(0, 249) + '[...]';
+        return string;
+    } catch (error) {
+        return 'Unknown';
+    }
 }
