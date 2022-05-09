@@ -30,10 +30,6 @@ export const command: Command = {
                             getTrackTypeColor(track.type)
                         )
                     );
-                })
-                .catch(async (reason) => {
-                    console.log(reason);
-                    await interaction.followUp(createErrorEmbed(String(reason), true));
                 });
             if (message) {
                 //message!.channel.send(`${message!.client.ws.ping}ms ping. 🏓`);

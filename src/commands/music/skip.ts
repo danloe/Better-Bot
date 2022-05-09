@@ -19,21 +19,18 @@ export const command: Command = {
             await client.musicManager
                 .skip(interaction, input)
                 .then(async () => {
-                    await interaction.reply(
+                    await interaction.editReply(
                         createEmbed(
                             'Skipped',
                             '✅ `' +
                                 input +
-                                '` track(s) `[' +
+                                (input == 1 ? '` track' : '` tracks') +
+                                ' skipped `[' +
                                 client.musicManager.queues.get(interaction.guildId!)!.length +
                                 ' more in queue]`',
                             false
                         )
                     );
-                })
-                .catch(async (reason) => {
-                    console.log(reason);
-                    await interaction.followUp(createErrorEmbed(String(reason), true));
                 });
             if (message) {
                 //message!.channel.send(`${message!.client.ws.ping}ms ping. 🏓`);

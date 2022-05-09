@@ -23,11 +23,11 @@ export function createErrorEmbed(message: string, ephemeral: boolean = true) {
 export function getTrackTypeColor(trackType: TrackType): ColorResolvable {
     switch (trackType) {
         case TrackType.DirectFile:
-            return '#999';
+            return '#999999';
         case TrackType.YouTube:
-            return '#FF0000';
+            return '#ff0000';
         case TrackType.SoundCloud:
-            return '#f50';
+            return '#ff5500';
         case TrackType.Newgrounds:
             return '#fda238';
     }

@@ -32,7 +32,7 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
                     announce,
                     info.videoDetails.video_url,
                     info.videoDetails.lengthSeconds,
-                    info.videoDetails.thumbnail.thumbnails[0].url,
+                    info.videoDetails.thumbnails[0].url,
                     info.videoDetails.description,
                     '',
                     info.videoDetails.publishDate
