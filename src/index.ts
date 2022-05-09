@@ -5,7 +5,7 @@ dotenv.config();
 
 // CLIENT
 const client = new BetterClient({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]
 });
 
 client.init();
