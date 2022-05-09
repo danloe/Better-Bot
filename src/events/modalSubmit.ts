@@ -13,3 +13,26 @@ export const event: Event = {
         }
     }
 };
+
+/* MODAL EXAMPLE
+} else {
+                //open modal
+                const modal = new Modal()
+                    .setCustomId('modal-play')
+                    .setTitle('Play or queue media.')
+                    .addComponents(
+                        new TextInputComponent()
+                            .setCustomId('input')
+                            .setLabel('YouTube 🔗/🔎  |  SoundCloud/Newgrounds 🔗')
+                            .setStyle('SHORT')
+                            .setPlaceholder('URL or Search Text...')
+                            .setRequired(true)
+                    );
+
+                showModal(modal, {
+                    client: interaction.client,
+                    interaction: interaction
+                });
+            }
+        }
+        */
