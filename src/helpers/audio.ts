@@ -3,6 +3,7 @@ import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import { Track, TrackType } from '../classes/Track';
 import https from 'node:https';
+import { secondsToDurationString } from './message';
 
 export function determineTrackType(args: string): TrackType {
     if (args.startsWith('http://') || args.startsWith('https://')) {
@@ -54,7 +55,7 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
                     requestor,
                     announce,
                     info.url,
-                    info.duration,
+                    secondsToDurationString(info.duration),
                     info.bestThumbnail.url,
                     info.description,
                     '',
@@ -81,7 +82,7 @@ export function getSoundCloudTrack(url: string, requestor: string, announce: boo
                 requestor,
                 announce,
                 info.uri,
-                info.duration,
+                secondsToDurationString(info.duration),
                 info.artwork_url,
                 info.genre,
                 info.created_at
@@ -120,7 +121,7 @@ export function getNewgroundsTrack(url: string, requestor: string, announce: boo
                         requestor,
                         announce,
                         url,
-                        info.duration,
+                        secondsToDurationString(info.duration),
                         info.icon
                     );
 

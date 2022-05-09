@@ -1,9 +1,8 @@
 import { Command } from '../../interfaces';
-import { CommandInteraction, Message } from 'discord.js';
+import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createEmbed, createErrorEmbed, getTrackTypeColor } from '../../helpers';
-import { Track } from '../../classes/Track';
+import { createEmbed, createErrorEmbed } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -12,9 +11,9 @@ export const command: Command = {
         .addNumberOption((option) =>
             option.setName('input').setDescription('Skip how many tracks?').setRequired(false)
         ),
-    run: async (client: BetterClient, interaction?: CommandInteraction, message?: Message, args?: string[]) => {
+    run: async (client: BetterClient, interaction?: CommandInteraction | ButtonInteraction, message?: Message, args?: string[]) => {
         if (interaction) {
-            let input = interaction.options.getNumber('input');
+            let input = (interaction instanceof CommandInteraction) ? interaction.options.getNumber('input') : 1;
             if (!input) input = 1;
             await client.musicManager
                 .skip(interaction, input)
@@ -36,7 +35,7 @@ export const command: Command = {
                     interaction.editReply(createErrorEmbed('🚩 Error skipping track(s): `' + err + '`'));
                 });
             if (message) {
-                //message!.channel.send(`${message!.client.ws.ping}ms ping. 🏓`);
+                //NOT PLANNED
             }
         }
     }

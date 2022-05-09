@@ -14,6 +14,7 @@ import {
 import { promisify } from 'node:util';
 import { Track } from './Track';
 import { Queue } from './Queue';
+import { TextBasedChannel } from 'discord.js';
 
 const wait = promisify(setTimeout);
 
@@ -22,6 +23,7 @@ export class MusicSubscription {
     public readonly audioPlayer: AudioPlayer;
     public queue: Queue;
     public currentTrack: Track | undefined;
+    public lastChannel: TextBasedChannel | null | undefined;
     public queueLock = false;
     public readyLock = false;
 
