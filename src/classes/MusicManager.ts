@@ -24,7 +24,7 @@ export class MusicManager {
 
     addMedia(interaction: CommandInteraction, args: string, announce: boolean) {
         return new Promise<Track>(async (done, error) => {
-            interaction.deferReply();
+            await interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction!');
                 return;
@@ -107,8 +107,8 @@ export class MusicManager {
     }
 
     stop(interaction: CommandInteraction) {
-        return new Promise(async (done, error) => {
-            interaction.deferReply();
+        return new Promise<void>(async (done, error) => {
+            await interaction.deferReply();
             if (!this.generalCheck) {
                 error('Not possible right now.');
                 return;
@@ -117,7 +117,7 @@ export class MusicManager {
             let subscription = this.subscriptions.get(interaction.guildId!);
 
             subscription!.audioPlayer.stop();
-            done;
+            done();
             await interaction.reply(createEmbed('Stopped', '⏹️ Audio was stopped.'));
         }).catch((err) => {
             interaction.editReply(createErrorEmbed('🚩 Error stopping track: `' + err + '`'));
@@ -125,8 +125,8 @@ export class MusicManager {
     }
 
     pause(interaction: CommandInteraction) {
-        return new Promise(async (done, error) => {
-            interaction.deferReply();
+        return new Promise<void>(async (done, error) => {
+            await interaction.deferReply();
             if (!this.generalCheck) {
                 error('Not possible right now.');
                 return;
@@ -135,15 +135,15 @@ export class MusicManager {
             let subscription = this.subscriptions.get(interaction.guildId!);
 
             subscription!.audioPlayer.pause();
-            done;
+            done();
         }).catch((err) => {
             interaction.editReply(createErrorEmbed('🚩 Error pausing track: `' + err + '`'));
         });
     }
 
     resume(interaction: CommandInteraction) {
-        return new Promise(async (done, error) => {
-            interaction.deferReply();
+        return new Promise<void>(async (done, error) => {
+            await interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction!');
                 return;
@@ -191,15 +191,15 @@ export class MusicManager {
             }
 
             subscription.audioPlayer.unpause();
-            done;
+            done();
         }).catch((err) => {
             interaction.editReply(createErrorEmbed('🚩 Error resuming track: `' + err + '`'));
         });
     }
 
     skip(interaction: CommandInteraction, amount: number) {
-        return new Promise(async (done, error) => {
-            interaction.deferReply();
+        return new Promise<void>(async (done, error) => {
+            await interaction.deferReply();
             if (!this.generalCheck) {
                 error('Not possible right now.');
                 return;
@@ -214,13 +214,13 @@ export class MusicManager {
             queue!.remove(1, amount);
             let subscription = this.subscriptions.get(interaction.guildId!);
             subscription!.audioPlayer.stop();
-            done;
+            done();
         });
     }
 
     remove(interaction: CommandInteraction, positions: number[]) {
-        return new Promise(async (done, error) => {
-            interaction.deferReply();
+        return new Promise<void>(async (done, error) => {
+            await interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction.');
                 return;
@@ -240,7 +240,7 @@ export class MusicManager {
             sorted.forEach((postition) => {
                 queue?.remove(postition);
             });
-            done;
+            done();
         }).catch((err) => {
             interaction.editReply(createErrorEmbed('🚩 Error removing track: `' + err + '`'));
         });
@@ -248,7 +248,7 @@ export class MusicManager {
 
     showQueue(interaction: CommandInteraction) {
         return new Promise<Queue>(async (done, error) => {
-            interaction.deferReply();
+            await interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction.');
                 return;
@@ -266,8 +266,8 @@ export class MusicManager {
     }
 
     clear(interaction: CommandInteraction) {
-        return new Promise(async (done, error) => {
-            interaction.deferReply();
+        return new Promise<void>(async (done, error) => {
+            await interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction.');
                 return;
@@ -281,15 +281,15 @@ export class MusicManager {
             }
 
             queue.clear();
-            done;
+            done();
         }).catch((err) => {
             interaction.editReply(createErrorEmbed('🚩 Error clearing queue: `' + err + '`'));
         });
     }
 
     shuffle(interaction: CommandInteraction) {
-        return new Promise(async (done, error) => {
-            interaction.deferReply();
+        return new Promise<void>(async (done, error) => {
+            await interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction.');
                 return;
@@ -307,15 +307,15 @@ export class MusicManager {
             }
 
             queue.shuffle();
-            done;
+            done();
         }).catch((err) => {
             interaction.editReply(createErrorEmbed('🚩 Error shuffling queue: `' + err + '`'));
         });
     }
 
     move(interaction: CommandInteraction, currentPos: number, targetPos: number) {
-        return new Promise(async (done, error) => {
-            interaction.deferReply();
+        return new Promise<void>(async (done, error) => {
+            await interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction.');
                 return;
@@ -338,7 +338,7 @@ export class MusicManager {
             }
 
             queue.move(currentPos, targetPos);
-            done;
+            done();
         }).catch((err) => {
             interaction.editReply(createErrorEmbed('🚩 Error moving tracks: `' + err + '`'));
         });
