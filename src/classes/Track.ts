@@ -9,7 +9,7 @@ export class Track {
     requestor: string;
     announce: boolean;
     displayUrl: string;
-    duration: string;
+    duration: number;
     artworkUrl: string;
     description: string;
     genre: string;
@@ -22,11 +22,11 @@ export class Track {
         requestor: string,
         announce: boolean,
         displayUrl: string = '',
-        duration: string = '',
+        duration: number = 0,
         artworkUrl: string = '',
-        description: string = '',
-        genre: string = '',
-        uploaded: string = ''
+        description: string = 'Not available.',
+        genre: string = 'Unknown',
+        uploaded: string = 'Unknown'
     ) {
         this.type = type;
         this.url = url;
