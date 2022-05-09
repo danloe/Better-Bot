@@ -21,26 +21,7 @@ export function determineTrackType(args: string): TrackType {
 export function getYouTubeTrack(query: string, requestor: string, announce: boolean) {
     return new Promise<Track>(async (resolve, reject) => {
         try {
-            let info: any;
-
-            if (query.startsWith('http://') || query.startsWith('https://')) {
-                info = await ytdl.getInfo(query);
-                const track = new Track(
-                    TrackType.YouTube,
-                    info.videoDetails.video_url,
-                    info.videoDetails.title,
-                    requestor,
-                    announce,
-                    info.videoDetails.video_url,
-                    timeStringToSecondsNumber(info.videoDetails.lengthSeconds),
-                    info.videoDetails.thumbnails[0].url,
-                    info.videoDetails.description,
-                    '',
-                    info.videoDetails.publishDate
-                );
-
-                resolve(track);
-            } else {
+            if (!query.startsWith('http://') && !query.startsWith('https://')) {
                 const filters1 = await ytsr.getFilters(query);
                 const filter1 = filters1.get('Type')!.get('Video');
                 const options = {
@@ -48,24 +29,27 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
                     safeSearch: false,
                     limit: 1
                 };
-                info = (await ytsr(filter1!.url!, options)).items[0];
-
-                const track = new Track(
-                    TrackType.YouTube,
-                    info.url,
-                    info.title,
-                    requestor,
-                    announce,
-                    info.url,
-                    timeStringToSecondsNumber(info.duration),
-                    info.bestThumbnail.url,
-                    info.description,
-                    '',
-                    info.uploadedAt
-                );
-
-                resolve(track);
+                let searchInfo: any = (await ytsr(filter1!.url!, options)).items[0];
+                query = searchInfo.url;
             }
+
+            let info = await ytdl.getInfo(query);
+
+            const track = new Track(
+                TrackType.YouTube,
+                info.videoDetails.video_url,
+                info.videoDetails.title,
+                requestor,
+                announce,
+                info.videoDetails.video_url,
+                timeStringToSecondsNumber(info.videoDetails.lengthSeconds),
+                info.videoDetails.thumbnails[0].url,
+                info.videoDetails.description,
+                '',
+                info.videoDetails.publishDate
+            );
+
+            resolve(track);
         } catch (error) {
             reject(error);
         }
