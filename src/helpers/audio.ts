@@ -24,7 +24,7 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
 
             if (query.startsWith('http://') || query.startsWith('https://')) {
                 info = await ytdl.getInfo(query);
-                console.log("🚀 ~ file: audio.ts ~ line 27 ~ returnnewPromise<Track> ~ info", info);                
+                console.log('🚀 ~ file: audio.ts ~ line 27 ~ returnnewPromise<Track> ~ info', info);
                 const track = new Track(
                     TrackType.YouTube,
                     info.videoDetails.video_url,
@@ -32,7 +32,11 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
                     requestor,
                     announce,
                     info.videoDetails.video_url,
-                    info.videoDetails.lengthSeconds
+                    info.videoDetails.lengthSeconds,
+                    info.videoDetails.thumbnail.thumbnails[0].url,
+                    info.videoDetails.description,
+                    '',
+                    info.videoDetails.publishDate
                 );
 
                 resolve(track);
@@ -43,9 +47,21 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
                     limit: 1
                 };
                 info = (await ytsr(filter1!.url!, options)).items[0];
-                console.log("🚀 ~ file: audio.ts ~ line 46 ~ returnnewPromise<Track> ~ info", info)
+                console.log('🚀 ~ file: audio.ts ~ line 46 ~ returnnewPromise<Track> ~ info', info);
 
-                const track = new Track(TrackType.YouTube, info.url, info.title, requestor, announce, info.duration);
+                const track = new Track(
+                    TrackType.YouTube,
+                    info.url,
+                    info.title,
+                    requestor,
+                    announce,
+                    info.url,
+                    info.duration,
+                    info.bestThumbnail.url,
+                    info.description,
+                    '',
+                    info.uploadedAt
+                );
 
                 resolve(track);
             }
@@ -154,4 +170,3 @@ function isNewgroundsURL(url: string): boolean {
     }
     return false;
 }
-
