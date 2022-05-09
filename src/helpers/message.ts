@@ -119,16 +119,16 @@ export function secondsToDurationString(seconds: number): string {
     } else {
         ss = String(secs);
     }
-    if (hrs > 0) return hs + 'h:' + ms + 'm:' + ss + 's';
-    if (mins > 0) return ms + 'm:' + ss + 's';
-    if (secs > 0) return ss + 's';
+    if (hrs > 0) return hs + 'hrs ' + ms + 'min ' + ss + 'sec';
+    if (mins > 0) return ms + 'min ' + ss + 'sec';
+    if (secs > 0) return ss + 'sec';
     return 'live or unknown';
 }
 
 export function checkEmbedString(string: string): string {
     try {
         if (string === null || string === undefined || string === '') return 'Unknown';
-        if (string.length > 250) return string.substring(0, 249) + '[...]';
+        if (string.length > 200) return string.substring(0, 199) + '[...]';
         return string;
     } catch (error) {
         return 'Unknown';
