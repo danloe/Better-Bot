@@ -18,7 +18,7 @@ export const command: Command = {
                         for (let i = 0; i < queue.length; i++) {
                             embedmsg.addField(
                                 i + 1 + ': `' + queue[i].name + '`',
-                                queue[i].requestor + ' | ' + queue[i].url
+                                queue[i].requestor + ' | ' + queue[i].displayUrl
                             );
                         }
                         await interaction.reply({
