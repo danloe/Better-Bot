@@ -8,6 +8,7 @@ export class Track {
     name: string;
     requestor: string;
     announce: boolean;
+    displayUrl: string;
     duration: number;
     artworkUrl: string;
     description: string;
@@ -20,6 +21,7 @@ export class Track {
         name: string,
         requestor: string,
         announce: boolean,
+        displayUrl: string = '',
         duration: number = 0,
         artworkUrl: string = '',
         description: string = '',
@@ -31,6 +33,7 @@ export class Track {
         this.name = name;
         this.requestor = requestor;
         this.announce = announce;
+        this.displayUrl = displayUrl;
         this.duration = duration;
         this.artworkUrl = artworkUrl;
         this.description = description;
