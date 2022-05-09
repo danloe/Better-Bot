@@ -150,3 +150,4 @@ function isNewgroundsURL(url: string): boolean {
     }
     return false;
 }
+

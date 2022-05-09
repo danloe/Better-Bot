@@ -1,10 +1,11 @@
 import { createEmbed, createErrorEmbed, determineTrackType, getNewgroundsTrack, getSoundCloudTrack, getYouTubeTrack } from '../helpers';
 import { Readable } from 'stream';
-import { Channel, CommandInteraction, Interaction, Snowflake } from 'discord.js';
+import { Channel, CommandInteraction, GuildMember, Interaction, Snowflake } from 'discord.js';
 import BetterClient from '../client';
 import { MusicSubscription } from './MusicSubscription';
 import { Queue } from './Queue';
 import { Track, TrackType } from './Track';
+import { DiscordGatewayAdapterCreator, entersState, joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
 
 export class MusicManager {
     client: BetterClient;
@@ -15,279 +16,286 @@ export class MusicManager {
         this.client = client;
     }
 
-    getSubscription(guildId: Snowflake) {
-        return this.subscriptions.get(guildId);
-    }
+    addMedia(interaction: CommandInteraction, args: string, announce:boolean) {
+        return new Promise(async (done, error) => {
+            if(!interaction.guildId) {
+                error('Not a guild interaction!');
+                return;
+            } 
 
-    addMedia(interaction: CommandInteraction, args: string,announce:boolean) {
-        return new Promise((done, error) => {
+            interaction.deferReply();
+
             let type = determineTrackType(args);
 
             let track: Track;
 
             switch(type) {
                 case TrackType.YouTube:
-                    track = await getYouTubeTrack(args,interaction.user.username,announce);
+                    track = await getYouTubeTrack(args, interaction.user.username, announce);
                     break;
 
                 case TrackType.SoundCloud:
-                    track = await getSoundCloudTrack(args,interaction.user.username,announce);
+                    track = await getSoundCloudTrack(args, interaction.user.username, announce);
                     break;
 
                 case TrackType.Newgrounds:
-                    track = await getNewgroundsTrack(args,interaction.user.username,announce);
+                    track = await getNewgroundsTrack(args, interaction.user.username, announce);
                     break;
 
                 case TrackType.DirectFile:
-                    track = new Track(TrackType.DirectFile,args,'Unknown File', interaction.user.username, announce,0,'','The requestor provided a direct file link. No information available.');
+                    track = new Track(TrackType.DirectFile, args, 'Unknown File', interaction.user.username, announce, 0, '', 'The requestor provided a direct file link. No information available.');
                     break;
             }
 
-            let queue = this.queues.get(interaction.guildId!);
-            if(!queue) this.queues.set(interaction.guildId!, new Queue);
-            queue = this.queues.get(interaction.guildId!);
+            let queue = this.queues.get(interaction.guildId);
+            if(!queue) this.queues.set(interaction.guildId, new Queue);
+            queue = this.queues.get(interaction.guildId);
             queue!.queue(track);
 
-            await interaction.reply("`➕ " + track.name + " was added to the queue. [" + queue!.length + " total]`");
+            await interaction.editReply(createEmbed('Added','➕ `' + track.name + '` was added to the queue. [`' + queue!.length + ' total]`','#FF0000'));
+
+            let subscription = this.subscriptions.get(interaction.guildId)
+
+            if (!subscription) {
+                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
+                    const channel = interaction.member.voice.channel;
+                    subscription = new MusicSubscription(
+                        joinVoiceChannel({
+                            channelId: channel.id,
+                            guildId: channel.guild.id,
+                            adapterCreator: channel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator, // TODO: remove cast when fixed
+                        }),
+                        queue!
+                    );
+                    subscription.voiceConnection.on('error', console.warn);
+                    this.subscriptions.set(interaction.guildId, subscription);
+                }
+            }
+
+            if (!subscription) {
+                await interaction.followUp(createErrorEmbed('⛔ You need to join a voice channel first!'));
+                done;
+                return;
+            }
+
+            try {
+                await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20e3);
+            } catch (error) {
+                console.warn(error);
+                await interaction.followUp(createErrorEmbed('⛔ Failed to join voice channel within 20 seconds, please try again later!'));
+                return;
+            }
+            done;
 
             })
             .catch((err) => {
-                    interaction.reply(createErrorEmbed(`Error adding track: ${err}`));
-            });
+                    interaction.editReply(createErrorEmbed('⛔ Error adding track: `'+ err + '`'));
+                });
     }
 
-    at(idx: number) {
-        return this.queue[idx];
-    }
-
-    remove(item: MediaItem) {
-        if (item == this.queue.first && (this.playing || this.paused)) {
-            this.stop();
+    stop(interaction: CommandInteraction) {
+        return new Promise(async (done, error) => {
+        if (!this.generalCheck) {
+            error('Somethings missing.');
+             return;
         }
-        this.queue.dequeue(item);
-        this.determineStatus();
-        if (this.channel) {
-            this.channel.send(createInfoEmbed(`Track Removed`, `${item.name}`));
-        }
-    }
-
-    clear() {
-        if (this.playing || this.paused) {
-            this.stop();
-        }
-        this.queue.clear();
-        this.determineStatus();
-        if (this.channel) {
-            this.channel.send(createInfoEmbed(`Playlist Cleared`));
-        }
-    }
-
-    dispatchStream(stream: Readable, item: MediaItem) {
-        if (this.dispatcher) {
-            this.dispatcher.end();
-            this.dispatcher = null;
-        }
-        this.dispatcher = this.connection.play(stream, {
-            seek: this.config.stream.seek,
-            volume: this.config.stream.volume,
-            bitrate: this.config.stream.bitrate,
-            fec: this.config.stream.forwardErrorCorrection,
-            plp: this.config.stream.packetLossPercentage,
-            highWaterMark: 1 << 25
+        let subscription = this.subscriptions.get(interaction.guildId!);
+        subscription!.audioPlayer.stop();
+        done;
+        await interaction.editReply(createEmbed('Stopped','⏹️ Audio was stopped.'));
         });
-        this.dispatcher.on('start', async () => {
-            this.playing = true;
-            this.determineStatus();
-            if (this.channel) {
-                const msg = await this.channel.send(
-                    createEmbed()
-                        .setTitle('▶️ Now playing')
-                        .setDescription(`${item.name}`)
-                        .addField('Requested By', `${item.requestor}`)
-                );
-                msg.react(this.config.emojis.stopSong);
-                msg.react(this.config.emojis.playSong);
-                msg.react(this.config.emojis.pauseSong);
-                msg.react(this.config.emojis.skipSong);
+    }
+
+    pause(interaction: CommandInteraction) {
+        return new Promise(async (done, error) => {
+            if (!this.generalCheck) {
+                error('Somethings missing.');
+                return;
             }
-        });
-        this.dispatcher.on('debug', (info: string) => {
-            this.logger.debug(info);
-        });
-        this.dispatcher.on('error', (err) => {
-            this.skip();
-            this.logger.error(err);
-            if (this.channel) {
-                this.channel.send(createErrorEmbed(`Error Playing Song: ${err}`));
-            }
-        });
-        this.dispatcher.on('close', () => {
-            this.logger.debug(`Stream Closed`);
-            if (this.dispatcher) {
-                this.playing = false;
-                this.dispatcher = null;
-                this.determineStatus();
-                if (!this.stopping) {
-                    let track = this.queue.dequeue();
-                    if (this.config.queue.repeat) {
-                        this.queue.enqueue(track);
-                    }
-                    setTimeout(() => {
-                        this.play();
-                    }, 1000);
-                }
-                this.stopping = false;
-            }
-        });
-        this.dispatcher.on('finish', () => {
-            this.logger.debug('Stream Finished');
-            if (this.dispatcher) {
-                this.playing = false;
-                this.dispatcher = null;
-                this.determineStatus();
-                if (!this.stopping) {
-                    let track = this.queue.dequeue();
-                    if (this.config.queue.repeat) {
-                        this.queue.enqueue(track);
-                    }
-                    setTimeout(() => {
-                        this.play();
-                    }, 1000);
-                }
-                this.stopping = false;
-            }
-        });
-        this.dispatcher.on('end', (reason: string) => {
-            this.logger.debug(`Stream Ended: ${reason}`);
+        let subscription = this.subscriptions.get(interaction.guildId!);
+        subscription!.audioPlayer.pause();
+        done;
+        //await interaction.editReply(createEmbed('Paused','⏸️ Audio was paused.')); //TODO remove
         });
     }
 
-    play() {
-        if (this.queue.length == 0 && this.channel) {
-            this.channel.send(createInfoEmbed(`Queue is empty! Add some songs!`));
-        }
-        if (this.playing && !this.paused) {
-            this.channel.send(createInfoEmbed(`Already playing a song!`));
-        }
-        let item = this.queue.first;
-        if (item && this.connection) {
-            let type = this.typeRegistry.get(item.type);
-            if (type) {
-                if (!this.playing) {
-                    type.getStream(item).then((stream) => {
-                        this.dispatchStream(stream, item);
-                    });
-                } else if (this.paused && this.dispatcher) {
-                    this.dispatcher.resume();
-                    this.paused = false;
-                    this.determineStatus();
-                    if (this.channel) {
-                        this.channel.send(createInfoEmbed(`⏯️ "${this.queue.first.name}" resumed`));
-                    }
+    resume(interaction: CommandInteraction) {
+        return new Promise(async (done, error) => {
+            if(!interaction.guildId) {
+                error('Not a guild interaction!');
+                return;
+            }
+
+            let queue = this.queues.get(interaction.guildId);
+            if(!queue) {
+                await interaction.followUp(createErrorEmbed('⛔ There is nothing to play! Add a track with the play command.'));
+                error('No queue.');
+                return;
+            }
+
+            let subscription = this.subscriptions.get(interaction.guildId)
+
+            if (!subscription) {
+                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
+                    const channel = interaction.member.voice.channel;
+                    subscription = new MusicSubscription(
+                        joinVoiceChannel({
+                            channelId: channel.id,
+                            guildId: channel.guild.id,
+                            adapterCreator: channel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator, // TODO: remove cast when fixed
+                        }),
+                        queue
+                    );
+                    subscription.voiceConnection.on('error', console.warn);
+                    this.subscriptions.set(interaction.guildId, subscription);
                 }
             }
-        }
-    }
 
-    stop() {
-        if (this.playing && this.dispatcher) {
-            let item = this.queue.first;
-            this.stopping = true;
-            this.paused = false;
-            this.playing = false;
-            this.dispatcher.pause();
-            this.dispatcher.destroy();
-            this.determineStatus();
-            if (this.channel) this.channel.send(createInfoEmbed(`⏹️ "${item.name}" stopped`));
-        }
-    }
-
-    skip() {
-        if (this.playing && this.dispatcher) {
-            let item = this.queue.first;
-            this.paused = false;
-            this.dispatcher.pause();
-            this.dispatcher.destroy();
-            if (this.channel) {
-                this.channel.send(createInfoEmbed(`⏭️ "${item.name}" skipped`));
+            if (!subscription) {
+                await interaction.followUp(createErrorEmbed('⛔ You need to join a voice channel first!'));
+                error('Not in a voice channel.');
+                return;
             }
-        } else if (this.queue.length > 0) {
-            let item = this.queue.first;
-            this.queue.dequeue();
-            if (this.channel) {
-                this.channel.send(createInfoEmbed(`⏭️ "${item.name}" skipped`));
+
+            try {
+                await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20e3);
+            } catch (error) {
+                console.warn(error);
+                await interaction.followUp(createErrorEmbed('⛔ Failed to join voice channel within 20 seconds, please try again later!'));
+                return;
             }
-        }
-        this.determineStatus();
+
+            subscription.audioPlayer.unpause();
+            done;
+        });
     }
 
-    pause() {
-        if (this.playing && !this.paused && this.dispatcher) {
-            this.dispatcher.pause();
-            this.paused = true;
-            this.determineStatus();
-            if (this.channel) {
-                this.channel.send(createInfoEmbed(`⏸️ "${this.queue.first.name}" paused`));
+    skip(interaction: CommandInteraction, amount: number) {
+        return new Promise(async (done, error) => {
+            if (!this.generalCheck) {
+                error('Somethings missing.');
+                return;
             }
-        }
+        let subscription = this.subscriptions.get(interaction.guildId!)
+        subscription!.audioPlayer.stop();
+        done;
+		//await interaction.reply('Skipped song!'); //TODO remove
+        });
     }
 
-    shuffle() {
-        if (this.playing || this.paused) {
-            this.stop();
-        }
-        this.queue.shuffle();
-        this.determineStatus();
-        if (this.channel) {
-            this.channel.send(createInfoEmbed(`🔀 Queue Shuffled`));
-        }
+    remove(interaction: CommandInteraction, positions: number[]) {
+        return new Promise(async (done, error) => {
+            if(!interaction.guildId) {
+                error('Not a guild interaction.');
+                return;
+            }
+
+            let queue = this.queues.get(interaction.guildId!);
+            if(!queue || queue.length <= 1) {
+                error('Queue not long enough.');
+                return;
+            }
+
+            // sort positions from high to low
+            let sorted = positions.sort(function (a, b) {  return b - a;  });
+            sorted.forEach(postition => {
+                queue?.remove(postition);
+            });           
+            done;
+    });
     }
 
-    move(currentIdx: number, targetIdx: number) {
-        let max = this.queue.length - 1;
-        let min = 0;
-        currentIdx = Math.min(Math.max(currentIdx, min), max);
-        targetIdx = Math.min(Math.max(targetIdx, min), max);
+    clear(interaction: CommandInteraction) {
+        return new Promise(async (done, error) => {
+            if(!interaction.guildId) {
+                error('Not a guild interaction.');
+                return;
+            }
 
-        if (currentIdx != targetIdx) {
-            this.queue.move(currentIdx, targetIdx);
-            this.determineStatus();
-        }
+            let queue = this.queues.get(interaction.guildId!);
+            if(!queue || queue.length <= 1) {
+                error('Queue not long enough.');
+                return;
+            }
+
+            queue.clear();
+            done;
+        });
     }
 
-    setVolume(volume: number) {
+    shuffle(interaction: CommandInteraction) {
+        return new Promise(async (done, error) => {
+            if(!interaction.guildId) {
+                error('Not a guild interaction.');
+                return;
+            }
+
+            let queue = this.queues.get(interaction.guildId!);
+            if(!queue || queue.length <= 1) {
+                error('Queue not long enough.');
+                return;
+            }
+
+            queue.shuffle();
+            done;
+        });
+    }
+
+    move(interaction: CommandInteraction, currentPos: number, targetPos: number) {
+        return new Promise(async (done, error) => {
+            if(!interaction.guildId) {
+                error('Not a guild interaction.');
+                return;
+            }
+
+            let queue = this.queues.get(interaction.guildId!);
+            if(!queue || queue.length <= 1) {
+                error('Queue not long enough.');
+                return;
+            }
+
+            if(currentPos < 1 || currentPos > queue.length) {
+                error('Current position not possible.');
+                return;
+            }
+
+            if(targetPos < 1 || currentPos > queue.length || targetPos == currentPos) {
+                error('Target position not possible.');
+                return;
+            }
+
+            queue.move(currentPos, targetPos);
+            done;
+        });
+    }
+
+    setVolume(interaction: CommandInteraction, volume: number) {
+        return new Promise(async (done, error) => {
         volume = Math.min(Math.max(volume / 100 + 0.5, 0.5), 2);
         this.config.stream.volume = volume;
         if (this.dispatcher) {
             this.dispatcher.setVolume(volume);
         }
+    });
     }
 
-    getVolume() {
+    getVolume(interaction: CommandInteraction) {
         return (this.config.stream.volume - 0.5) * 100 + '%';
     }
-/*
-    determineStatus() {
-        let item = this.queue.first;
-        if (item) {
-            if (this.playing) {
-                if (this.paused) {
-                    this.status.setBanner(`Paused: "${item.name}" Requested by: ${item.requestor}`);
-                } else {
-                    this.status.setBanner(
-                        `Now Playing: "${item.name}" Requested by: ${item.requestor}${
-                            this.queue.length > 1 ? `, Up Next "${this.queue[1].name}"` : ''
-                        }`
-                    );
-                }
-            } else {
-                this.status.setBanner(`Up Next: "${item.name}" Requested by: ${item.requestor}`);
-            }
-        } else {
-            this.status.setBanner(`No Songs In Queue`);
-        }
+
+    /**
+     * Checks for guildId, subscription, queue, queue empty
+     * @param interaction 
+     * @returns boolean
+     */
+    generalCheck(interaction: CommandInteraction): boolean {
+        if(!interaction.guildId) return false;
+        if(!this.subscriptions.get(interaction.guildId)) return false;
+        if(!this.queues.get(interaction.guildId)) return false;
+        if(this.queues.get(interaction.guildId)?.length == 0) return false;
+        return true;
     }
-}*/
+}
 
 export enum PlayerStatus {
     Playing,
