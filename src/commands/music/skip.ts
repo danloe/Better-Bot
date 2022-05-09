@@ -31,6 +31,9 @@ export const command: Command = {
                             false
                         )
                     );
+                })
+                .catch((err) => {
+                    interaction.editReply(createErrorEmbed('🚩 Error skipping track(s): `' + err + '`'));
                 });
             if (message) {
                 //message!.channel.send(`${message!.client.ws.ping}ms ping. 🏓`);

@@ -30,6 +30,9 @@ export const command: Command = {
                             getTrackTypeColor(track.type)
                         )
                     );
+                })
+                .catch((err) => {
+                    interaction.editReply(createErrorEmbed('🚩 Error adding track: `' + err + '`'));
                 });
             if (message) {
                 //message!.channel.send(`${message!.client.ws.ping}ms ping. 🏓`);

@@ -103,8 +103,6 @@ export class MusicManager {
                 return;
             }
             done(track);
-        }).catch((err) => {
-            interaction.editReply(createErrorEmbed('🚩 Error adding track: `' + err + '`'));
         });
     }
 
@@ -207,18 +205,16 @@ export class MusicManager {
                 return;
             }
 
-            let queue = this.queues.get(interaction.guildId);
+            let queue = this.queues.get(interaction.guildId!);
 
-            if (amount > queue.length - 1) {
+            if (amount > queue!.length - 1) {
                 error('Not enough tracks in queue.');
                 return;
             }
-            queue.remove(1, amount);
+            queue!.remove(1, amount);
             let subscription = this.subscriptions.get(interaction.guildId!);
             subscription!.audioPlayer.stop();
             done;
-        }).catch((err) => {
-            interaction.editReply(createErrorEmbed('🚩 Error skipping track(s): `' + err + '`'));
         });
     }
 
@@ -266,8 +262,6 @@ export class MusicManager {
             }
 
             done(queue);
-        }).catch((err) => {
-            interaction.editReply(createErrorEmbed('🚩 Error showing the queue: `' + err + '`'));
         });
     }
 
