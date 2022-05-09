@@ -1,5 +1,5 @@
 import { Command } from '../../interfaces';
-import { CommandInteraction, Message } from 'discord.js';
+import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { createEmbed } from '../../helpers';
 import BetterClient from '../../client';
@@ -8,7 +8,7 @@ export const command: Command = {
     data: new SlashCommandBuilder()
         .setName('uptime')
         .setDescription('Tells you how much time is on the bots clock'),
-    run: async (client: BetterClient, interaction?: CommandInteraction, message?: Message, args?: string[]) => {
+    run: async (client: BetterClient, interaction?: CommandInteraction | ButtonInteraction, message?: Message, args?: string[]) => {
         let diff = new Date().getTime() - client.readyAt!.getTime();
         let days = Math.floor(diff / (1000 * 60 * 60 * 24));
         diff -= days * (1000 * 60 * 60 * 24);

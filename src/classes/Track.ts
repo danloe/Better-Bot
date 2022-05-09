@@ -9,7 +9,7 @@ export class Track {
     requestor: string;
     announce: boolean;
     displayUrl: string;
-    duration: number;
+    duration: string;
     artworkUrl: string;
     description: string;
     genre: string;
@@ -22,7 +22,7 @@ export class Track {
         requestor: string,
         announce: boolean,
         displayUrl: string = '',
-        duration: number = 0,
+        duration: string = '',
         artworkUrl: string = '',
         description: string = '',
         genre: string = '',
