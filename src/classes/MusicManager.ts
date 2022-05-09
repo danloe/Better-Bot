@@ -200,12 +200,17 @@ export class MusicManager {
                 error('Not possible right now.');
                 return;
             }
+            let queue = this.queues.get(interaction.guildId);
+            if(amount > queue.length - 1) {                
+                error('Not enough tracks in queue.');
+                return;
+            }
+            queue.remove(1, amount);
             let subscription = this.subscriptions.get(interaction.guildId!);
             subscription!.audioPlayer.stop();
             done;
-            //await interaction.reply('Skipped song!'); //TODO remove
         }).catch((err) => {
-            interaction.editReply(createErrorEmbed('🚩 Error skipping track: `' + err + '`'));
+            interaction.editReply(createErrorEmbed('🚩 Error skipping track(s): `' + err + '`'));
         });
     }
 

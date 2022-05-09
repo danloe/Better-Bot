@@ -24,7 +24,6 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
 
             if (query.startsWith('http://') || query.startsWith('https://')) {
                 info = await ytdl.getInfo(query);
-                console.log('🚀 ~ file: audio.ts ~ line 27 ~ returnnewPromise<Track> ~ info', info);
                 const track = new Track(
                     TrackType.YouTube,
                     info.videoDetails.video_url,
@@ -47,7 +46,6 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
                     limit: 1
                 };
                 info = (await ytsr(filter1!.url!, options)).items[0];
-                console.log('🚀 ~ file: audio.ts ~ line 46 ~ returnnewPromise<Track> ~ info', info);
 
                 const track = new Track(
                     TrackType.YouTube,
