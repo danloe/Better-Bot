@@ -5,7 +5,7 @@ export function createEmbed(
     title: string,
     message: string,
     ephemeral: boolean = false,
-    color: ColorResolvable = '#1e81b0'
+    color: ColorResolvable = '#403075'
 ) {
     return {
         embeds: [new MessageEmbed().setColor(color).setTitle(title).setDescription(message)],

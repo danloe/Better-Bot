@@ -82,6 +82,7 @@ export class MusicSubscription {
                     this.readyLock = true;
                     try {
                         await entersState(this.voiceConnection, VoiceConnectionStatus.Ready, 20_000);
+                        this.processQueue();
                     } catch {
                         if (this.voiceConnection.state.status !== VoiceConnectionStatus.Destroyed)
                             this.voiceConnection.destroy();
@@ -114,7 +115,7 @@ export class MusicSubscription {
     }
 
     /**
-     * Stops audio playback and empties the queue.
+     * Stops audio playback.
      */
     public stop() {
         this.audioPlayer.stop(true);
