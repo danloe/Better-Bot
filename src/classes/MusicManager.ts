@@ -24,13 +24,11 @@ export class MusicManager {
     }
 
     addMedia(interaction: CommandInteraction, args: string, announce: boolean) {
-        return new Promise(async (done, error) => {
+        return new Promise<Track>(async (done, error) => {
             if (!interaction.guildId) {
                 error('Not a guild interaction!');
                 return;
             }
-
-            interaction.deferReply();
 
             let type = determineTrackType(args);
 
@@ -68,15 +66,6 @@ export class MusicManager {
             queue = this.queues.get(interaction.guildId);
             queue!.queue(track);
 
-            await interaction.editReply(
-                createEmbed(
-                    'Added',
-                    '➕ `' + track.name + '` was added to the queue. [`' + queue!.length + ' total]`',
-                    false,
-                    '#FF0000'
-                )
-            );
-
             let subscription = this.subscriptions.get(interaction.guildId);
 
             if (!subscription) {
@@ -96,8 +85,8 @@ export class MusicManager {
             }
 
             if (!subscription) {
-                await interaction.followUp(createErrorEmbed('⛔ You need to join a voice channel first!'));
-                done;
+                await interaction.followUp(createErrorEmbed('⛔ You need to join a voice channel first! ➡️ Then try the resume command.'));
+                done(track);
                 return;
             }
 
@@ -110,7 +99,7 @@ export class MusicManager {
                 );
                 return;
             }
-            done;
+            done(track);
         }).catch((err) => {
             interaction.editReply(createErrorEmbed('⛔ Error adding track: `' + err + '`'));
         });
