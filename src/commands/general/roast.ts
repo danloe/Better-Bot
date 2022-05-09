@@ -77,7 +77,7 @@ const answers = [
 export const command: Command = {
     data: new SlashCommandBuilder()
         .setName('roast')
-        .setDescription('Roast you or someone else.')
+        .setDescription('Roast yourself or someone else.')
         .addUserOption((option) =>
             option.setName('user').setDescription('The user to roast').setRequired(true)
         ),
