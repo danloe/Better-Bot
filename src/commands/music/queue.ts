@@ -15,6 +15,16 @@ export const command: Command = {
                     let embedmsg = new MessageEmbed().setColor('#403075').setTitle('Queue');
 
                     if (queue) {
+                        let subscription = client.musicManager.subscriptions.get(interaction.guildId);
+                        if (subscription) {
+                            if (subscription.currentTrack) {
+                                embedmsg.addField(
+                                    'Now playing:',
+                                    '`' + subscription.currentTrack.name + '` | ' + subscription.currentTrack.displayUrl
+                                );
+                            }
+                        }
+
                         for (let i = 0; i < queue.length; i++) {
                             embedmsg.addField(
                                 i + 1 + ': `' + queue[i].name + '`',
