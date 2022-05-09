@@ -24,11 +24,11 @@ export class MusicManager {
 
     addMedia(interaction: CommandInteraction, args: string, announce: boolean) {
         return new Promise<Track>(async (done, error) => {
+            interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction!');
                 return;
             }
-            interaction.deferReply();
 
             let type = determineTrackType(args);
 
@@ -110,43 +110,49 @@ export class MusicManager {
 
     stop(interaction: CommandInteraction) {
         return new Promise(async (done, error) => {
+            interaction.deferReply();
             if (!this.generalCheck) {
                 error('Not possible right now.');
                 return;
             }
+
             let subscription = this.subscriptions.get(interaction.guildId!);
+
             subscription!.audioPlayer.stop();
             done;
             await interaction.reply(createEmbed('Stopped', '⏹️ Audio was stopped.'));
         }).catch((err) => {
-            interaction.reply(createErrorEmbed('🚩 Error stopping track: `' + err + '`'));
+            interaction.editReply(createErrorEmbed('🚩 Error stopping track: `' + err + '`'));
         });
     }
 
     pause(interaction: CommandInteraction) {
         return new Promise(async (done, error) => {
+            interaction.deferReply();
             if (!this.generalCheck) {
                 error('Not possible right now.');
                 return;
             }
+
             let subscription = this.subscriptions.get(interaction.guildId!);
+
             subscription!.audioPlayer.pause();
             done;
         }).catch((err) => {
-            interaction.reply(createErrorEmbed('🚩 Error pausing track: `' + err + '`'));
+            interaction.editReply(createErrorEmbed('🚩 Error pausing track: `' + err + '`'));
         });
     }
 
     resume(interaction: CommandInteraction) {
         return new Promise(async (done, error) => {
+            interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction!');
                 return;
             }
 
-            interaction.deferReply();
-
             let queue = this.queues.get(interaction.guildId);
+
             if (!queue) {
                 await interaction.followUp(
                     createErrorEmbed('There is nothing to play! Add a track with the play command.')
@@ -156,7 +162,6 @@ export class MusicManager {
             }
 
             let subscription = this.subscriptions.get(interaction.guildId);
-
             if (!subscription) {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     const channel = interaction.member.voice.channel;
@@ -196,12 +201,15 @@ export class MusicManager {
 
     skip(interaction: CommandInteraction, amount: number) {
         return new Promise(async (done, error) => {
+            interaction.deferReply();
             if (!this.generalCheck) {
                 error('Not possible right now.');
                 return;
             }
+
             let queue = this.queues.get(interaction.guildId);
-            if(amount > queue.length - 1) {                
+
+            if (amount > queue.length - 1) {
                 error('Not enough tracks in queue.');
                 return;
             }
@@ -216,12 +224,14 @@ export class MusicManager {
 
     remove(interaction: CommandInteraction, positions: number[]) {
         return new Promise(async (done, error) => {
+            interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction.');
                 return;
             }
 
             let queue = this.queues.get(interaction.guildId!);
+
             if (!queue || queue.length <= 1) {
                 error('Queue not long enough.');
                 return;
@@ -236,18 +246,20 @@ export class MusicManager {
             });
             done;
         }).catch((err) => {
-            interaction.reply(createErrorEmbed('🚩 Error removing track: `' + err + '`'));
+            interaction.editReply(createErrorEmbed('🚩 Error removing track: `' + err + '`'));
         });
     }
 
     showQueue(interaction: CommandInteraction) {
         return new Promise<Queue>(async (done, error) => {
+            interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction.');
                 return;
             }
 
             let queue = this.queues.get(interaction.guildId!);
+
             if (!queue || queue.length < 1) {
                 error('Queue is empty.');
                 return;
@@ -255,18 +267,20 @@ export class MusicManager {
 
             done(queue);
         }).catch((err) => {
-            interaction.reply(createErrorEmbed('🚩 Error showing the queue: `' + err + '`'));
+            interaction.editReply(createErrorEmbed('🚩 Error showing the queue: `' + err + '`'));
         });
     }
 
     clear(interaction: CommandInteraction) {
         return new Promise(async (done, error) => {
+            interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction.');
                 return;
             }
 
             let queue = this.queues.get(interaction.guildId!);
+
             if (!queue || queue.length <= 1) {
                 error('Queue is empty.');
                 return;
@@ -275,18 +289,20 @@ export class MusicManager {
             queue.clear();
             done;
         }).catch((err) => {
-            interaction.reply(createErrorEmbed('🚩 Error clearing queue: `' + err + '`'));
+            interaction.editReply(createErrorEmbed('🚩 Error clearing queue: `' + err + '`'));
         });
     }
 
     shuffle(interaction: CommandInteraction) {
         return new Promise(async (done, error) => {
+            interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction.');
                 return;
             }
 
             let queue = this.queues.get(interaction.guildId!);
+
             if (!queue) {
                 error('Queue is empty.');
                 return;
@@ -299,12 +315,13 @@ export class MusicManager {
             queue.shuffle();
             done;
         }).catch((err) => {
-            interaction.reply(createErrorEmbed('🚩 Error shuffling queue: `' + err + '`'));
+            interaction.editReply(createErrorEmbed('🚩 Error shuffling queue: `' + err + '`'));
         });
     }
 
     move(interaction: CommandInteraction, currentPos: number, targetPos: number) {
         return new Promise(async (done, error) => {
+            interaction.deferReply();
             if (!interaction.guildId) {
                 error('Not a guild interaction.');
                 return;
@@ -329,7 +346,7 @@ export class MusicManager {
             queue.move(currentPos, targetPos);
             done;
         }).catch((err) => {
-            interaction.reply(createErrorEmbed('🚩 Error moving tracks: `' + err + '`'));
+            interaction.editReply(createErrorEmbed('🚩 Error moving tracks: `' + err + '`'));
         });
     }
 

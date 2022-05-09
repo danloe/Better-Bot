@@ -31,15 +31,10 @@ export const command: Command = {
                                 queue[i].requestor + ' | ' + queue[i].displayUrl
                             );
                         }
-                        await interaction.reply({
-                            embeds: [embedmsg],
-                            ephemeral: false
+                        await interaction.editReply({
+                            embeds: [embedmsg]
                         });
                     }
-                })
-                .catch(async (reason) => {
-                    console.log(reason);
-                    await interaction.followUp(createErrorEmbed(String(reason), true));
                 });
 
             if (message) {
