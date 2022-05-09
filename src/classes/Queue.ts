@@ -25,9 +25,9 @@ export class Queue extends Array<Track> {
         }
     }
 
-    remove(position: number) {
+    remove(position: number, amount: number = 1) {
         if (position > 0 && this.queue.length >= position) {
-            this.splice(position - 1, 1);
+            this.splice(position - 1, amount);
         }
     }
 
