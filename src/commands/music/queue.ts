@@ -15,7 +15,7 @@ export const command: Command = {
                     let embedmsg = new MessageEmbed().setColor('#403075').setTitle('Queue');
 
                     if (queue) {
-                        let subscription = client.musicManager.subscriptions.get(interaction.guildId);
+                        let subscription = client.musicManager.subscriptions.get(interaction.guildId!);
                         if (subscription) {
                             if (subscription.currentTrack) {
                                 embedmsg.addField(
@@ -35,6 +35,9 @@ export const command: Command = {
                             embeds: [embedmsg]
                         });
                     }
+                })
+                .catch((err) => {
+                    interaction.editReply(createErrorEmbed('🚩 Error showing the queue: `' + err + '`'));
                 });
 
             if (message) {
