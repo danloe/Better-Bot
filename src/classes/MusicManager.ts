@@ -110,7 +110,7 @@ export class MusicManager {
         });
     }
 
-    stop(interaction: CommandInteraction) {
+    stop(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             await deferReply(interaction);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
@@ -126,7 +126,7 @@ export class MusicManager {
         });
     }
 
-    pause(interaction: CommandInteraction) {
+    pause(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             await deferReply(interaction);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
@@ -138,7 +138,7 @@ export class MusicManager {
         });
     }
 
-    resume(interaction: CommandInteraction) {
+    resume(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             await deferReply(interaction);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
@@ -217,7 +217,7 @@ export class MusicManager {
         });
     }
 
-    remove(interaction: CommandInteraction, positions: number[]) {
+    remove(interaction: CommandInteraction | ButtonInteraction, positions: number[]) {
         return new Promise<void>(async (done, error) => {
             await deferReply(interaction);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
@@ -259,7 +259,7 @@ export class MusicManager {
             await deferReply(interaction);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
-            if (!queue || queue.length <= 1) {
+            if (!queue || queue.length < 1) {
                 error('Queue is empty.');
                 return;
             }
@@ -269,7 +269,7 @@ export class MusicManager {
         });
     }
 
-    shuffle(interaction: CommandInteraction) {
+    shuffle(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             await deferReply(interaction);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
@@ -288,7 +288,7 @@ export class MusicManager {
         });
     }
 
-    move(interaction: CommandInteraction, currentPos: number, targetPos: number) {
+    move(interaction: CommandInteraction | ButtonInteraction, currentPos: number, targetPos: number) {
         return new Promise<void>(async (done, error) => {
             await deferReply(interaction);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);

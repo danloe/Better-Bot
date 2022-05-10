@@ -7,7 +7,8 @@ import {
     createEmbed,
     createErrorEmbed,
     getTrackTypeColor,
-    getTrackTypeString,
+    getTrackTypeString as getTrackSourceString,
+    replyInteraction,
     secondsToDurationString
 } from '../../helpers';
 import { Track } from '../../classes/Track';
@@ -32,7 +33,8 @@ export const command: Command = {
                 await client.musicManager
                     .addMedia(interaction, input!, false)
                     .then(async (track: Track) => {
-                        await interaction.editReply(
+                        await replyInteraction(
+                            interaction,
                             createEmbed(
                                 track.name,
                                 '`➕ Track was added to the queue [' +
@@ -42,7 +44,7 @@ export const command: Command = {
                                 getTrackTypeColor(track.type),
                                 [
                                     { name: 'Description', value: checkEmbedString(track.description) },
-                                    { name: 'Source', value: getTrackTypeString(track.type), inline: true },
+                                    { name: 'Source', value: getTrackSourceString(track), inline: true },
                                     { name: 'Duration', value: secondsToDurationString(track.duration), inline: true },
                                     { name: 'Uploaded', value: checkEmbedString(track.uploaded), inline: true }
                                 ],
@@ -58,7 +60,7 @@ export const command: Command = {
                     .then(done)
                     .catch(async (err) => {
                         console.log(err);
-                        await interaction.editReply(createErrorEmbed('🚩 Error adding track: `' + err + '`'));
+                        await replyInteraction(interaction, createErrorEmbed('🚩 Error adding track: `' + err + '`'));
                         error(err);
                     });
                 if (message) {
