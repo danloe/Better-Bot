@@ -11,33 +11,31 @@ export const command: Command = {
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
-    ) => {
-        return new Promise<void>(async (done, error) => {
-            if (interaction) {
+    ) => new Promise<void>(async (done, error) => {
+        if (interaction) {
+            try {
+                await client.musicManager.resume(interaction);
+                await replyInteraction(
+                    interaction,
+                    createEmbed('Resumed', '`✅ The audio has been resumed.`', false)
+                );
+                done();
+            } catch (err) {
                 try {
-                    await client.musicManager.resume(interaction);
                     await replyInteraction(
                         interaction,
-                        createEmbed('Resumed', '`✅ The audio has been resumed.`', false)
+                        createErrorEmbed('🚩 Error resuming the track: `' + err + '`')
                     );
-                    done();
-                } catch (err) {
-                    try {
-                        await replyInteraction(
-                            interaction,
-                            createErrorEmbed('🚩 Error resuming the track: `' + err + '`')
-                        );
-                    } catch (err2) {
-                        console.log(err2);
-                    }
-                    console.log(err);
-                    error(err);
+                } catch (err2) {
+                    console.log(err2);
                 }
-
-                if (message) {
-                    //NOT PLANNED
-                }
+                console.log(err);
+                error(err);
             }
-        });
-    }
+
+            if (message) {
+                //NOT PLANNED
+            }
+        }
+    })
 };

@@ -16,35 +16,32 @@ export const command: Command = {
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
-    ) => {
-        return new Promise<void>(async (done, error) => {
-            if (interaction) {
+    ) => new Promise<void>(async (done, error) => {
+        if (interaction) {
+            try {
+                const input = interaction instanceof CommandInteraction ? interaction.options.getString('input') : '';
+                await client.musicManager.say(interaction, input!);
+                await replyInteraction(
+                    interaction,
+                    createEmbed('Listen To Me', '`✅ I say what you said you wanted me to say.`', true)
+                );
+                done();
+            } catch (err) {
                 try {
-                    const input =
-                        interaction instanceof CommandInteraction ? interaction.options.getString('input') : '';
-                    await client.musicManager.say(interaction, input!);
                     await replyInteraction(
                         interaction,
-                        createEmbed('Listen To Me', '`✅ I say what you said you wanted me to say.`', true)
+                        createErrorEmbed('🚩 Error saying something: `' + err + '`')
                     );
-                    done();
-                } catch (err) {
-                    try {
-                        await replyInteraction(
-                            interaction,
-                            createErrorEmbed('🚩 Error saying something: `' + err + '`')
-                        );
-                    } catch (err2) {
-                        console.log(err2);
-                    }
-                    console.log(err);
-                    error(err);
+                } catch (err2) {
+                    console.log(err2);
                 }
-
-                if (message) {
-                    //NOT PLANNED
-                }
+                console.log(err);
+                error(err);
             }
-        });
-    }
+
+            if (message) {
+                //NOT PLANNED
+            }
+        }
+    })
 };

@@ -25,51 +25,48 @@ export const command: Command = {
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
-    ) => {
-        return new Promise<void>(async (done, error) => {
-            if (interaction) {
+    ) => new Promise<void>(async (done, error) => {
+        if (interaction) {
+            try {
+                const input = interaction instanceof CommandInteraction ? interaction.options.getString('input') : '';
+                const track = await client.musicManager.play(interaction, input!, false);
+                await replyInteraction(
+                    interaction,
+                    createEmbed(
+                        track.name,
+                        '`➕ Track was added [' +
+                        client.musicManager.queues.get(interaction.guildId!)!.length +
+                        ' in queue]`',
+                        false,
+                        getTrackTypeColor(track.type),
+                        [
+                            { name: 'Description', value: checkEmbedString(track.description) },
+                            { name: 'Source', value: getTrackSourceString(track), inline: true },
+                            { name: 'Duration', value: secondsToDurationString(track.duration), inline: true },
+                            { name: 'Uploaded', value: checkEmbedString(track.uploaded), inline: true }
+                        ],
+                        track.artworkUrl,
+                        track.displayUrl,
+                        {
+                            text: `Requested by ${interaction.user.username}`,
+                            iconURL: interaction.user.avatarURL() || undefined
+                        }
+                    )
+                );
+                done();
+            } catch (err) {
                 try {
-                    const input =
-                        interaction instanceof CommandInteraction ? interaction.options.getString('input') : '';
-                    const track = await client.musicManager.play(interaction, input!, false);
-                    await replyInteraction(
-                        interaction,
-                        createEmbed(
-                            track.name,
-                            '`➕ Track was added [' +
-                                client.musicManager.queues.get(interaction.guildId!)!.length +
-                                ' in queue]`',
-                            false,
-                            getTrackTypeColor(track.type),
-                            [
-                                { name: 'Description', value: checkEmbedString(track.description) },
-                                { name: 'Source', value: getTrackSourceString(track), inline: true },
-                                { name: 'Duration', value: secondsToDurationString(track.duration), inline: true },
-                                { name: 'Uploaded', value: checkEmbedString(track.uploaded), inline: true }
-                            ],
-                            track.artworkUrl,
-                            track.displayUrl,
-                            {
-                                text: `Requested by ${interaction.user.username}`,
-                                iconURL: interaction.user.avatarURL() || undefined
-                            }
-                        )
-                    );
-                    done();
-                } catch (err) {
-                    try {
-                        await replyInteraction(interaction, createErrorEmbed('🚩 Error adding track: `' + err + '`'));
-                    } catch (err2) {
-                        console.log(err2);
-                    }
-                    console.log(err);
-                    error(err);
+                    await replyInteraction(interaction, createErrorEmbed('🚩 Error adding track: `' + err + '`'));
+                } catch (err2) {
+                    console.log(err2);
                 }
-
-                if (message) {
-                    //NOT PLANNED
-                }
+                console.log(err);
+                error(err);
             }
-        });
-    }
+
+            if (message) {
+                //NOT PLANNED
+            }
+        }
+    })
 };

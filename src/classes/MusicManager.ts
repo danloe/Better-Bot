@@ -331,20 +331,25 @@ export class MusicManager {
 
     shuffle(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
-            await deferReply(interaction);
-            let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
+            try {
+                await deferReply(interaction);
+                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
-            if (!queue) {
-                error('Queue is empty.');
-                return;
-            }
-            if (queue.length <= 1) {
-                error('Queue has not enough tracks.');
-                return;
-            }
+                if (!queue) {
+                    error('Queue is empty.');
+                    return;
+                }
+                if (queue.length <= 1) {
+                    error('Queue has not enough tracks.');
+                    return;
+                }
 
-            queue.shuffle();
-            done();
+                queue.shuffle();
+                done();
+            } catch (err) {
+                console.log(err);
+                error(err);
+            }
         });
     }
 
