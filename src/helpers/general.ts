@@ -19,10 +19,10 @@ export async function replyInteraction(
     }
 }
 
-export async function replyDefer(interaction: CommandInteraction | ButtonInteraction) {
+export async function replyDefer(interaction: CommandInteraction | ButtonInteraction, ephemeral: boolean = false) {
     try {
         if (!interaction.deferred) {
-            await interaction.deferReply();
+            await interaction.deferReply({ ephemeral: ephemeral });
         }
     } catch (err) {
         console.log(err);
