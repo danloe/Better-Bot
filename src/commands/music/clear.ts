@@ -11,27 +11,25 @@ export const command: Command = {
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
-    ) => {
-        return new Promise<void>(async (done, error) => {
-            if (interaction) {
+    ) => new Promise<void>(async (done, error) => {
+        if (interaction) {
+            try {
+                await client.musicManager.clear(interaction);
+                await replyInteraction(interaction, createEmbed('Cleared', '`✅ The Queue is now empty.`', false));
+                done();
+            } catch (err) {
                 try {
-                    await client.musicManager.clear(interaction);
-                    await replyInteraction(interaction, createEmbed('Cleared', '`✅ The Queue is now empty.`', false));
-                    done();
-                } catch (err) {
-                    try {
-                        await replyInteraction(interaction, createErrorEmbed('🚩 Error clearing queue: `' + err + '`'));
-                    } catch (err2) {
-                        console.log(err2);
-                    }
-                    console.log(err);
-                    error(err);
+                    await replyInteraction(interaction, createErrorEmbed('🚩 Error clearing queue: `' + err + '`'));
+                } catch (err2) {
+                    console.log(err2);
                 }
-
-                if (message) {
-                    //NOT PLANNED
-                }
+                console.log(err);
+                error(err);
             }
-        });
-    }
+
+            if (message) {
+                //NOT PLANNED
+            }
+        }
+    })
 };
