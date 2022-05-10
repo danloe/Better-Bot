@@ -113,7 +113,7 @@ export class MusicManager {
                 error('Failed to join voice channel within 20 seconds, please try again later!');
                 return;
             }
-
+            
             subscription.play();
             done(track);
         });
@@ -123,6 +123,9 @@ export class MusicManager {
         return new Promise<void>(async (done, error) => {
             await deferReply(interaction);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
+
+            if (!queue) this.queues.set(interaction.guildId!, new Queue());
+            queue = this.queues.get(interaction.guildId!);
 
             if (!subscription) {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
