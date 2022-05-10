@@ -10,7 +10,7 @@ import {
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
 import { Queue } from '../../classes';
-import { createErrorEmbed, replyDefer } from '../../helpers';
+import { createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
 import { command as skip } from './skip';
 import { command as clear } from './clear';
 import { command as shuffle } from './shuffle';
@@ -73,7 +73,7 @@ export const command: Command = {
 
                             const collector = interaction.channel!.createMessageComponentCollector({
                                 componentType: 'BUTTON',
-                                time: 60000
+                                time: 60_000
                             });
 
                             collector.on('collect', async (button) => {
@@ -95,11 +95,21 @@ export const command: Command = {
                                             break;
                                     }
                                 } else {
-                                    button.editReply(createErrorEmbed("⛔ These buttons aren't for you.", true));
+                                    await replyInteraction(
+                                        button,
+                                        createErrorEmbed("⛔ These buttons aren't for you.", true)
+                                    );
                                 }
                             });
 
-                            await interaction.editReply({
+                            collector.on('end', async (collection) => {
+                                await replyInteraction(interaction, {
+                                    embeds: [embedmsg],
+                                    components: []
+                                })
+                            });
+
+                            await replyInteraction(interaction, {
                                 embeds: [embedmsg],
                                 components: [row]
                             });
@@ -107,7 +117,10 @@ export const command: Command = {
                     })
                     .then(done)
                     .catch(async (err) => {
-                        await interaction.editReply(createErrorEmbed('🚩 Error showing the queue: `' + err + '`'));
+                        await replyInteraction(
+                            interaction,
+                            createErrorEmbed('🚩 Error showing the queue: `' + err + '`')
+                        );
                         error(err);
                     });
 

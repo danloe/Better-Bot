@@ -3,7 +3,7 @@ import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import { Track, TrackType } from '../classes/Track';
 import https from 'node:https';
-import { secondsToDurationString, timeStringToDurationString as timeStringToSecondsNumber } from './message';
+import { timeStringToDurationString as timeStringToSecondsNumber } from './message';
 
 export function determineTrackType(args: string): TrackType {
     if (args.startsWith('http://') || args.startsWith('https://')) {
@@ -44,7 +44,7 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
                 info.videoDetails.video_url,
                 timeStringToSecondsNumber(info.videoDetails.lengthSeconds),
                 info.videoDetails.thumbnails[0].url,
-                info.videoDetails.description,
+                String(info.videoDetails.description),
                 '',
                 info.videoDetails.publishDate
             );

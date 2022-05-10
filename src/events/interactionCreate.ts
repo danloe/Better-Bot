@@ -19,10 +19,6 @@ export const event: Event = {
                 await (command as Command).run(client, interaction);
             } catch (error) {
                 console.error(error);
-                await interaction.reply({
-                    content: 'There was an error. My brain froze while executing this command!',
-                    ephemeral: true
-                });
             }
         }
 
@@ -32,10 +28,6 @@ export const event: Event = {
                 // TODO
             } catch (error) {
                 console.error(error);
-                await interaction.reply({
-                    content: 'There was an error. Did you press the button too hard?',
-                    ephemeral: true
-                });
             }
         }
 
@@ -45,10 +37,6 @@ export const event: Event = {
                 // TODO
             } catch (error) {
                 console.error(error);
-                await interaction.reply({
-                    content: 'There was an error. The selector seems to be undecided.',
-                    ephemeral: true
-                });
             }
         } else {
             return;

@@ -72,12 +72,14 @@ export async function replyInteraction(
     interaction: CommandInteraction | ButtonInteraction,
     options: string | MessagePayload | WebhookEditMessageOptions
 ) {
-    if (interaction.replied) {
-        await interaction.editReply(options);
-    } else if (interaction instanceof ButtonInteraction) {
+    if (interaction instanceof ButtonInteraction) {
         await interaction.followUp(options);
     } else {
-        await interaction.reply(options);
+        if (interaction.replied || interaction.deferred) {
+            await interaction.editReply(options);
+        } else {
+            await interaction.reply(options);
+        }
     }
 }
 
@@ -102,6 +104,7 @@ export function timeStringToDurationString(seconds: string): number {
         secs = secs + parseInt(split[2]);
         return secs;
     }
+    return 0
 }
 
 export function secondsToDurationString(seconds: number): string {

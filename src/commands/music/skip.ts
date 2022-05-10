@@ -25,12 +25,12 @@ export const command: Command = {
                 await client.musicManager
                     .skip(interaction, input)
                     .then(async () => {
-                        let msg = String(input) + ' ' + (input == 1 ? '` track' : '` tracks') + ' skipped';
-                        if (input == 0) msg = 'Skipped to the next track';
+                        let msg = '`' + String(input) + (input == 1 ? ' track' : ' tracks') + ' skipped';
+                        if (input == 0) msg = '`Skipped to the next track';
                         msg =
                             msg +
-                            ' `[' +
-                            (client.musicManager.queues.get(interaction.guildId!)!.length - Math.max(input, 1)) +
+                            ' [' +
+                            (client.musicManager.queues.get(interaction.guildId!)!.length - 1) +
                             ' more in queue]`';
 
                         await replyInteraction(interaction, createEmbed('Skipped', msg, false));
