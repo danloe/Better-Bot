@@ -6,7 +6,7 @@ import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('stop').setDescription('Stop audio playback.'),
-    run: async (
+    run: (
         client: BetterClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
@@ -14,22 +14,26 @@ export const command: Command = {
     ) => {
         new Promise<void>(async (done, error) => {
             if (interaction) {
-                await client.musicManager
-                    .stop(interaction)
-                    .then(async () => {
-                        await replyInteraction(
-                            interaction,
-                            createEmbed('Stopped', '`✅ The audio playback has stopped.`', false)
-                        );
-                    })
-                    .then(done)
-                    .catch(async (err) => {
+                try {
+                    await client.musicManager.stop(interaction);
+                    await replyInteraction(
+                        interaction,
+                        createEmbed('Stopped', '`✅ The audio playback has stopped.`', false)
+                    );
+                    done();
+                } catch (err) {
+                    try {
                         await replyInteraction(
                             interaction,
                             createErrorEmbed('🚩 Error stopping the track: `' + err + '`')
                         );
-                        error(err);
-                    });
+                    } catch (err2) {
+                        console.log(err2);
+                    }
+                    console.log(err);
+                    error(err);
+                }
+
                 if (message) {
                     //NOT PLANNED
                 }

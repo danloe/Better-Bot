@@ -14,9 +14,8 @@ export const event: Event = {
         if (interaction.isCommand()) {
             const command = client.commands.get(interaction.commandName);
             if (!command) return;
-
             try {
-                await (command as Command).run(client, interaction);
+                (command as Command).run(client, interaction);
             } catch (error) {
                 console.error(error);
             }
