@@ -1,5 +1,4 @@
 import {
-    createEmbed,
     createErrorEmbed,
     replyDefer as deferReply,
     determineTrackType,
@@ -13,8 +12,17 @@ import BetterClient from '../client';
 import { MusicSubscription } from './MusicSubscription';
 import { Queue } from './Queue';
 import { Track, TrackType } from './Track';
-import { DiscordGatewayAdapterCreator, entersState, joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
+import {
+    createAudioResource,
+    DiscordGatewayAdapterCreator,
+    entersState,
+    joinVoiceChannel,
+    StreamType,
+    VoiceConnectionStatus
+} from '@discordjs/voice';
 import google from 'googlethis';
+const discordTTS = require("discord-tts");
+//import discordTTS from 'discord-tts';
 
 export class MusicManager {
     client: BetterClient;
@@ -111,17 +119,50 @@ export class MusicManager {
         });
     }
 
-    say(interaction: CommandInteraction | ButtonInteraction) {
+    say(interaction: CommandInteraction | ButtonInteraction, phrase: string) {
         return new Promise<void>(async (done, error) => {
             await deferReply(interaction);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
             if (!subscription) {
-                error('Not playing anything.');
+                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
+                    const channel = interaction.member.voice.channel;
+                    subscription = new MusicSubscription(
+                        joinVoiceChannel({
+                            channelId: channel.id,
+                            guildId: channel.guild.id,
+                            adapterCreator: channel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator // TODO: remove cast when fixed
+                        }),
+                        queue!,
+                        false
+                    );
+                    subscription.voiceConnection.on('error', console.warn);
+                    this.subscriptions.set(interaction.guildId!, subscription);
+                }
+            }
+
+            if (!subscription) {
+                error(
+                    'Could not join a voice channel: You must first join a voice channel for me to follow you. ➡️ Then try the say command.'
+                );
                 return;
             }
 
-            subscription!.audioPlayer.stop();
+            try {
+                await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20e3);
+            } catch (err) {
+                console.warn(err);
+                error('Failed to join voice channel within 20 seconds, please try again later!');
+                return;
+            }
+
+            const stream = discordTTS.getVoiceStream(phrase, {
+                lang: 'en',
+                slow: false
+            });
+
+            const audioResource = createAudioResource(stream, { inputType: StreamType.Arbitrary, inlineVolume: true });
+            subscription!.playVoice(audioResource);
             done();
         });
     }
