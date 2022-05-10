@@ -55,7 +55,7 @@ export class MusicManager {
                     break;
 
                 case TrackType.DirectFile:
-                    let domainName = args.replace(/.+\/\/|www.|\..+/g, '');
+                    let domainName = args.match(/\w+(?=\.\w+\/)/gi)[0];
                     let images = await google.image(domainName, { safe: false });
                     const imageUrl = images[0].url;
 
@@ -119,9 +119,9 @@ export class MusicManager {
         });
     }
 
-    say(interaction: CommandInteraction | ButtonInteraction, phrase: string) {
+    say(interaction: CommandInteraction | ButtonInteraction, phrase: string, lang: string = 'en') {
         return new Promise<void>(async (done, error) => {
-            await deferReply(interaction);
+            await deferReply(interaction, true);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
             if (!queue) this.queues.set(interaction.guildId!, new Queue());
@@ -160,7 +160,7 @@ export class MusicManager {
             }
 
             const stream = discordTTS.getVoiceStream(phrase, {
-                lang: 'en',
+                lang: lang,
                 slow: false
             });
 

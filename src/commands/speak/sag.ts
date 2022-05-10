@@ -6,10 +6,10 @@ import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
-        .setName('say')
-        .setDescription('Says everything you want [ENGLISH].')
+        .setName('sag')
+        .setDescription('Says everything you want [GERMAN].')
         .addStringOption((option) =>
-            option.setName('input').setDescription('The text to be spoken.').setRequired(true)
+            option.setName('input').setDescription('Der zu sprechende Text.').setRequired(true)
         ),
     run: (
         client: BetterClient,
@@ -22,8 +22,8 @@ export const command: Command = {
                 try {
                     const input =
                         interaction instanceof CommandInteraction ? interaction.options.getString('input') : '';
-                    await client.musicManager.say(interaction, input!, 'en');
-                    await replyInteraction(interaction, '`🗨️💂 ' + input + '`');
+                    await client.musicManager.say(interaction, input!, 'de');
+                    await replyInteraction(interaction, '`🗨️🍺 ' + input + '`');
                     done();
                 } catch (err) {
                     try {
