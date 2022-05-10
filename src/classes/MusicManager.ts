@@ -25,7 +25,7 @@ export class MusicManager {
         this.client = client;
     }
 
-    addMedia(interaction: CommandInteraction | ButtonInteraction, args: string, announce: boolean) {
+    play(interaction: CommandInteraction | ButtonInteraction, args: string, announce: boolean) {
         return new Promise<Track>(async (done, error) => {
             await deferReply(interaction);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
@@ -107,8 +107,22 @@ export class MusicManager {
             }
 
             subscription.play();
-
             done(track);
+        });
+    }
+
+    say(interaction: CommandInteraction | ButtonInteraction) {
+        return new Promise<void>(async (done, error) => {
+            await deferReply(interaction);
+            let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
+
+            if (!subscription) {
+                error('Not playing anything.');
+                return;
+            }
+
+            subscription!.audioPlayer.stop();
+            done();
         });
     }
 
@@ -124,7 +138,6 @@ export class MusicManager {
 
             subscription!.audioPlayer.stop();
             done();
-            await interaction.reply(createEmbed('Stopped', '⏹️ Audio was stopped.'));
         });
     }
 
@@ -133,7 +146,10 @@ export class MusicManager {
             await deferReply(interaction);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
-            if (!subscription) error('Not playing anything.');
+            if (!subscription) {
+                error('Not playing anything.');
+                return;
+            }
 
             subscription!.audioPlayer.pause();
             done();
@@ -150,15 +166,11 @@ export class MusicManager {
                 return;
             }
 
-            if (!queue) {
-                await interaction.followUp(
-                    createErrorEmbed('There is nothing to play! Add a track with the play command.')
-                );
-                error('No queue.');
-                return;
-            }
-
             if (!subscription) {
+                if (!queue) {
+                    error('No queue.');
+                    return;
+                }
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     const channel = interaction.member.voice.channel;
                     subscription = new MusicSubscription(
@@ -175,7 +187,6 @@ export class MusicManager {
             }
 
             if (!subscription) {
-                await interaction.followUp(createErrorEmbed('You need to join a voice channel first!'));
                 error('Not in a voice channel.');
                 return;
             }
@@ -236,9 +247,8 @@ export class MusicManager {
             sorted.forEach((postition) => {
                 queue?.remove(postition);
             });
+
             done();
-        }).catch((err) => {
-            interaction.editReply(createErrorEmbed('🚩 Error removing track: `' + err + '`'));
         });
     }
 
