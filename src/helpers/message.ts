@@ -10,6 +10,8 @@ import {
 } from 'discord.js';
 import { Track, TrackType } from '../classes/Track';
 
+
+
 export function createEmbed(
     title: string,
     message: string,
@@ -68,27 +70,6 @@ export function getTrackTypeString(track: Track): string {
     }
 }
 
-export async function replyInteraction(
-    interaction: CommandInteraction | ButtonInteraction,
-    options: string | MessagePayload | WebhookEditMessageOptions
-) {
-    if (interaction instanceof ButtonInteraction) {
-        await interaction.followUp(options);
-    } else {
-        if (interaction.replied || interaction.deferred) {
-            await interaction.editReply(options);
-        } else {
-            await interaction.reply(options);
-        }
-    }
-}
-
-export async function replyDefer(interaction: CommandInteraction | ButtonInteraction) {
-    if (!interaction.deferred) {
-        await interaction.deferReply();
-    }
-}
-
 export function timeStringToDurationString(seconds: string): number {
     var split = seconds.split(':');
     var secs = 0;
@@ -104,7 +85,7 @@ export function timeStringToDurationString(seconds: string): number {
         secs = secs + parseInt(split[2]);
         return secs;
     }
-    return 0
+    return 0;
 }
 
 export function secondsToDurationString(seconds: number): string {

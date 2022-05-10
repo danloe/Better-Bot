@@ -28,7 +28,6 @@ export const command: Command = {
     ) => {
         new Promise<void>(async (done, error) => {
             if (interaction) {
-                //if (interaction instanceof CommandInteraction) return;
                 const input = interaction instanceof CommandInteraction ? interaction.options.getString('input') : '';
                 await client.musicManager
                     .addMedia(interaction, input!, false)
