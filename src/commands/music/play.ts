@@ -26,7 +26,7 @@ export const command: Command = {
         message?: Message,
         args?: string[]
     ) => {
-        new Promise<void>(async (done, error) => {
+        return new Promise<void>(async (done, error) => {
             if (interaction) {
                 try {
                     const input =
