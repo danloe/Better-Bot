@@ -1,13 +1,13 @@
-import { EmbedBuilder, EmbedFooterData } from '@discordjs/builders';
+import { EmbedFooterData } from '@discordjs/builders';
 import {
     ButtonInteraction,
     ColorResolvable,
     CommandInteraction,
     EmbedFieldData,
     MessageEmbed,
-    MessagePayload
+    MessagePayload,
+    WebhookEditMessageOptions
 } from 'discord.js';
-import { kStringMaxLength } from 'node:buffer';
 import { TrackType } from '../classes/Track';
 
 export function createEmbed(
@@ -68,11 +68,16 @@ export function getTrackTypeString(trackType: TrackType): string {
     }
 }
 
-export async function replyInteraction(interaction: CommandInteraction, message: string | MessagePayload) {
+export async function replyInteraction(
+    interaction: CommandInteraction | ButtonInteraction,
+    options: string | MessagePayload | WebhookEditMessageOptions
+) {
     if (interaction.replied) {
-        await interaction.editReply(message);
+        await interaction.editReply(options);
+    } else if (interaction instanceof ButtonInteraction) {
+        await interaction.followUp(options);
     } else {
-        await interaction.reply(message);
+        await interaction.reply(options);
     }
 }
 
