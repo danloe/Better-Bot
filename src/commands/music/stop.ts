@@ -32,10 +32,6 @@ export const command: Command = {
                 console.log(err);
                 error(err);
             }
-
-            if (message) {
-                //NOT PLANNED
-            }
         }
     })
 };

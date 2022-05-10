@@ -6,12 +6,10 @@ import BetterClient from '../../client';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('uptime').setDescription('Tells you how much time is on the bots clock'),
-    run: async (
-        client: BetterClient,
+    run: async (client: BetterClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
-        args?: string[]
-    ) => {
+        args?: string[]) => {
         new Promise<void>(async (done, error) => {
             let diff = new Date().getTime() - client.readyAt!.getTime();
             let days = Math.floor(diff / (1000 * 60 * 60 * 24));

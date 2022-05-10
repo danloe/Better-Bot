@@ -6,12 +6,10 @@ import BetterClient from '../../client';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('ping').setDescription('Returns the ping. pong.'),
-    run: async (
-        client: BetterClient,
+    run: async (client: BetterClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
-        args?: string[]
-    ) => {
+        args?: string[]) => {
         new Promise<void>(async (done, error) => {
             if (interaction) {
                 await interaction
