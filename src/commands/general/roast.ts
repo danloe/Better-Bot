@@ -2,6 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
+import { createErrorEmbed } from '../../helpers';
 
 const answers = [
     'My phone battery lasts longer than your relationships.',
@@ -78,38 +79,52 @@ export const command: Command = {
     data: new SlashCommandBuilder()
         .setName('roast')
         .setDescription('Roast yourself or someone else.')
-        .addUserOption((option) =>
-            option.setName('user').setDescription('The user to roast').setRequired(true)
-        ),
-    run: async (client: BetterClient, interaction?: CommandInteraction | ButtonInteraction, message?: Message, args?: string[]) => {
-        if (interaction) {
-            let i = Math.floor(Math.random() * answers.length);
-            let user = (interaction instanceof CommandInteraction) ? interaction.options.getUser('user') : interaction.member?.user;
-            await interaction.reply({
-                content: `${user!} ${answers[i]}`,
-                options: {
-                    tts: true
-                }
-            });
-        }
-
-        if (message) {
-            let author: any = message.author;
-
-            if (args!.length > 0) {
-                if (args![0].toLowerCase() != 'me') author = args![0];
-
+        .addUserOption((option) => option.setName('user').setDescription('The user to roast').setRequired(true)),
+    run: async (
+        client: BetterClient,
+        interaction?: CommandInteraction | ButtonInteraction,
+        message?: Message,
+        args?: string[]
+    ) => {
+        new Promise<void>(async (done, error) => {
+            if (interaction) {
                 let i = Math.floor(Math.random() * answers.length);
-                await message.channel.send({
-                    content: `${author} ${answers[i]}`,
-                    options: {
-                        tts: true
-                    }
-                });
-            } else {
-                await message.channel.send(`${author} You need to mention someone with *@[name]*`);
-                return;
+                let user =
+                    interaction instanceof CommandInteraction
+                        ? interaction.options.getUser('user')
+                        : interaction.member?.user;
+                await interaction
+                    .reply({
+                        content: `${user!} ${answers[i]}`,
+                        options: {
+                            tts: true
+                        }
+                    })
+                    .then(done)
+                    .catch(async (err) => {
+                        await interaction.editReply(createErrorEmbed('🚩 Error roasting: `' + err + '`'));
+                        error(err);
+                    });
             }
-        }
+
+            if (message) {
+                let author: any = message.author;
+
+                if (args!.length > 0) {
+                    if (args![0].toLowerCase() != 'me') author = args![0];
+
+                    let i = Math.floor(Math.random() * answers.length);
+                    await message.channel.send({
+                        content: `${author} ${answers[i]}`,
+                        options: {
+                            tts: true
+                        }
+                    });
+                } else {
+                    await message.channel.send(`${author} You need to mention someone with *@[name]*`);
+                    return;
+                }
+            }
+        });
     }
 };
