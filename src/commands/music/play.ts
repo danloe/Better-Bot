@@ -20,7 +20,7 @@ export const command: Command = {
         .addStringOption((option) =>
             option.setName('input').setDescription('URL to a File or Search Text').setRequired(true)
         ),
-    run: async (
+    run: (
         client: BetterClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
@@ -28,40 +28,44 @@ export const command: Command = {
     ) => {
         new Promise<void>(async (done, error) => {
             if (interaction) {
-                const input = interaction instanceof CommandInteraction ? interaction.options.getString('input') : '';
-                await client.musicManager
-                    .play(interaction, input!, false)
-                    .then(async (track: Track) => {
-                        await replyInteraction(
-                            interaction,
-                            createEmbed(
-                                track.name,
-                                '`➕ Track was added [' +
-                                    client.musicManager.queues.get(interaction.guildId!)!.length +
-                                    ' in queue]`',
-                                false,
-                                getTrackTypeColor(track.type),
-                                [
-                                    { name: 'Description', value: checkEmbedString(track.description) },
-                                    { name: 'Source', value: getTrackSourceString(track), inline: true },
-                                    { name: 'Duration', value: secondsToDurationString(track.duration), inline: true },
-                                    { name: 'Uploaded', value: checkEmbedString(track.uploaded), inline: true }
-                                ],
-                                track.artworkUrl,
-                                track.displayUrl,
-                                {
-                                    text: `Requested by ${interaction.user.username}`,
-                                    iconURL: interaction.user.avatarURL() || undefined
-                                }
-                            )
-                        );
-                    })
-                    .then(done)
-                    .catch(async (err) => {
-                        console.log(err);
+                try {
+                    const input =
+                        interaction instanceof CommandInteraction ? interaction.options.getString('input') : '';
+                    const track = await client.musicManager.play(interaction, input!, false);
+                    await replyInteraction(
+                        interaction,
+                        createEmbed(
+                            track.name,
+                            '`➕ Track was added [' +
+                                client.musicManager.queues.get(interaction.guildId!)!.length +
+                                ' in queue]`',
+                            false,
+                            getTrackTypeColor(track.type),
+                            [
+                                { name: 'Description', value: checkEmbedString(track.description) },
+                                { name: 'Source', value: getTrackSourceString(track), inline: true },
+                                { name: 'Duration', value: secondsToDurationString(track.duration), inline: true },
+                                { name: 'Uploaded', value: checkEmbedString(track.uploaded), inline: true }
+                            ],
+                            track.artworkUrl,
+                            track.displayUrl,
+                            {
+                                text: `Requested by ${interaction.user.username}`,
+                                iconURL: interaction.user.avatarURL() || undefined
+                            }
+                        )
+                    );
+                    done();
+                } catch (err) {
+                    try {
                         await replyInteraction(interaction, createErrorEmbed('🚩 Error adding track: `' + err + '`'));
-                        error(err);
-                    });
+                    } catch (err2) {
+                        console.log(err2);
+                    }
+                    console.log(err);
+                    error(err);
+                }
+
                 if (message) {
                     //NOT PLANNED
                 }

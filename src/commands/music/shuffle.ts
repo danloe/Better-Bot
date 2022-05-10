@@ -6,7 +6,7 @@ import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('shuffle').setDescription('Shuffle all tracks in the queue.'),
-    run: async (
+    run: (
         client: BetterClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
@@ -14,22 +14,26 @@ export const command: Command = {
     ) => {
         new Promise<void>(async (done, error) => {
             if (interaction) {
-                await client.musicManager
-                    .shuffle(interaction)
-                    .then(async () => {
-                        await replyInteraction(
-                            interaction,
-                            createEmbed('Shuffled', '`✅ The Queue is no longer in OOOORDER.`', false)
-                        );
-                    })
-                    .then(done)
-                    .catch(async (err) => {
+                try {
+                    await client.musicManager.shuffle(interaction);
+                    await replyInteraction(
+                        interaction,
+                        createEmbed('Shuffled', '`✅ The Queue is no longer in OOOORDER.`', false)
+                    );
+                    done();
+                } catch (err) {
+                    try {
                         await replyInteraction(
                             interaction,
                             createErrorEmbed('🚩 Error shuffling the queue: `' + err + '`')
                         );
-                        error(err);
-                    });
+                    } catch (err2) {
+                        console.log(err2);
+                    }
+                    console.log(err);
+                    error(err);
+                }
+
                 if (message) {
                     //NOT PLANNED
                 }
