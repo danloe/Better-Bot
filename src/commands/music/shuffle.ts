@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createEmbed, createErrorEmbed } from '../../helpers';
+import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('shuffle').setDescription('Shuffle all tracks in the queue.'),
@@ -15,15 +15,19 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction) {
                 await client.musicManager
-                    .clear(interaction)
+                    .shuffle(interaction)
                     .then(async () => {
-                        await interaction.editReply(
-                            createEmbed('Shuffled', '✅ The Queue no longer has any old OOOORDER.', false)
+                        await replyInteraction(
+                            interaction,
+                            createEmbed('Shuffled', '`✅ The Queue is no longer in OOOORDER.`', false)
                         );
                     })
                     .then(done)
                     .catch(async (err) => {
-                        await interaction.editReply(createErrorEmbed('🚩 Error shuffling the queue: `' + err + '`'));
+                        await replyInteraction(
+                            interaction,
+                            createErrorEmbed('🚩 Error shuffling the queue: `' + err + '`')
+                        );
                         error(err);
                     });
                 if (message) {

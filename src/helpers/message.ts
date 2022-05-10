@@ -8,7 +8,7 @@ import {
     MessagePayload,
     WebhookEditMessageOptions
 } from 'discord.js';
-import { TrackType } from '../classes/Track';
+import { Track, TrackType } from '../classes/Track';
 
 export function createEmbed(
     title: string,
@@ -55,10 +55,10 @@ export function getTrackTypeColor(trackType: TrackType): ColorResolvable {
     }
 }
 
-export function getTrackTypeString(trackType: TrackType): string {
-    switch (trackType) {
+export function getTrackTypeString(track: Track): string {
+    switch (track.type) {
         case TrackType.DirectFile:
-            return 'Direct Link To File';
+            return track.url.replace(/.+\/\/|www.|\/.+/g, '');
         case TrackType.YouTube:
             return 'YouTube';
         case TrackType.SoundCloud:

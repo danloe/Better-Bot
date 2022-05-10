@@ -97,7 +97,7 @@ export const command: Command = {
                                 } else {
                                     await replyInteraction(
                                         button,
-                                        createErrorEmbed("⛔ These buttons aren't for you.", true)
+                                        createErrorEmbed("`⛔ These buttons aren't for you.`", true)
                                     );
                                 }
                             });

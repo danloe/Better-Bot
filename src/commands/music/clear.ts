@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createEmbed, createErrorEmbed } from '../../helpers';
+import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('clear').setDescription('Remove all tracks from the queue.'),
@@ -17,11 +17,14 @@ export const command: Command = {
                 await client.musicManager
                     .clear(interaction)
                     .then(async () => {
-                        await interaction.editReply(createEmbed('Cleared', '✅ The Queue is now empty.', false));
+                        await replyInteraction(
+                            interaction,
+                            createEmbed('Cleared', '`✅ The Queue is now empty.`', false)
+                        );
                     })
                     .then(done)
                     .catch(async (err) => {
-                        await interaction.editReply(createErrorEmbed('🚩 Error clearing queue: `' + err + '`'));
+                        await replyInteraction(interaction, createErrorEmbed('🚩 Error clearing queue: `' + err + '`'));
                         error(err);
                     });
                 if (message) {
