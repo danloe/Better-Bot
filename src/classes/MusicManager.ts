@@ -13,6 +13,7 @@ import { MusicSubscription } from './MusicSubscription';
 import { Queue } from './Queue';
 import { Track, TrackType } from './Track';
 import { DiscordGatewayAdapterCreator, entersState, joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice';
+import google from 'googlethis';
 
 export class MusicManager {
     client: BetterClient;
@@ -45,6 +46,10 @@ export class MusicManager {
                     break;
 
                 case TrackType.DirectFile:
+                    let domainName = args.replace(/.+\/\/|www.|\..+/g, '');
+                    let images = await google.image(domainName, { safe: false });
+                    const imageUrl = images[0].url;
+
                     track = new Track(
                         TrackType.DirectFile,
                         args,
@@ -53,7 +58,7 @@ export class MusicManager {
                         announce,
                         args,
                         0,
-                        '',
+                        imageUrl,
                         'The requestor provided a direct file link. No information available.',
                         'unknown',
                         'unknown'
@@ -98,6 +103,9 @@ export class MusicManager {
                 error('Failed to join voice channel within 20 seconds, please try again later!');
                 return;
             }
+
+            subscription.play();
+
             done(track);
         });
     }

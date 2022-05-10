@@ -51,7 +51,10 @@ export class Track {
                             filter: 'audioonly',
                             highWaterMark: 1 << 22
                         });
-                        break;
+                        demuxProbe(stream).then((probe: { stream: any; type: any }) => {
+                            resolve(createAudioResource(probe.stream, { metadata: this, inputType: probe.type }));
+                        });
+                        return;
 
                     case TrackType.SoundCloud:
                         stream = await scdl.downloadFormat(
@@ -59,7 +62,10 @@ export class Track {
                             scdl.FORMATS.MP3
                             //process.env.SC_CLIENTID
                         );
-                        break;
+                        demuxProbe(stream).then((probe: { stream: any; type: any }) => {
+                            resolve(createAudioResource(probe.stream, { metadata: this, inputType: probe.type }));
+                        });
+                        return;
 
                     case TrackType.Newgrounds:
                         stream = this.url;
@@ -69,9 +75,7 @@ export class Track {
                         stream = this.url;
                         break;
                 }
-                demuxProbe(stream).then((probe: { stream: any; type: any }) => {
-                    resolve(createAudioResource(probe.stream, { metadata: this, inputType: probe.type }));
-                });
+                resolve(createAudioResource(stream, { metadata: this }));
             } catch (error) {
                 console.log(error);
                 reject();

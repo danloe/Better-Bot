@@ -122,6 +122,13 @@ export class MusicSubscription {
     public stop() {
         this.audioPlayer.stop(true);
     }
+    
+    /**
+     * Plays audio.
+     */
+     public play() {
+        if(this.audioPlayer.playable) this.processQueue();
+    }
 
     /**
      * Attempts to play a Track from the queue.
