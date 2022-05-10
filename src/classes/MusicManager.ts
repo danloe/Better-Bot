@@ -5,7 +5,8 @@ import {
     determineTrackType,
     getNewgroundsTrack,
     getSoundCloudTrack,
-    getYouTubeTrack
+    getYouTubeTrack,
+    replyInteraction
 } from '../helpers';
 import { ButtonInteraction, CommandInteraction, GuildMember, Snowflake } from 'discord.js';
 import BetterClient from '../client';
@@ -87,7 +88,8 @@ export class MusicManager {
             }
 
             if (!subscription) {
-                await interaction.followUp(
+                await replyInteraction(
+                    interaction,
                     createErrorEmbed(
                         '🚩 Could not join a voice channel: `You must first join a voice channel for me to follow you. ➡️ Then try the resume command.`'
                     )
