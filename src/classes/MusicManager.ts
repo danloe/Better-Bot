@@ -21,7 +21,7 @@ import {
     VoiceConnectionStatus
 } from '@discordjs/voice';
 import google from 'googlethis';
-const discordTTS = require("discord-tts");
+const discordTTS = require('discord-tts');
 //import discordTTS from 'discord-tts';
 
 export class MusicManager {
@@ -113,7 +113,7 @@ export class MusicManager {
                 error('Failed to join voice channel within 20 seconds, please try again later!');
                 return;
             }
-            
+
             subscription.play();
             done(track);
         });
@@ -298,15 +298,19 @@ export class MusicManager {
 
     showQueue(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<Queue>(async (done, error) => {
-            await deferReply(interaction);
-            let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
+            try {
+                await deferReply(interaction);
+                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
-            if (!queue || queue.length < 1) {
-                error('Queue is empty.');
-                return;
+                if (!queue || queue.length < 1) {
+                    error('Queue is empty.');
+                    return;
+                }
+
+                done(queue);
+            } catch (err) {
+                console.log(err);
             }
-
-            done(queue);
         });
     }
 

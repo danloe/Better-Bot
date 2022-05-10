@@ -16,8 +16,8 @@ export const command: Command = {
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
-    ) =>
-        new Promise<void>(async (done, error) => {
+    ) => {
+        return new Promise<void>(async (done, error) => {
             if (interaction) {
                 let input = interaction instanceof CommandInteraction ? interaction.options.getNumber('input') : 0;
                 if (!input) input = 0;
@@ -52,5 +52,6 @@ export const command: Command = {
                     //NOT PLANNED
                 }
             }
-        })
+        });
+    }
 };
