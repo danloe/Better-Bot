@@ -28,13 +28,15 @@ export class MusicSubscription {
     public lastChannel: TextBasedChannel | null | undefined;
     public queueLock = false;
     public readyLock = false;
+    public autoplay = true;
     public pausedForVoice = false;
 
-    public constructor(voiceConnection: VoiceConnection, queue: Queue) {
+    public constructor(voiceConnection: VoiceConnection, queue: Queue, autoplay: boolean = true) {
         this.voiceConnection = voiceConnection;
         this.audioPlayer = createAudioPlayer();
         this.voicePlayer = createAudioPlayer();
         this.queue = queue;
+        this.autoplay = autoplay;
 
         this.voiceConnection.on<'stateChange'>(
             'stateChange',
@@ -88,7 +90,7 @@ export class MusicSubscription {
                     this.readyLock = true;
                     try {
                         await entersState(this.voiceConnection, VoiceConnectionStatus.Ready, 20_000);
-                        this.processQueue();
+                        if(this.autoplay) this.processQueue();
                     } catch {
                         if (this.voiceConnection.state.status !== VoiceConnectionStatus.Destroyed)
                             this.voiceConnection.destroy();
@@ -123,6 +125,7 @@ export class MusicSubscription {
                 }
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
+                this.autoplay = true;
             }
         });
 
@@ -144,7 +147,11 @@ export class MusicSubscription {
      * Plays audio.
      */
     public play() {
-        if (this.audioPlayer.playable) this.processQueue();
+        if (this.audioPlayer.playable) {
+            this.autoplay = true;
+            this.pausedForVoice = false;
+            this.processQueue();
+        }
     }
 
     /**
