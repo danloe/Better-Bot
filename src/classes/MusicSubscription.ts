@@ -4,6 +4,7 @@ import {
     AudioPlayer,
     AudioPlayerState,
     AudioPlayerStatus,
+    AudioResource,
     createAudioPlayer,
     entersState,
     VoiceConnection,
@@ -21,15 +22,18 @@ const wait = promisify(setTimeout);
 export class MusicSubscription {
     public readonly voiceConnection: VoiceConnection;
     public readonly audioPlayer: AudioPlayer;
+    public readonly voicePlayer: AudioPlayer;
     public queue: Queue;
     public currentTrack: Track | undefined;
     public lastChannel: TextBasedChannel | null | undefined;
     public queueLock = false;
     public readyLock = false;
+    public pausedForVoice = false;
 
     public constructor(voiceConnection: VoiceConnection, queue: Queue) {
         this.voiceConnection = voiceConnection;
         this.audioPlayer = createAudioPlayer();
+        this.voicePlayer = createAudioPlayer();
         this.queue = queue;
 
         this.voiceConnection.on<'stateChange'>(
@@ -100,18 +104,31 @@ export class MusicSubscription {
             if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
                 // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
                 // The queue is then processed to start playing the next track, if one is available.
-                //(oldState.resource as AudioResource<Track>).metadata.onFinish();
                 void this.processQueue();
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
-                //(newState.resource as AudioResource<Track>).metadata.onStart();
             }
         });
 
-        this.audioPlayer.on('error', (error: { resource: any }) =>
-            //(error.resource as AudioResource<Track>).metadata.onError(error)
-            console.log(error)
-        );
+        // Configure voice player
+        this.voicePlayer.on<'stateChange'>('stateChange', (oldState: AudioPlayerState, newState: AudioPlayerState) => {
+            if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
+                // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
+                // The queue is then processed to start playing the next track, if one is available.
+                this.voiceConnection.subscribe(this.audioPlayer);
+
+                if (this.pausedForVoice) {
+                    this.pausedForVoice = false;
+                    this.audioPlayer.unpause();
+                }
+            } else if (newState.status === AudioPlayerStatus.Playing) {
+                // If the Playing state has been entered, then a new track has started playback.
+            }
+        });
+
+        this.audioPlayer.on('error', (error: { resource: any }) => console.log(error));
+
+        this.voicePlayer.on('error', (error: { resource: any }) => console.log(error));
 
         voiceConnection.subscribe(this.audioPlayer);
     }
@@ -122,12 +139,24 @@ export class MusicSubscription {
     public stop() {
         this.audioPlayer.stop(true);
     }
-    
+
     /**
      * Plays audio.
      */
-     public play() {
-        if(this.audioPlayer.playable) this.processQueue();
+    public play() {
+        if (this.audioPlayer.playable) this.processQueue();
+    }
+
+    /**
+     * Plays voice audio.
+     */
+    public playVoice(resource: AudioResource) {
+        if (this.audioPlayer.state.status === AudioPlayerStatus.Playing) {
+            this.pausedForVoice = true;
+            this.audioPlayer.pause();
+        }
+        this.voiceConnection.subscribe(this.voicePlayer);
+        this.voicePlayer.play(resource);
     }
 
     /**

@@ -30,7 +30,7 @@ export const command: Command = {
             if (interaction) {
                 const input = interaction instanceof CommandInteraction ? interaction.options.getString('input') : '';
                 await client.musicManager
-                    .addMedia(interaction, input!, false)
+                    .play(interaction, input!, false)
                     .then(async (track: Track) => {
                         await replyInteraction(
                             interaction,
