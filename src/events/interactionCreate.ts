@@ -16,7 +16,7 @@ export const event: Event = {
             if (!command) return;
 
             try {
-                (command as Command).run(client, interaction);
+                await (command as Command).run(client, interaction);
             } catch (error) {
                 console.error(error);
                 await interaction.reply({
