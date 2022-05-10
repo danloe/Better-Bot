@@ -193,7 +193,7 @@ export class MusicManager {
                 return;
             }
 
-            if (amount > queue!.length - 1) {
+            if (amount > 0 && amount > queue!.length - 1) {
                 error('Not enough tracks in queue.');
                 return;
             }
@@ -203,7 +203,7 @@ export class MusicManager {
                 return;
             }
 
-            queue.remove(1, amount);
+            if (amount > 0) queue.remove(1, amount);
             subscription.audioPlayer.stop();
             done();
         });
