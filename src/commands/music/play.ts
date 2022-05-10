@@ -36,9 +36,9 @@ export const command: Command = {
                             interaction,
                             createEmbed(
                                 track.name,
-                                '`➕ Track was added to the queue [' +
+                                '`➕ Track was added [' +
                                     client.musicManager.queues.get(interaction.guildId!)!.length +
-                                    ' total]`',
+                                    ' in queue]`',
                                 false,
                                 getTrackTypeColor(track.type),
                                 [
