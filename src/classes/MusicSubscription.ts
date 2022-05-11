@@ -131,7 +131,10 @@ export class MusicSubscription {
             }
         });
 
-        this.audioPlayer.on('error', (error: { resource: any }) => console.log(error));
+        this.audioPlayer.on('error', (error: { resource: any }) => {
+            console.log(error);
+            this.processQueue();
+        });
 
         this.voicePlayer.on('error', (error: { resource: any }) => console.log(error));
 
