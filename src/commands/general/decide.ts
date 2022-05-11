@@ -47,7 +47,7 @@ export const command: Command = {
                         let iDecision = Math.floor(Math.random() * splitInput.length);
                         let embedmsg = new MessageEmbed().setColor('#403075').setTitle('Decision');
                         for (let i = 0; i < splitInput.length; i++) {
-                            embedmsg.addField(splitInput[i], i == iDecision ? '✅' : '❌', true);
+                            embedmsg.addField(splitInput[i], i == iDecision ? '✅' : '❌', false);
                         }
                         await replyInteraction(interaction, { embeds: [embedmsg] });
                         done();

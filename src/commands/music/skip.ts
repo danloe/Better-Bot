@@ -26,7 +26,7 @@ export const command: Command = {
                     const queue = await client.musicManager.skip(interaction, input);
                     let msg = '';
                     if (queue.length == 0) {
-                        msg = 'No more tracks in queue. Audio has stopped playing.';
+                        msg = '`No more tracks in queue. Audio has stopped playing.`';
                     } else {
                         msg = '`✅ ' + String(input) + (input == 1 ? ' track' : ' tracks') + ' skipped';
                         if (input == 0) msg = '`✅ Skipped to the next track';
