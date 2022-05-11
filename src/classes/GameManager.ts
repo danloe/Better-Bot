@@ -18,7 +18,7 @@ export class GameManager {
                     error('You have created a game lobby already!');
                     return;
                 }
-                lobby = new GameLobby(GameType.TTT, host, interaction.channel, 2, 2);
+                lobby = new GameLobby(GameType.TTT, host, interaction.channel!, 2, 2);
                 this.games.set(host.id, lobby);
                 done(lobby);
             } catch (err) {
