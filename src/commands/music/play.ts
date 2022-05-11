@@ -40,10 +40,18 @@ export const command: Command = {
                 try {
                     const input =
                         interaction instanceof CommandInteraction ? interaction.options.getString('input') : '';
+                    let mode =
+                        interaction instanceof CommandInteraction ? interaction.options.getString('mode') : undefined;
                     let announce =
                         interaction instanceof CommandInteraction ? interaction.options.getBoolean('announce') : false;
+                    let skip = false;
+                    let next = false;
+                    if (mode) {
+                        if (mode === 'skip') skip = true;
+                        if (mode === 'next') next = true;
+                    }
                     if (!announce) announce = false;
-                    const track = await client.musicManager.play(interaction, input!, announce);
+                    const track = await client.musicManager.play(interaction, input!, announce, skip, next);
                     await replyInteraction(
                         interaction,
                         createEmbed(

@@ -67,4 +67,5 @@ function getLanguageEmoji(lang: string): string {
         case 'es':
             return '🐂';
     }
+    return '🏳️‍🌈';
 }
