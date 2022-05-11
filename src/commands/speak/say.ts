@@ -7,7 +7,7 @@ import { createErrorEmbed, replyInteraction } from '../../helpers';
 export const command: Command = {
     data: new SlashCommandBuilder()
         .setName('say')
-        .setDescription('Says everything you want [ENGLISH].')
+        .setDescription('Says everything you want.')
         .addStringOption((option) => option.setName('input').setDescription('The text to be spoken.').setRequired(true))
         .addStringOption((option) =>
             option
