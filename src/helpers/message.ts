@@ -54,7 +54,7 @@ export function getTrackTypeColor(trackType: TrackType): ColorResolvable {
 export function getTrackTypeString(track: Track): string {
     switch (track.type) {
         case TrackType.DirectFile:
-            return track.url.replace(/.+\/\/|www.|\/.+/g, '');
+            return track.url.match(/\w+(?=\.\w+\/)\.\w+/gi)![0];
         case TrackType.YouTube:
             return 'YouTube';
         case TrackType.SoundCloud:

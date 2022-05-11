@@ -1,4 +1,4 @@
-import { AudioResource, createAudioResource, demuxProbe } from '@discordjs/voice';
+import { AudioResource, createAudioResource, demuxProbe, StreamType } from '@discordjs/voice';
 import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 
@@ -75,10 +75,15 @@ export class Track {
                         stream = this.url;
                         break;
                 }
-                resolve(createAudioResource(stream, { metadata: this }));
+                const resource = createAudioResource(stream, { metadata: this, inputType: StreamType.Arbitrary });
+                if (resource) {
+                    resolve(resource);
+                } else {
+                    reject('Resource is not readable.');
+                }
             } catch (error) {
                 console.log(error);
-                reject();
+                reject(error);
             }
         });
     }
