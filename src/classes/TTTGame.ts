@@ -1,12 +1,7 @@
-import { promisify } from 'node:util';
 import { TextBasedChannel, User } from 'discord.js';
 import { GameType } from './GameManager';
 import { GameLobby } from './GameLobby';
 
-const wait = promisify(setTimeout);
-const charField = '🔳';
-const charX = '❌';
-const charO = '⭕';
 const winningCombinations = [
     [0, 1, 2],
     [3, 4, 5],
@@ -19,32 +14,41 @@ const winningCombinations = [
 ];
 
 export class TTTGame extends GameLobby {
+    public readonly charField = '🔳';
+    public readonly charX = '❌';
+    public readonly charO = '⭕';
     gameField: string[] = [];
     playerOturn: boolean = false;
 
     public constructor(host: User, channel: TextBasedChannel) {
         super(GameType.TTT, host, channel, 2, 2);
+
         this.createGameField();
         this.state = GameState.Waiting;
         this.playerOturn = Math.random() >= 0.5 ? true : false;
     }
 
+    getTurnPlayer(): User {
+        if (this.playerOturn) return this.players[1];
+        return this.players[0];
+    }
+
     createGameField() {
         this.gameField = [
-            charField,
-            charField,
-            charField,
-            charField,
-            charField,
-            charField,
-            charField,
-            charField,
-            charField
+            this.charField,
+            this.charField,
+            this.charField,
+            this.charField,
+            this.charField,
+            this.charField,
+            this.charField,
+            this.charField,
+            this.charField
         ];
     }
 
     placeMark(index: number) {
-        this.gameField[index] = this.playerOturn ? charO : charX;
+        this.gameField[index] = this.playerOturn ? this.charO : this.charX;
         if (this.checkWin) {
             this.endGame(false);
         } else if (this.isDraw()) {
@@ -57,14 +61,14 @@ export class TTTGame extends GameLobby {
     checkWin(): boolean {
         return winningCombinations.some((combination) => {
             return combination.every((index) => {
-                return this.gameField[index] === (this.playerOturn ? charO : charX);
+                return this.gameField[index] === (this.playerOturn ? this.charO : this.charX);
             });
         });
     }
 
     isDraw(): boolean {
         for (let i = 0; i < this.gameField.length; i++) {
-            if (this.gameField[i] === charField) return false;
+            if (this.gameField[i] === this.charField) return false;
         }
         return true;
     }
@@ -72,11 +76,16 @@ export class TTTGame extends GameLobby {
     endGame(draw: boolean) {
         this.state = GameState.Finished;
         if (draw) {
+            this.emit('end', null);
+        } else {
+            const winner = this.players[this.playerOturn ? 1 : 0];
+            this.emit('end', winner);
         }
     }
 
     swapTurns() {
         this.playerOturn = !this.playerOturn;
+        this.emit('tick', this);
     }
 }
 
