@@ -44,6 +44,7 @@ async function setCommands(message: Message) {
             commands.push(command.data.toJSON());
         }
     });
+    console.log(commands);
     await message.guild!.commands.set(commands);
     await message.reply('Commands deployed to guild.');
 }

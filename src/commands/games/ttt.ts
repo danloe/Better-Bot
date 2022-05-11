@@ -14,7 +14,7 @@ import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
 import { TTTGame } from '../../classes/TTTGame';
 
 export const command: Command = {
-    data: new SlashCommandBuilder().setName('stop').setDescription('Stop audio playback.'),
+    data: new SlashCommandBuilder().setName('ttt').setDescription('Start a game of tic tac toe.'),
     run: (
         client: BetterClient,
         interaction?: CommandInteraction | ButtonInteraction,
@@ -147,19 +147,55 @@ export const command: Command = {
                     lobby.on('tick', async (game: TTTGame) => {
                         let embedmsg = new MessageEmbed().setColor('#403075').setTitle('Tic Tac Toe');
                         const row1 = new MessageActionRow().addComponents([
-                            new MessageButton().setCustomId('ttt_0').setLabel(game.gameField[0]).setStyle('SECONDARY').setDisabled((game.gameField[0] !== game.charField)),
-                            new MessageButton().setCustomId('ttt_1').setLabel(game.gameField[1]).setStyle('SECONDARY').setDisabled((game.gameField[0] !== game.charField)),
-                            new MessageButton().setCustomId('ttt_2').setLabel(game.gameField[2]).setStyle('SECONDARY').setDisabled((game.gameField[0] !== game.charField))
+                            new MessageButton()
+                                .setCustomId('ttt_0')
+                                .setLabel(game.gameField[0])
+                                .setStyle('SECONDARY')
+                                .setDisabled(game.gameField[0] !== game.charField),
+                            new MessageButton()
+                                .setCustomId('ttt_1')
+                                .setLabel(game.gameField[1])
+                                .setStyle('SECONDARY')
+                                .setDisabled(game.gameField[0] !== game.charField),
+                            new MessageButton()
+                                .setCustomId('ttt_2')
+                                .setLabel(game.gameField[2])
+                                .setStyle('SECONDARY')
+                                .setDisabled(game.gameField[0] !== game.charField)
                         ]);
                         const row2 = new MessageActionRow().addComponents([
-                            new MessageButton().setCustomId('ttt_3').setLabel(game.gameField[3]).setStyle('SECONDARY').setDisabled((game.gameField[0] !== game.charField)),
-                            new MessageButton().setCustomId('ttt_4').setLabel(game.gameField[4]).setStyle('SECONDARY').setDisabled((game.gameField[0] !== game.charField)),
-                            new MessageButton().setCustomId('ttt_5').setLabel(game.gameField[5]).setStyle('SECONDARY').setDisabled((game.gameField[0] !== game.charField))
+                            new MessageButton()
+                                .setCustomId('ttt_3')
+                                .setLabel(game.gameField[3])
+                                .setStyle('SECONDARY')
+                                .setDisabled(game.gameField[0] !== game.charField),
+                            new MessageButton()
+                                .setCustomId('ttt_4')
+                                .setLabel(game.gameField[4])
+                                .setStyle('SECONDARY')
+                                .setDisabled(game.gameField[0] !== game.charField),
+                            new MessageButton()
+                                .setCustomId('ttt_5')
+                                .setLabel(game.gameField[5])
+                                .setStyle('SECONDARY')
+                                .setDisabled(game.gameField[0] !== game.charField)
                         ]);
                         const row3 = new MessageActionRow().addComponents([
-                            new MessageButton().setCustomId('ttt_6').setLabel(game.gameField[6]).setStyle('SECONDARY').setDisabled((game.gameField[0] !== game.charField)),
-                            new MessageButton().setCustomId('ttt_7').setLabel(game.gameField[7]).setStyle('SECONDARY').setDisabled((game.gameField[0] !== game.charField)),
-                            new MessageButton().setCustomId('ttt_8').setLabel(game.gameField[8]).setStyle('SECONDARY').setDisabled((game.gameField[0] !== game.charField))
+                            new MessageButton()
+                                .setCustomId('ttt_6')
+                                .setLabel(game.gameField[6])
+                                .setStyle('SECONDARY')
+                                .setDisabled(game.gameField[0] !== game.charField),
+                            new MessageButton()
+                                .setCustomId('ttt_7')
+                                .setLabel(game.gameField[7])
+                                .setStyle('SECONDARY')
+                                .setDisabled(game.gameField[0] !== game.charField),
+                            new MessageButton()
+                                .setCustomId('ttt_8')
+                                .setLabel(game.gameField[8])
+                                .setStyle('SECONDARY')
+                                .setDisabled(game.gameField[0] !== game.charField)
                         ]);
                         await interaction.editReply({
                             embeds: [embedmsg],
