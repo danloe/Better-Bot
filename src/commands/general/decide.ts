@@ -11,7 +11,7 @@ export const command: Command = {
         .addStringOption((option) =>
             option
                 .setName('input')
-                .setDescription('Question or Options to decide from. Separate options by commas.')
+                .setDescription('Question or options to decide from. Separate options by commas.')
                 .setRequired(true)
         ),
     run: (
@@ -35,7 +35,7 @@ export const command: Command = {
                             interaction,
                             createEmbed(
                                 'Decision',
-                                `${interaction.user}:` + ' `' + splitInput[0] + '` **' + answers[i] + '**',
+                                `${interaction.user}:` + ' `' + splitInput[0] + '`  **' + answers[i] + '**',
                                 false
                             )
                         );
@@ -47,7 +47,7 @@ export const command: Command = {
                         let iDecision = Math.floor(Math.random() * splitInput.length);
                         let embedmsg = new MessageEmbed().setColor('#403075').setTitle('Decision');
                         for (let i = 0; i < splitInput.length; i++) {
-                            embedmsg.addField(splitInput[i], i == iDecision ? '✅' : '❌', false);
+                            embedmsg.addField(splitInput[i], i == iDecision ? '✅' : '❌', true);
                         }
                         await replyInteraction(interaction, { embeds: [embedmsg] });
                         done();
