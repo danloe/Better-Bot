@@ -80,16 +80,19 @@ export const command: Command = {
         .setName('roast')
         .setDescription('Roast yourself or someone else.')
         .addUserOption((option) => option.setName('user').setDescription('The user to roast').setRequired(true)),
-    run: async (client: BetterClient,
+    run: async (
+        client: BetterClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
-        args?: string[]) => {
+        args?: string[]
+    ) => {
         new Promise<void>(async (done, error) => {
             if (interaction) {
                 let i = Math.floor(Math.random() * answers.length);
-                let user = interaction instanceof CommandInteraction
-                    ? interaction.options.getUser('user')
-                    : interaction.member?.user;
+                let user =
+                    interaction instanceof CommandInteraction
+                        ? interaction.options.getUser('user')
+                        : interaction.member?.user;
                 await interaction
                     .reply({
                         content: `${user!} ${answers[i]}`,
@@ -108,8 +111,7 @@ export const command: Command = {
                 let author: any = message.author;
 
                 if (args!.length > 0) {
-                    if (args![0].toLowerCase() != 'me')
-                        author = args![0];
+                    if (args![0].toLowerCase() != 'me') author = args![0];
 
                     let i = Math.floor(Math.random() * answers.length);
                     await message.channel.send({

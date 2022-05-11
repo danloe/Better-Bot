@@ -249,7 +249,7 @@ export class MusicManager {
     }
 
     skip(interaction: CommandInteraction | ButtonInteraction, amount: number) {
-        return new Promise<void>(async (done, error) => {
+        return new Promise<Queue>(async (done, error) => {
             await deferReply(interaction);
             let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
@@ -270,7 +270,7 @@ export class MusicManager {
 
             if (amount > 0) queue.remove(1, amount);
             subscription.audioPlayer.stop();
-            done();
+            done(queue);
         });
     }
 

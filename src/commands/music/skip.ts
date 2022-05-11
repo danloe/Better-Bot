@@ -16,38 +16,36 @@ export const command: Command = {
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
-    ) => new Promise<void>(async (done, error) => {
-        if (interaction) {
-            let input = interaction instanceof CommandInteraction ? interaction.options.getNumber('input') : 0;
-            if (!input)
-                input = 0;
+    ) =>
+        new Promise<void>(async (done, error) => {
+            if (interaction) {
+                let input = interaction instanceof CommandInteraction ? interaction.options.getNumber('input') : 0;
+                if (!input) input = 0;
 
-            try {
-                await client.musicManager.skip(interaction, input);
-
-                let msg = '`✅ ' + String(input) + (input == 1 ? ' track' : ' tracks') + ' skipped';
-                if (input == 0)
-                    msg = '`✅ Skipped to the next track';
-                msg =
-                    msg +
-                    ' [' +
-                    (client.musicManager.queues.get(interaction.guildId!)!.length - 1) +
-                    ' more in queue]`';
-
-                await replyInteraction(interaction, createEmbed('Skipped', msg, false));
-                done();
-            } catch (err) {
                 try {
-                    await replyInteraction(
-                        interaction,
-                        createErrorEmbed('🚩 Error skipping track(s): `' + err + '`')
-                    );
-                } catch (err2) {
-                    console.log(err2);
+                    const queue = await client.musicManager.skip(interaction, input);
+                    let msg = '';
+                    if (queue.length == 0) {
+                        msg = 'No more tracks in queue. Audio has stopped playing.';
+                    } else {
+                        msg = '`✅ ' + String(input) + (input == 1 ? ' track' : ' tracks') + ' skipped';
+                        if (input == 0) msg = '`✅ Skipped to the next track';
+                        msg = msg + ' [' + (queue.length - 1) + ' more in queue]`';
+                    }
+                    await replyInteraction(interaction, createEmbed('Skipped', msg, false));
+                    done();
+                } catch (err) {
+                    try {
+                        await replyInteraction(
+                            interaction,
+                            createErrorEmbed('🚩 Error skipping track(s): `' + err + '`')
+                        );
+                    } catch (err2) {
+                        console.log(err2);
+                    }
+                    console.log(err);
+                    error(err);
                 }
-                console.log(err);
-                error(err);
             }
-        }
-    })
+        })
 };
