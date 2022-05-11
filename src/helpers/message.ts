@@ -1,22 +1,16 @@
 import { EmbedFooterData } from '@discordjs/builders';
 import {
-    ButtonInteraction,
     ColorResolvable,
-    CommandInteraction,
     EmbedFieldData,
     MessageEmbed,
-    MessagePayload,
-    WebhookEditMessageOptions
 } from 'discord.js';
 import { Track, TrackType } from '../classes/Track';
-
-
 
 export function createEmbed(
     title: string,
     message: string,
     ephemeral: boolean = false,
-    color: ColorResolvable = '#403075',
+    color: ColorResolvable = '#E63326',
     fieldData: EmbedFieldData[] = [],
     thumbnail: string = '',
     url: string = '',

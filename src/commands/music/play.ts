@@ -11,7 +11,6 @@ import {
     replyInteraction,
     secondsToDurationString
 } from '../../helpers';
-import { Track } from '../../classes/Track';
 
 export const command: Command = {
     data: new SlashCommandBuilder()

@@ -17,7 +17,7 @@ export const command: Command = {
                 await client.musicManager.pause(interaction);
                 await replyInteraction(
                     interaction,
-                    createEmbed('Paused', '`✅ The current track is now on hold.`', false)
+                    createEmbed('Paused', '`✅ The current track is now on pause.`', false)
                 );
                 done();
             } catch (err) {
