@@ -3,14 +3,9 @@ import { ButtonInteraction, CommandInteraction, GuildMember, Message, TextChanne
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
 import {
-    checkEmbedString,
     createEmbed,
     createErrorEmbed,
-    getTrackTypeColor,
-    getTrackTypeString as getTrackSourceString,
-    replyDefer,
     replyInteraction,
-    secondsToDurationString
 } from '../../helpers';
 
 export const command: Command = {

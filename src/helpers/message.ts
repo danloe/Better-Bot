@@ -110,7 +110,7 @@ export function secondsToDurationString(seconds: number): string {
 
 export function checkEmbedString(string: string): string {
     try {
-        if (string === null || string === undefined || string === '') return 'Unknown';
+        if (string == null || string == undefined || string == '') return 'Unknown';
         if (string.length > 200) return string.substring(0, 199) + '[...]';
         return string;
     } catch (error) {
