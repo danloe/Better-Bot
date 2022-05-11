@@ -35,8 +35,8 @@ export const command: Command = {
         args?: string[]
     ) =>
         new Promise<void>(async (done, error) => {
-            try {
-                if (interaction) {
+            if (interaction) {
+                try {
                     const member = interaction.member as GuildMember;
                     if (member.permissions.has('ADMINISTRATOR')) {
                         const channel = interaction.channel as TextChannel;
@@ -49,7 +49,7 @@ export const command: Command = {
                             const messages = await channel.messages.fetch();
                             const userMessages = messages.filter(
                                 function (m) {
-                                    if (this.count < amount && m.author.id == user.id) {
+                                    if (this.count < amount! && m.author.id == user.id) {
                                         this.count++;
                                         return true;
                                     }
@@ -64,7 +64,7 @@ export const command: Command = {
                             );
                         } else {
                             // No User given
-                            const bulk = await channel.bulkDelete(amount);
+                            const bulk = await channel.bulkDelete(amount!);
                             await replyInteraction(
                                 interaction,
                                 createEmbed(' ', '`🚮 Successfully deleted ' + bulk.size + ' messages.`')
@@ -78,15 +78,18 @@ export const command: Command = {
                         );
                     }
                     done();
+                } catch (err) {
+                    try {
+                        await replyInteraction(
+                            interaction,
+                            createErrorEmbed('🚩 Error deleting messages: `' + err + '`')
+                        );
+                    } catch (err2) {
+                        console.log(err2);
+                    }
+                    console.log(err);
+                    error(err);
                 }
-            } catch (err) {
-                try {
-                    await replyInteraction(interaction, createErrorEmbed('🚩 Error deleting messages: `' + err + '`'));
-                } catch (err2) {
-                    console.log(err2);
-                }
-                console.log(err);
-                error(err);
             }
         })
 };

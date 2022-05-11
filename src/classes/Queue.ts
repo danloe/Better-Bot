@@ -13,6 +13,11 @@ export class Queue extends Array<Track> {
         this.push(item);
     }
 
+    next(item: Track): void {
+        this.push(item);
+        this.move(this.length - 1, 0);
+    }
+
     dequeue(item?: Track): Track {
         if (item) {
             let idx = this.indexOf(item);

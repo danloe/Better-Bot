@@ -27,7 +27,7 @@ export const command: Command = {
                 try {
                     if (interaction instanceof ButtonInteraction) return;
                     let input = interaction.options.getString('input');
-                    let splitInput = input.split(',');
+                    let splitInput = input!.split(',');
 
                     if (splitInput.length == 1) {
                         let i = Math.floor(Math.random() * answers.length);

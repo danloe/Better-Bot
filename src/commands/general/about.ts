@@ -61,8 +61,8 @@ export const command: Command = {
                             'https://unsplash.com/photos/N2zxMUDwT4I/download?ixid=MnwxMjA3fDB8MXxhbGx8fHx8fHx8fHwxNjUyMjYzNzA3&force=true&w=640',
                             '',
                             {
-                                text: client.user.username + ` ❤️ ${interaction.user.username}`,
-                                iconURL: client.user.avatarURL()
+                                text: client.user!.username + ` ❤️ ${interaction.user.username}`,
+                                iconURL: client.user!.avatarURL() || undefined
                             }
                         )
                     )

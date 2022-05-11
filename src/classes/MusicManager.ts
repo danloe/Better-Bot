@@ -33,7 +33,13 @@ export class MusicManager {
         this.client = client;
     }
 
-    play(interaction: CommandInteraction | ButtonInteraction, args: string, announce: boolean) {
+    play(
+        interaction: CommandInteraction | ButtonInteraction,
+        args: string,
+        announce: boolean,
+        skip: boolean,
+        next: boolean
+    ) {
         return new Promise<Track>(async (done, error) => {
             try {
                 await deferReply(interaction);
@@ -78,7 +84,11 @@ export class MusicManager {
 
                 if (!queue) this.queues.set(interaction.guildId!, new Queue());
                 queue = this.queues.get(interaction.guildId!);
-                queue!.queue(track);
+                if (skip || next) {
+                    queue!.next(track);
+                } else {
+                    queue!.queue(track);
+                }
 
                 if (!subscription || !subscription.voiceConnection) {
                     if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
@@ -116,7 +126,11 @@ export class MusicManager {
                     return;
                 }
 
-                subscription.play();
+                if (skip) {
+                    subscription.audioPlayer.stop();
+                } else {
+                    subscription.play();
+                }
                 done(track);
             } catch (err) {
                 console.log(err);
