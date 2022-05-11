@@ -80,7 +80,7 @@ export class MusicManager {
                 queue = this.queues.get(interaction.guildId!);
                 queue!.queue(track);
 
-                if (!subscription) {
+                if (!subscription || !subscription.voiceConnection) {
                     if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                         const channel = interaction.member.voice.channel;
                         subscription = new MusicSubscription(
@@ -236,7 +236,7 @@ export class MusicManager {
                     return;
                 }
 
-                if (!subscription) {
+                if (!subscription || !subscription.voiceConnection) {
                     if (!queue) {
                         error('No queue.');
                         return;
