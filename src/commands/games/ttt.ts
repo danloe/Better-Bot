@@ -11,7 +11,6 @@ import {
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
 import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
-import { GameLobby } from '../../classes/GameLobby';
 import { TTTGame } from '../../classes/TTTGame';
 
 export const command: Command = {
@@ -209,7 +208,8 @@ export const command: Command = {
                             await interaction.followUp(createEmbed('Game Over', '🫱🏼‍🫲🏼 Draw.'));
                         }
                     });
-                    
+
+                    lobby.join(interaction.user);
                     done();
                 } catch (err) {
                     try {
