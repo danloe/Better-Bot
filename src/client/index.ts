@@ -5,12 +5,14 @@ import { Command, Config, Event } from '../interfaces';
 import ConfigJson from '../config.json';
 import discordModals from 'discord-modals';
 import { MusicManager } from '../classes/MusicManager';
+import { GameManager } from '../classes/GameManager';
 
 class BetterClient extends Client {
     public commands: Collection<string, Command> = new Collection();
     public events: Collection<string, Event> = new Collection();
     public config: Config = ConfigJson;
     public musicManager: MusicManager = new MusicManager(this);
+    public gameManager: GameManager = new GameManager(this);
 
     public async init() {
         try {
