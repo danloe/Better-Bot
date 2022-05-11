@@ -20,6 +20,13 @@ export const command: Command = {
         .addStringOption((option) =>
             option.setName('input').setDescription('URL to a File or Search Text').setRequired(true)
         )
+        .addStringOption((option) =>
+            option
+                .setName('mode')
+                .setDescription('Skip current track or play next?')
+                .setRequired(false)
+                .addChoices({ name: 'skip', value: 'skip' }, { name: 'next', value: 'next' })
+        )
         .addBooleanOption((option) =>
             option.setName('announce').setDescription('Announce the track with TTS voice.').setRequired(false)
         ),

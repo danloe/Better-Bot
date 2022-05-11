@@ -86,19 +86,13 @@ export const command: Command = {
                                         case 'queue_previous':
                                             break;
                                         case 'queue_skip':
-                                            try {
-                                                await skip.run(client, button);
-                                            } catch (e) {}
+                                            await skip.run(client, button);
                                             break;
                                         case 'queue_clear':
-                                            try {
-                                                await clear.run(client, button);
-                                            } catch (e) {}
+                                            await clear.run(client, button);
                                             break;
                                         case 'queue_shuffle':
-                                            try {
-                                                shuffle.run(client, button);
-                                            } catch (e) {}
+                                            shuffle.run(client, button);
                                             break;
                                         case 'queue_next':
                                             break;
