@@ -21,7 +21,7 @@ export class GameLobby extends EventEmitter {
 
     public game: GameType;
     public host: User;
-    public players: User[];
+    public players: User[] = [];
     public channel: TextBasedChannel;
     public state: GameState = GameState.Waiting;
     public minPlayers = 1;

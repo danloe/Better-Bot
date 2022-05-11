@@ -49,7 +49,7 @@ export class TTTGame extends GameLobby {
 
     placeMark(index: number) {
         this.gameField[index] = this.playerOturn ? this.charO : this.charX;
-        if (this.checkWin) {
+        if (this.checkWin()) {
             this.endGame(false);
         } else if (this.isDraw()) {
             this.endGame(true);
