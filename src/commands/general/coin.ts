@@ -1,7 +1,7 @@
 import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
+import { createErrorEmbed, replyInteraction } from '../../helpers';
 import BetterClient from '../../client';
 import { promisify } from 'node:util';
 
