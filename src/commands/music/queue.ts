@@ -51,22 +51,25 @@ export const command: Command = {
                         let subscription = client.musicManager.subscriptions.get(interaction.guildId!);
                         if (subscription) {
                             if (subscription.currentTrack) {
-                                embedmsg.addField(
-                                    'Now playing:',
-                                    '`' +
-                                        subscription.currentTrack.name +
-                                        '`\n' +
-                                        subscription.currentTrack.requestor +
-                                        ' | ' +
-                                        subscription.currentTrack.displayUrl
-                                );
+                                embedmsg
+                                    .addField(
+                                        'Now playing:',
+                                        '`' +
+                                            subscription.currentTrack.name +
+                                            '`\n' +
+                                            subscription.currentTrack.requestor +
+                                            ' | ' +
+                                            subscription.currentTrack.displayUrl
+                                    )
+                                    .addField('\u200B', '**Tracks in queue:**')
+                                    .setThumbnail(subscription.currentTrack.artworkUrl);
                             }
                         }
 
                         for (let i = 0; i < queue.length; i++) {
                             embedmsg.addField(
                                 i + 1 + ': `' + queue[i].name + '`',
-                                queue[i].requestor + ' | ' + queue[i].displayUrl
+                                queue[i].requestor + (queue[i].announce ? ' 📣' : '') + ' | ' + queue[i].displayUrl
                             );
                         }
 
@@ -117,7 +120,7 @@ export const command: Command = {
 
                         collector.on('end', async (collection) => {
                             try {
-                                await replyInteraction(interaction, {
+                                await interaction.editReply({
                                     embeds: [embedmsg],
                                     components: []
                                 });
