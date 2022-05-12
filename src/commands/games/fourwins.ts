@@ -15,10 +15,10 @@ import { createEmbed, createErrorEmbed, replyDefer, replyInteraction } from '../
 import { TTTGame } from '../../classes/TTTGame';
 import { GameType } from '../../classes/GameManager';
 
-const tttThumbnail = 'https://www.dropbox.com/s/fkqrplz0duuqto9/ttt.png?dl=1';
+const fourWinsThumbnail = 'https://www.dropbox.com/s/0jq0iqts4a9vque/fourwins.png?dl=1';
 
 export const command: Command = {
-    data: new SlashCommandBuilder().setName('tictactoe').setDescription('Start a game of tic tac toe.'),
+    data: new SlashCommandBuilder().setName('fourwins').setDescription('Start a game of four wins.'),
     run: (
         client: BetterClient,
         interaction?: CommandInteraction | ButtonInteraction,
@@ -28,28 +28,28 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction instanceof CommandInteraction) {
                 try {
-                    const lobby = await client.gameManager.createLobby(GameType.TicTacToe, interaction, interaction.user);
+                    const lobby = await client.gameManager.createLobby(GameType.FourWins, interaction, interaction.user);
                     await replyDefer(interaction);
 
                     // A PLAYER JOINED OR LEFT
                     lobby.on('join', async (game: TTTGame) => {
-                        console.log(`[TTT] ${game.players[game.players.length - 1].username} joined`);
+                        console.log(`[Four Wins] ${game.players[game.players.length - 1].username} joined`);
                         let players = '';
                         game.players.forEach((player) => {
                             players = players + '<@' + player.id + '>';
                         });
                         let embedmsg = new MessageEmbed()
                             .setColor('#403075')
-                            .setTitle('Tic Tac Toe')
+                            .setTitle('Four Wins')
                             .setDescription('`Waiting for more players...`')
-                            .setThumbnail(tttThumbnail)
+                            .setThumbnail(fourWinsThumbnail)
                             .addField(
                                 `Players: ${game.players.length} of ${game.minPlayers} [max ${game.maxPlayers}]`,
                                 players
                             );
                         const row = new MessageActionRow().addComponents([
-                            new MessageButton().setCustomId('ttt_join').setLabel('Join').setStyle('PRIMARY'),
-                            new MessageButton().setCustomId('ttt_cancel').setLabel('Cancel Game').setStyle('DANGER')
+                            new MessageButton().setCustomId('fw_join').setLabel('Join').setStyle('PRIMARY'),
+                            new MessageButton().setCustomId('fw_cancel').setLabel('Cancel Game').setStyle('DANGER')
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
@@ -59,12 +59,12 @@ export const command: Command = {
                         collector.on('collect', async (button) => {
                             try {
                                 if (button.user.id === interaction.user.id) {
-                                    if (button.customId === 'ttt_cancel') {
+                                    if (button.customId === 'fw_cancel') {
                                         let embedmsg = new MessageEmbed()
                                             .setColor('#403075')
-                                            .setTitle('Tic Tac Toe')
+                                            .setTitle('Four Wins')
                                             .setDescription('`The game was canceled.`')
-                                            .setThumbnail(tttThumbnail)
+                                            .setThumbnail(fourWinsThumbnail)
                                             .addField(
                                                 `Players: ${game.players.length} of ${game.minPlayers}[${game.maxPlayers}]`,
                                                 players
@@ -87,23 +87,23 @@ export const command: Command = {
 
                     // GAME READY TO START
                     lobby.on('ready', async (game: TTTGame) => {
-                        console.log('[TTT] Ready');
+                        console.log('[Four Wins] Ready');
                         let players = '';
                         game.players.forEach((player) => {
                             players = players + '<@' + player.id + '>';
                         });
                         let embedmsg = new MessageEmbed()
                             .setColor('#403075')
-                            .setTitle('Tic Tac Toe')
+                            .setTitle('Four Wins')
                             .setDescription('`Minimum player count reached. The game is ready.`')
-                            .setThumbnail(tttThumbnail)
+                            .setThumbnail(fourWinsThumbnail)
                             .addField(
                                 `Players: ${game.players.length} of ${game.minPlayers} [max ${game.maxPlayers}]`,
                                 players
                             );
                         const row = new MessageActionRow().addComponents([
-                            new MessageButton().setCustomId('ttt_cancel').setLabel('Cancel Game').setStyle('DANGER'),
-                            new MessageButton().setCustomId('ttt_start').setLabel('Start Game').setStyle('SUCCESS')
+                            new MessageButton().setCustomId('fw_cancel').setLabel('Cancel Game').setStyle('DANGER'),
+                            new MessageButton().setCustomId('fw_start').setLabel('Start Game').setStyle('SUCCESS')
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
@@ -113,17 +113,17 @@ export const command: Command = {
                         collector.on('collect', async (button) => {
                             try {
                                 if (button.user.id === interaction.user.id) {
-                                    if (button.customId === 'ttt_start') {
+                                    if (button.customId === 'fw_start') {
                                         await button.update(' ');
                                         game.start();
-                                    } else if (button.customId === 'ttt_cancel') {
+                                    } else if (button.customId === 'fw_cancel') {
                                         await button.update(' ');
 
                                         let embedmsg = new MessageEmbed()
                                             .setColor('#403075')
-                                            .setTitle('Tic Tac Toe')
+                                            .setTitle('Four Wins')
                                             .setDescription('`The game was canceled.`')
-                                            .setThumbnail(tttThumbnail)
+                                            .setThumbnail(fourWinsThumbnail)
                                             .addField(
                                                 `Players: ${game.players.length} of ${game.minPlayers}[${game.maxPlayers}]`,
                                                 players
@@ -152,7 +152,7 @@ export const command: Command = {
 
                     // GAME STARTED
                     lobby.on('start', async (game: TTTGame) => {
-                        console.log('[TTT] Started');
+                        console.log('[Four Wins] Started');
                         const gameFieldMessage = getGameFieldMessage(game);
                         await interaction.editReply(gameFieldMessage);
 
@@ -165,7 +165,7 @@ export const command: Command = {
                             try {
                                 if (button.user.id === game.getTurnPlayer().id) {
                                     await button.update(' ');
-                                    game.placeMark(parseInt(button.customId.replace('ttt_', '')));
+                                    game.placeMark(parseInt(button.customId.replace('fw_', '')));
                                     collector.stop();
                                 } else {
                                     try {
@@ -192,7 +192,7 @@ export const command: Command = {
 
                     // GAME TICK
                     lobby.on('tick', async (game: TTTGame) => {
-                        console.log('[TTT] Game Tick');
+                        console.log('[Four Wins] Game Tick');
                         const gameFieldMessage = getGameFieldMessage(game);
                         await interaction.editReply(gameFieldMessage);
 
@@ -205,7 +205,7 @@ export const command: Command = {
                             try {
                                 if (button.user.id === game.getTurnPlayer().id) {
                                     await button.update(' ');
-                                    game.placeMark(parseInt(button.customId.replace('ttt_', '')));
+                                    game.placeMark(parseInt(button.customId.replace('fw_', '')));
                                     collector.stop();
                                 } else {
                                     try {
@@ -232,7 +232,7 @@ export const command: Command = {
 
                     // GAME OVER
                     lobby.on('end', async (game: TTTGame) => {
-                        console.log('[TTT] Game Over');
+                        console.log('[Four Wins] Game Over');
                         const gameFieldMessage = getGameFieldMessage(game);
                         await interaction.editReply(gameFieldMessage);
 

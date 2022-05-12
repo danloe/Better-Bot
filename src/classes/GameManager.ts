@@ -2,6 +2,7 @@ import { CommandInteraction, Snowflake, User } from 'discord.js';
 import BetterClient from '../client';
 import { GameLobby } from './GameLobby';
 import { TTTGame } from './TTTGame';
+import { FourWinsGame } from './FourWinsGame';
 
 export class GameManager {
     client: BetterClient;
@@ -11,15 +12,22 @@ export class GameManager {
         this.client = client;
     }
 
-    createTTTLobby(interaction: CommandInteraction, host: User) {
+    createLobby(gameType: GameType, interaction: CommandInteraction, host: User) {
         return new Promise<GameLobby>(async (done, error) => {
             try {
                 let lobby = this.games.get(host.id);
                 if (lobby) {
-                    error('You have created a game lobby already!');
+                    error('You have created a' + lobby.game.toString() + 'game lobby already!');
                     return;
                 }
-                lobby = new TTTGame(host, interaction.channel!);
+                switch (gameType) {
+                    case GameType.TicTacToe:
+                        lobby = new TTTGame(host, interaction.channel!);
+                        break;
+                    case GameType.FourWins:
+                        lobby = new FourWinsGame(host, interaction.channel!);
+                        break;
+                }
                 this.games.set(host.id, lobby);
                 done(lobby);
             } catch (err) {
@@ -35,5 +43,6 @@ export class GameManager {
 }
 
 export enum GameType {
-    TTT
+    TicTacToe,
+    FourWins
 }
