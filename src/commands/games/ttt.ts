@@ -14,6 +14,8 @@ import BetterClient from '../../client';
 import { createEmbed, createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
 import { TTTGame } from '../../classes/TTTGame';
 
+const tttThumbnail = 'https://www.dropbox.com/s/fkqrplz0duuqto9/ttt.png?dl=1';
+
 export const command: Command = {
     data: new SlashCommandBuilder().setName('tictactoe').setDescription('Start a game of tic tac toe.'),
     run: (
@@ -39,14 +41,13 @@ export const command: Command = {
                             .setColor('#403075')
                             .setTitle('Tic Tac Toe')
                             .setDescription('`Waiting for more players...`')
-                            .setThumbnail(
-                                'https://pixabay.com/get/geaca61548231e95d24eaf16a57d31eb647db750a6c6d1a02e69e81966015b12fe9a34662d842139b486848ae7b51acebf86b4af31982de47281c1eaadeade62081228461f9c68c68f26b2b03b6963fdb_640.jpg'
-                            )
+                            .setThumbnail(tttThumbnail)
                             .addField(
-                                `Players: ${game.players.length} of ${game.minPlayers}[${game.maxPlayers}]`,
+                                `Players: ${game.players.length} of ${game.minPlayers} [max ${game.maxPlayers}]`,
                                 players
                             );
                         const row = new MessageActionRow().addComponents([
+                            new MessageButton().setCustomId('ttt_join').setLabel('Join').setStyle('PRIMARY'),
                             new MessageButton().setCustomId('ttt_cancel').setLabel('Cancel Game').setStyle('DANGER')
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
@@ -57,31 +58,25 @@ export const command: Command = {
                         collector.on('collect', async (button) => {
                             try {
                                 if (button.user.id === interaction.user.id) {
-                                    await button.update('Cancel');
+                                    if (button.customId === 'ttt_cancel') {
+                                        let embedmsg = new MessageEmbed()
+                                            .setColor('#403075')
+                                            .setTitle('Tic Tac Toe')
+                                            .setDescription('`The game was canceled.`')
+                                            .setThumbnail(tttThumbnail)
+                                            .addField(
+                                                `Players: ${game.players.length} of ${game.minPlayers}[${game.maxPlayers}]`,
+                                                players
+                                            );
+                                        await interaction.editReply({ embeds: [embedmsg], components: [] });
 
-                                    let embedmsg = new MessageEmbed()
-                                        .setColor('#403075')
-                                        .setTitle('Tic Tac Toe')
-                                        .setDescription('`The game was canceled.`')
-                                        .setThumbnail(
-                                            'https://pixabay.com/get/geaca61548231e95d24eaf16a57d31eb647db750a6c6d1a02e69e81966015b12fe9a34662d842139b486848ae7b51acebf86b4af31982de47281c1eaadeade62081228461f9c68c68f26b2b03b6963fdb_640.jpg'
-                                        )
-                                        .addField(`Players: 0 of ${game.minPlayers}[${game.maxPlayers}]`, players);
-                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
-
-                                    client.gameManager.destroyLobby(interaction.user);
-                                    collector.stop();
-                                } else {
-                                    try {
-                                        await replyInteraction(
-                                            button,
-                                            createErrorEmbed("`⛔ This button isn't for you.`", true)
-                                        );
+                                        client.gameManager.destroyLobby(interaction.user);
                                         collector.stop();
-                                    } catch (err) {
-                                        console.log(err);
                                     }
+                                } else {
+                                    game.join(button.user);
                                 }
+                                await button.update(' ');
                             } catch (err) {
                                 console.log(err);
                             }
@@ -100,11 +95,9 @@ export const command: Command = {
                             .setColor('#403075')
                             .setTitle('Tic Tac Toe')
                             .setDescription('`Minimum player count reached. The game is ready.`')
-                            .setThumbnail(
-                                'https://pixabay.com/get/geaca61548231e95d24eaf16a57d31eb647db750a6c6d1a02e69e81966015b12fe9a34662d842139b486848ae7b51acebf86b4af31982de47281c1eaadeade62081228461f9c68c68f26b2b03b6963fdb_640.jpg'
-                            )
+                            .setThumbnail(tttThumbnail)
                             .addField(
-                                `Players: ${game.players.length} of ${game.minPlayers}[${game.maxPlayers}]`,
+                                `Players: ${game.players.length} of ${game.minPlayers} [max ${game.maxPlayers}]`,
                                 players
                             );
                         const row = new MessageActionRow().addComponents([
@@ -123,16 +116,17 @@ export const command: Command = {
                                         await button.update(' ');
                                         game.start();
                                     } else if (button.customId === 'ttt_cancel') {
-                                        await button.update('Cancel');
+                                        await button.update(' ');
 
                                         let embedmsg = new MessageEmbed()
                                             .setColor('#403075')
                                             .setTitle('Tic Tac Toe')
                                             .setDescription('`The game was canceled.`')
-                                            .setThumbnail(
-                                                'https://pixabay.com/get/geaca61548231e95d24eaf16a57d31eb647db750a6c6d1a02e69e81966015b12fe9a34662d842139b486848ae7b51acebf86b4af31982de47281c1eaadeade62081228461f9c68c68f26b2b03b6963fdb_640.jpg'
-                                            )
-                                            .addField(`Players: 0 of ${game.minPlayers}[${game.maxPlayers}]`, players);
+                                            .setThumbnail(tttThumbnail)
+                                            .addField(
+                                                `Players: ${game.players.length} of ${game.minPlayers}[${game.maxPlayers}]`,
+                                                players
+                                            );
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
 
                                         client.gameManager.destroyLobby(interaction.user);
@@ -277,6 +271,12 @@ function getGameFieldMessage(game: TTTGame): string | MessagePayload | WebhookEd
         .setTitle('Tic Tac Toe')
         .setDescription(
             '<@' + game.players[0].id + '>`' + game.charX + ' vs ' + game.charO + '`<@' + game.players[1].id + '>'
+        )
+        .addField(
+            `Player Turn`,
+            `<@${game.playerOturn ? game.players[1].id : game.players[0].id}> ${
+                game.playerOturn ? game.charO : game.charX
+            }`
         );
     const row1 = new MessageActionRow().addComponents([
         new MessageButton()
