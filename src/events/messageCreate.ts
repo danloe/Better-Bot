@@ -41,19 +41,18 @@ async function setCommands(message: Message) {
         const regex = RegExp(/^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$/gu);
         for (const file of dirs) {
             const { command } = require(`${commandPath}\\${dir}\\${file}`);
-            if (regex.test(command.data.name)) {
-                commands.push(command.data.toJSON());
-            } else {
+            if (!regex.test(command.data.name)) {
                 console.log(command.data.name + ' failed the regex check.');
                 passed = false;
             }
+            commands.push(command.data.toJSON());
         }
     });
     if (passed) {
         await message.reply('Commands deployed to guild.');
     } else {
         await message.reply('Some commands failed the regex check. Commands may not be deployed.');
-    }    
+    }
     await message.guild!.commands.set(commands);
 }
 
