@@ -245,11 +245,6 @@ export class MusicManager {
                 await deferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
-                if (!subscription) {
-                    error('Not playing anything.');
-                    return;
-                }
-
                 if (!subscription || !subscription.voiceConnection) {
                     if (!queue) {
                         error('No queue.');
@@ -351,7 +346,7 @@ export class MusicManager {
         });
     }
 
-    showQueue(interaction: CommandInteraction | ButtonInteraction) {
+    getQueue(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<Queue>(async (done, error) => {
             try {
                 await deferReply(interaction);
@@ -461,19 +456,15 @@ export class MusicManager {
     */
 
     /**
-     * Checks for guildId, subscription, queue, queue empty
-     * @param interaction
-     * @returns boolean
+     * Returns for subscription and queue if available
      */
     getSubscriptionAndQueue(
         interaction: CommandInteraction | ButtonInteraction
     ): [MusicSubscription | undefined, Queue | undefined] {
         if (!interaction.guildId) return [undefined, undefined];
         const subscription = this.subscriptions.get(interaction.guildId);
-        if (!subscription) return [undefined, undefined];
         const queue = this.queues.get(interaction.guildId);
-        if (!queue) return [subscription, undefined];
-        subscription.lastChannel = interaction.channel;
+        if(subscription) subscription.lastChannel = interaction.channel || undefined;
         return [subscription, queue];
     }
 }
