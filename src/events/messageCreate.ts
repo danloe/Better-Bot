@@ -38,7 +38,7 @@ async function setCommands(message: Message) {
     let passed = true;
     readdirSync(commandPath).forEach((dir) => {
         const dirs = readdirSync(`${commandPath}\\${dir}`).filter((file) => file.endsWith('.ts'));
-        const regex = RegExp(/^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$/, 'gu');
+        const regex = RegExp(/^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$/gu);
         for (const file of dirs) {
             const { command } = require(`${commandPath}\\${dir}\\${file}`);
             if (regex.test(command.data.name)) {
@@ -50,11 +50,11 @@ async function setCommands(message: Message) {
         }
     });
     if (passed) {
-        await message.guild!.commands.set(commands);
         await message.reply('Commands deployed to guild.');
     } else {
-        await message.reply('Some commands failed the regex check. Commands not deployed.');
-    }
+        await message.reply('Some commands failed the regex check. Commands may not be deployed.');
+    }    
+    await message.guild!.commands.set(commands);
 }
 
 async function clearCommands(message: Message) {

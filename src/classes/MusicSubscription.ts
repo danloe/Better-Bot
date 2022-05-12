@@ -25,7 +25,7 @@ export class MusicSubscription {
     public readonly voicePlayer: AudioPlayer;
     public queue: Queue;
     public currentTrack: Track | undefined;
-    public lastChannel: TextBasedChannel | null | undefined;
+    public lastChannel: TextBasedChannel | undefined = undefined;
     public queueLock = false;
     public readyLock = false;
     public autoplay = true;

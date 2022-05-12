@@ -25,7 +25,7 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction) {
                 try {
-                    const queue = await client.musicManager.showQueue(interaction);
+                    const queue = await client.musicManager.getQueue(interaction);
 
                     if (queue) {
                         let embedmsg = new MessageEmbed().setColor('#403075').setTitle('Queue');

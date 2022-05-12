@@ -19,7 +19,7 @@ export class TTTGame extends GameLobby {
     public readonly charO = '⭕';
     gameField: string[] = [];
     playerOturn: boolean = false;
-    winner: User = null;
+    winner: User | null = null;
 
     public constructor(host: User, channel: TextBasedChannel) {
         super(GameType.TTT, host, channel, 2, 2);
