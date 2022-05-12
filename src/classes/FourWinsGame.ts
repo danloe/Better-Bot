@@ -108,6 +108,7 @@ export class FourWinsGame extends GameLobby {
         }
     }
 
+    /* https://codepen.io/osbulbul/pen/ngJdYy */
     checkWin(row: number, col: number) {
         if (this.getAdj(row, col, 0, 1) + this.getAdj(row, col, 0, -1) > 2) {
             return true;
