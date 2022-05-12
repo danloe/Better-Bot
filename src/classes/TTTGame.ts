@@ -19,9 +19,10 @@ export class TTTGame extends GameLobby {
     public readonly charO = '⭕';
     gameField: string[] = [];
     playerOturn: boolean = false;
+    winner: User = null;
 
     public constructor(host: User, channel: TextBasedChannel) {
-        super(GameType.TTT, host, channel, 2, 2);
+        super(GameType.TTT, host, channel, 1, 2);
 
         this.createGameField();
         this.state = GameState.Waiting;
@@ -76,10 +77,10 @@ export class TTTGame extends GameLobby {
     endGame(draw: boolean) {
         this.state = GameState.Finished;
         if (draw) {
-            this.emit('end', null);
+            this.emit('end', this);
         } else {
-            const winner = this.players[this.playerOturn ? 1 : 0];
-            this.emit('end', winner);
+            this.winner = this.players[this.playerOturn ? 1 : 0];
+            this.emit('end', this);
         }
     }
 
