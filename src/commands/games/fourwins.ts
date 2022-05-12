@@ -343,13 +343,12 @@ function getGameFieldMessage(game: FourWinsGame): string | MessagePayload | Webh
                 ' vs ' +
                 game.charYellow +
                 '`<@' +
-                game.players[0].id + //TODO 1
+                game.players[1].id +
                 '>'
         )
         .addField(
             `Player Turn`,
-            `<@${game.playerYellowTurn ? game.players[0].id : game.players[0].id}> ${
-                //TODO 1 0
+            `<@${game.playerYellowTurn ? game.players[1].id : game.players[0].id}> ${
                 game.playerYellowTurn ? game.charYellow : game.charRed
             }`
         )
