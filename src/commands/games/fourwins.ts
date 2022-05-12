@@ -2,7 +2,6 @@ import { Command } from '../../interfaces';
 import {
     ButtonInteraction,
     CommandInteraction,
-    InteractionCollector,
     Message,
     MessageActionRow,
     MessageButton,
