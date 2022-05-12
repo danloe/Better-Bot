@@ -30,7 +30,7 @@ export const command: Command = {
             if (interaction instanceof CommandInteraction) {
                 try {
                     const lobby = await client.gameManager.createLobby(
-                        GameType.FourWins,
+                        GameType.TicTacToe,
                         interaction,
                         interaction.user
                     );
@@ -38,23 +38,15 @@ export const command: Command = {
 
                     // A PLAYER JOINED OR LEFT
                     lobby.on('join', async (game: TTTGame) => {
-                        console.log(`[Four Wins] ${game.players[game.players.length - 1].username} joined`);
+                        console.log(`[TTT] ${game.players[game.players.length - 1].username} joined`);
                         let players = '';
                         game.players.forEach((player) => {
                             players = players + '<@' + player.id + '>';
                         });
-                        let embedmsg = new MessageEmbed()
-                            .setColor('#403075')
-                            .setTitle('Four Wins')
-                            .setDescription('`Waiting for more players...`')
-                            .setThumbnail(fourWinsThumbnail)
-                            .addField(
-                                `Players: ${game.players.length} of ${game.minPlayers} [max ${game.maxPlayers}]`,
-                                players
-                            );
+                        let embedmsg = getLobbyMessageEmbed(game, 'Waiting for more players...');
                         const row = new MessageActionRow().addComponents([
-                            new MessageButton().setCustomId('fw_join').setLabel('Join').setStyle('PRIMARY'),
-                            new MessageButton().setCustomId('fw_cancel').setLabel('Cancel Game').setStyle('DANGER')
+                            new MessageButton().setCustomId('ttt_join').setLabel('Join').setStyle('PRIMARY'),
+                            new MessageButton().setCustomId('ttt_cancel').setLabel('Cancel Game').setStyle('DANGER')
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
@@ -64,16 +56,8 @@ export const command: Command = {
                         collector.on('collect', async (button) => {
                             try {
                                 if (button.user.id === interaction.user.id) {
-                                    if (button.customId === 'fw_cancel') {
-                                        let embedmsg = new MessageEmbed()
-                                            .setColor('#403075')
-                                            .setTitle('Four Wins')
-                                            .setDescription('`The game was canceled.`')
-                                            .setThumbnail(fourWinsThumbnail)
-                                            .addField(
-                                                `Players: ${game.players.length} of ${game.minPlayers}[${game.maxPlayers}]`,
-                                                players
-                                            );
+                                    if (button.customId === 'ttt_cancel') {
+                                        let embedmsg = getLobbyMessageEmbed(game, 'The game was canceled.');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
 
                                         client.gameManager.destroyLobby(interaction.user);
@@ -91,15 +75,7 @@ export const command: Command = {
                         collector.on('end', async (collected) => {
                             try {
                                 if (game.state === GameState.Waiting || game.state === GameState.Ready) {
-                                    let embedmsg = new MessageEmbed()
-                                        .setColor('#403075')
-                                        .setTitle('Four Wins')
-                                        .setDescription('`The game was canceled.`')
-                                        .setThumbnail(fourWinsThumbnail)
-                                        .addField(
-                                            `Players: ${game.players.length} of ${game.minPlayers}[${game.maxPlayers}]`,
-                                            players
-                                        );
+                                    let embedmsg = getLobbyMessageEmbed(game, 'The game was canceled.');
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
 
                                     client.gameManager.destroyLobby(interaction.user);
@@ -114,23 +90,15 @@ export const command: Command = {
 
                     // GAME READY TO START
                     lobby.on('ready', async (game: TTTGame) => {
-                        console.log('[Four Wins] Ready');
+                        console.log('[TTT] Ready');
                         let players = '';
                         game.players.forEach((player) => {
                             players = players + '<@' + player.id + '>';
                         });
-                        let embedmsg = new MessageEmbed()
-                            .setColor('#403075')
-                            .setTitle('Four Wins')
-                            .setDescription('`Minimum player count reached. The game is ready.`')
-                            .setThumbnail(fourWinsThumbnail)
-                            .addField(
-                                `Players: ${game.players.length} of ${game.minPlayers} [max ${game.maxPlayers}]`,
-                                players
-                            );
+                        let embedmsg = getLobbyMessageEmbed(game, 'Minimum player count reached. The game is ready.');
                         const row = new MessageActionRow().addComponents([
-                            new MessageButton().setCustomId('fw_cancel').setLabel('Cancel Game').setStyle('DANGER'),
-                            new MessageButton().setCustomId('fw_start').setLabel('Start Game').setStyle('SUCCESS')
+                            new MessageButton().setCustomId('ttt_cancel').setLabel('Cancel Game').setStyle('DANGER'),
+                            new MessageButton().setCustomId('ttt_start').setLabel('Start Game').setStyle('SUCCESS')
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
@@ -140,21 +108,12 @@ export const command: Command = {
                         collector.on('collect', async (button) => {
                             try {
                                 if (button.user.id === interaction.user.id) {
-                                    if (button.customId === 'fw_start') {
+                                    if (button.customId === 'ttt_start') {
                                         await button.update(' ');
                                         game.start();
-                                    } else if (button.customId === 'fw_cancel') {
+                                    } else if (button.customId === 'ttt_cancel') {
                                         await button.update(' ');
-
-                                        let embedmsg = new MessageEmbed()
-                                            .setColor('#403075')
-                                            .setTitle('Four Wins')
-                                            .setDescription('`The game was canceled.`')
-                                            .setThumbnail(fourWinsThumbnail)
-                                            .addField(
-                                                `Players: ${game.players.length} of ${game.minPlayers}[${game.maxPlayers}]`,
-                                                players
-                                            );
+                                        let embedmsg = getLobbyMessageEmbed(game, 'The game was canceled.');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
 
                                         client.gameManager.destroyLobby(interaction.user);
@@ -178,19 +137,10 @@ export const command: Command = {
                         collector.on('end', async (collected) => {
                             try {
                                 if (game.state === GameState.Waiting || game.state === GameState.Ready) {
-                                    let embedmsg = new MessageEmbed()
-                                        .setColor('#403075')
-                                        .setTitle('Four Wins')
-                                        .setDescription('`The game was canceled.`')
-                                        .setThumbnail(fourWinsThumbnail)
-                                        .addField(
-                                            `Players: ${game.players.length} of ${game.minPlayers}[${game.maxPlayers}]`,
-                                            players
-                                        );
+                                    let embedmsg = getLobbyMessageEmbed(game, 'The game was canceled.');
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
 
                                     client.gameManager.destroyLobby(interaction.user);
-                                    collector.stop();
                                 }
                             } catch (err) {
                                 console.log(err);
@@ -202,7 +152,7 @@ export const command: Command = {
 
                     // GAME STARTED
                     lobby.on('start', async (game: TTTGame) => {
-                        console.log('[Four Wins] Started');
+                        console.log('[TTT] Started');
                         const gameFieldMessage = getGameFieldMessage(game);
                         await interaction.editReply(gameFieldMessage);
 
@@ -215,7 +165,7 @@ export const command: Command = {
                             try {
                                 if (button.user.id === game.getTurnPlayer().id) {
                                     await button.update(' ');
-                                    game.placeMark(parseInt(button.customId.replace('fw_', '')));
+                                    game.placeMark(parseInt(button.customId.replace('ttt_', '')));
                                     collector.stop();
                                 } else {
                                     try {
@@ -242,7 +192,7 @@ export const command: Command = {
 
                     // GAME TICK
                     lobby.on('tick', async (game: TTTGame) => {
-                        console.log('[Four Wins] Game Tick');
+                        console.log('[TTT] Game Tick');
                         const gameFieldMessage = getGameFieldMessage(game);
                         await interaction.editReply(gameFieldMessage);
 
@@ -255,7 +205,7 @@ export const command: Command = {
                             try {
                                 if (button.user.id === game.getTurnPlayer().id) {
                                     await button.update(' ');
-                                    game.placeMark(parseInt(button.customId.replace('fw_', '')));
+                                    game.placeMark(parseInt(button.customId.replace('ttt_', '')));
                                     collector.stop();
                                 } else {
                                     try {
@@ -282,7 +232,7 @@ export const command: Command = {
 
                     // GAME OVER
                     lobby.on('end', async (game: TTTGame) => {
-                        console.log('[Four Wins] Game Over');
+                        console.log('[TTT] Game Over');
                         const gameFieldMessage = getGameFieldMessage(game);
                         await interaction.editReply(gameFieldMessage);
 
@@ -304,7 +254,7 @@ export const command: Command = {
                     try {
                         await replyInteraction(
                             interaction,
-                            createErrorEmbed('🚩 Error stopping the track: `' + err + '`')
+                            createErrorEmbed('🚩 Error creating a four wins game: `' + err + '`')
                         );
                     } catch (err2) {
                         console.log(err2);
@@ -315,6 +265,19 @@ export const command: Command = {
             }
         })
 };
+
+function getLobbyMessageEmbed(game: TTTGame, message: string) {
+    let players = '';
+    game.players.forEach((player) => {
+        players = players + '<@' + player.id + '>';
+    });
+    return new MessageEmbed()
+        .setColor('#403075')
+        .setTitle('Four Wins')
+        .setDescription('`' + message + '`')
+        .setThumbnail(fourWinsThumbnail)
+        .addField(`Players: ${game.players.length} of ${game.minPlayers} [${game.maxPlayers}]`, players);
+}
 
 function getGameFieldMessage(game: TTTGame): string | MessagePayload | WebhookEditMessageOptions {
     let embedmsg = new MessageEmbed()
