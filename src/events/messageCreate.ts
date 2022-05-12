@@ -26,9 +26,7 @@ export const event: Event = {
 
         const command = client.commands.get(cmd);
         if (command) {
-            console.log(
-                `${message.author.username} triggered an interaction. [${command.data.name}]`
-            );
+            console.log(`${message.author.username} triggered an interaction. [${command.data.name}]`);
             (command as Command).run(client, undefined, message, args);
         }
     }
@@ -37,16 +35,26 @@ export const event: Event = {
 async function setCommands(message: Message) {
     const commands: any[] = [];
     const commandPath = path.join(__dirname, '..', 'commands');
+    let passed = true;
     readdirSync(commandPath).forEach((dir) => {
         const dirs = readdirSync(`${commandPath}\\${dir}`).filter((file) => file.endsWith('.ts'));
+        const regex = RegExp(/^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$/, 'gu');
         for (const file of dirs) {
             const { command } = require(`${commandPath}\\${dir}\\${file}`);
-            commands.push(command.data.toJSON());
+            if (regex.test(command.data.name)) {
+                commands.push(command.data.toJSON());
+            } else {
+                console.log(command.data.name + ' failed the regex check.');
+                passed = false;
+            }
         }
     });
-    console.log(commands);
-    await message.guild!.commands.set(commands);
-    await message.reply('Commands deployed to guild.');
+    if (passed) {
+        await message.guild!.commands.set(commands);
+        await message.reply('Commands deployed to guild.');
+    } else {
+        await message.reply('Some commands failed the regex check. Commands not deployed.');
+    }
 }
 
 async function clearCommands(message: Message) {
