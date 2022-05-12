@@ -22,7 +22,7 @@ export class TTTGame extends GameLobby {
     winner: User = null;
 
     public constructor(host: User, channel: TextBasedChannel) {
-        super(GameType.TTT, host, channel, 1, 2);
+        super(GameType.TTT, host, channel, 2, 2);
 
         this.createGameField();
         this.state = GameState.Waiting;
