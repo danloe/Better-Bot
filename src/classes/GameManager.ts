@@ -17,7 +17,7 @@ export class GameManager {
             try {
                 let lobby = this.games.get(host.id);
                 if (lobby) {
-                    error('You have created a' + lobby.game.toString() + 'game lobby already!');
+                    error('You have created a game lobby already!');
                     return;
                 }
                 switch (gameType) {

@@ -44,5 +44,6 @@ export enum GameState {
     Waiting,
     Ready,
     Started,
-    Finished
+    Finished,
+    Canceled
 }

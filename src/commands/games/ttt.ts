@@ -43,7 +43,7 @@ export const command: Command = {
                         game.players.forEach((player) => {
                             players = players + '<@' + player.id + '>';
                         });
-                        let embedmsg = getLobbyMessageEmbed(game, 'Waiting for more players...');
+                        let embedmsg = getLobbyMessageEmbed(game, '`Waiting for more players...`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('ttt_join').setLabel('Join').setStyle('PRIMARY'),
                             new MessageButton().setCustomId('ttt_cancel').setLabel('Cancel Game').setStyle('DANGER')
@@ -57,10 +57,11 @@ export const command: Command = {
                             try {
                                 if (button.user.id === interaction.user.id) {
                                     if (button.customId === 'ttt_cancel') {
-                                        let embedmsg = getLobbyMessageEmbed(game, 'The game was canceled.');
+                                        let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
 
                                         client.gameManager.destroyLobby(interaction.user);
+                                        collector.off('end', endListener);
                                         collector.stop();
                                     }
                                 } else {
@@ -72,18 +73,18 @@ export const command: Command = {
                             }
                         });
 
-                        collector.on('end', async (collected) => {
+                        const endListener = async (_collected: any) => {
                             try {
                                 if (game.state === GameState.Waiting || game.state === GameState.Ready) {
-                                    let embedmsg = getLobbyMessageEmbed(game, 'The game was canceled.');
+                                    let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
-
                                     client.gameManager.destroyLobby(interaction.user);
                                 }
                             } catch (err) {
                                 console.log(err);
                             }
-                        });
+                        };
+                        collector.on('end', endListener);
 
                         await interaction.editReply({ embeds: [embedmsg], components: [row] });
                     });
@@ -95,7 +96,7 @@ export const command: Command = {
                         game.players.forEach((player) => {
                             players = players + '<@' + player.id + '>';
                         });
-                        let embedmsg = getLobbyMessageEmbed(game, 'Minimum player count reached. The game is ready.');
+                        let embedmsg = getLobbyMessageEmbed(game, '`Minimum player count reached. The game is ready.`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('ttt_cancel').setLabel('Cancel Game').setStyle('DANGER'),
                             new MessageButton().setCustomId('ttt_start').setLabel('Start Game').setStyle('SUCCESS')
@@ -113,11 +114,12 @@ export const command: Command = {
                                         game.start();
                                     } else if (button.customId === 'ttt_cancel') {
                                         await button.update(' ');
-                                        let embedmsg = getLobbyMessageEmbed(game, 'The game was canceled.');
+                                        let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
 
                                         client.gameManager.destroyLobby(interaction.user);
                                     }
+                                    collector.off('end', endListener);
                                     collector.stop();
                                 } else {
                                     try {
@@ -134,18 +136,18 @@ export const command: Command = {
                             }
                         });
 
-                        collector.on('end', async (collected) => {
+                        const endListener = async (_collected: any) => {
                             try {
                                 if (game.state === GameState.Waiting || game.state === GameState.Ready) {
-                                    let embedmsg = getLobbyMessageEmbed(game, 'The game was canceled.');
+                                    let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
-
                                     client.gameManager.destroyLobby(interaction.user);
                                 }
                             } catch (err) {
                                 console.log(err);
                             }
-                        });
+                        };
+                        collector.on('end', endListener);
 
                         await interaction.editReply({ embeds: [embedmsg], components: [row] });
                     });
@@ -166,6 +168,7 @@ export const command: Command = {
                                 if (button.user.id === game.getTurnPlayer().id) {
                                     await button.update(' ');
                                     game.placeMark(parseInt(button.customId.replace('ttt_', '')));
+                                    collector.off('end', endListener);
                                     collector.stop();
                                 } else {
                                     try {
@@ -189,14 +192,14 @@ export const command: Command = {
                             }
                         });
 
-                        collector.on('end', async (collected) => {
+                        const endListener = async (_collected: any) => {
                             try {
                                 if (game.state === GameState.Started) {
                                     let embedmsg = getLobbyMessageEmbed(
                                         game,
                                         '<@' +
                                             game.getTurnPlayer().id +
-                                            '> has not executed his move. The game is closed.'
+                                            '>` has not executed his move. The game is closed.`'
                                     );
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
 
@@ -205,7 +208,8 @@ export const command: Command = {
                             } catch (err) {
                                 console.log(err);
                             }
-                        });
+                        };
+                        collector.on('end', endListener);
                     });
 
                     // GAME TICK
@@ -224,6 +228,7 @@ export const command: Command = {
                                 if (button.user.id === game.getTurnPlayer().id) {
                                     await button.update(' ');
                                     game.placeMark(parseInt(button.customId.replace('ttt_', '')));
+                                    collector.off('end', endListener);
                                     collector.stop();
                                 } else {
                                     try {
@@ -247,14 +252,14 @@ export const command: Command = {
                             }
                         });
 
-                        collector.on('end', async (collected) => {
+                        const endListener = async (_collected: any) => {
                             try {
                                 if (game.state === GameState.Started) {
                                     let embedmsg = getLobbyMessageEmbed(
                                         game,
                                         '<@' +
                                             game.getTurnPlayer().id +
-                                            '> has not executed his move. The game is closed.'
+                                            '>` has not executed his move. The game is closed.`'
                                     );
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
 
@@ -263,7 +268,8 @@ export const command: Command = {
                             } catch (err) {
                                 console.log(err);
                             }
-                        });
+                        };
+                        collector.on('end', endListener);
                     });
 
                     // GAME OVER
@@ -309,10 +315,10 @@ function getLobbyMessageEmbed(game: TTTGame, message: string) {
     });
     return new MessageEmbed()
         .setColor('#403075')
-        .setTitle('Four Wins')
-        .setDescription('`' + message + '`')
+        .setTitle('Tic Tac Toe')
+        .setDescription(message)
         .setThumbnail(tttThumbnail)
-        .addField(`Players: ${game.players.length} of ${game.minPlayers} [${game.maxPlayers}]`, players);
+        .addField(`Players: ${game.players.length} of ${game.maxPlayers} [min:${game.minPlayers}]`, players);
 }
 
 function getGameFieldMessage(game: TTTGame): string | MessagePayload | WebhookEditMessageOptions {
