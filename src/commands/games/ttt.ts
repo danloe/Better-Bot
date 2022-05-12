@@ -14,6 +14,7 @@ import BetterClient from '../../client';
 import { createEmbed, createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
 import { TTTGame } from '../../classes/TTTGame';
 import { GameType } from '../../classes/GameManager';
+import { GameState } from '../../classes/GameLobby';
 
 const tttThumbnail = 'https://www.dropbox.com/s/fkqrplz0duuqto9/ttt.png?dl=1';
 
@@ -28,7 +29,11 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction instanceof CommandInteraction) {
                 try {
-                    const lobby = await client.gameManager.createLobby(GameType.TicTacToe, interaction, interaction.user);
+                    const lobby = await client.gameManager.createLobby(
+                        GameType.TicTacToe,
+                        interaction,
+                        interaction.user
+                    );
                     await replyDefer(interaction);
 
                     // A PLAYER JOINED OR LEFT
@@ -82,6 +87,28 @@ export const command: Command = {
                                 console.log(err);
                             }
                         });
+
+                        collector.on('end', async (collected) => {
+                            try {
+                                if (game.state === GameState.Waiting || game.state === GameState.Ready) {
+                                    let embedmsg = new MessageEmbed()
+                                        .setColor('#403075')
+                                        .setTitle('Four Wins')
+                                        .setDescription('`The game was canceled.`')
+                                        .setThumbnail(tttThumbnail)
+                                        .addField(
+                                            `Players: ${game.players.length} of ${game.minPlayers}[${game.maxPlayers}]`,
+                                            players
+                                        );
+                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
+
+                                    client.gameManager.destroyLobby(interaction.user);
+                                }
+                            } catch (err) {
+                                console.log(err);
+                            }
+                        });
+
                         await interaction.editReply({ embeds: [embedmsg], components: [row] });
                     });
 
@@ -147,6 +174,28 @@ export const command: Command = {
                                 console.log(err);
                             }
                         });
+
+                        collector.on('end', async (collected) => {
+                            try {
+                                if (game.state === GameState.Waiting || game.state === GameState.Ready) {
+                                    let embedmsg = new MessageEmbed()
+                                        .setColor('#403075')
+                                        .setTitle('Four Wins')
+                                        .setDescription('`The game was canceled.`')
+                                        .setThumbnail(tttThumbnail)
+                                        .addField(
+                                            `Players: ${game.players.length} of ${game.minPlayers}[${game.maxPlayers}]`,
+                                            players
+                                        );
+                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
+
+                                    client.gameManager.destroyLobby(interaction.user);
+                                }
+                            } catch (err) {
+                                console.log(err);
+                            }
+                        });
+
                         await interaction.editReply({ embeds: [embedmsg], components: [row] });
                     });
 
