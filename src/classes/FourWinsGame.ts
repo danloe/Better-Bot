@@ -21,7 +21,7 @@ export class FourWinsGame extends GameLobby {
     winner: User | null = null;
 
     public constructor(host: User, channel: TextBasedChannel) {
-        super(GameType.FourWins, host, channel, 1, 2); //TODO 2 2
+        super(GameType.FourWins, host, channel, 2, 2);
 
         this.createGameField();
         this.state = GameState.Waiting;
@@ -29,7 +29,7 @@ export class FourWinsGame extends GameLobby {
     }
 
     getTurnPlayer(): User {
-        if (this.playerYellowTurn) return this.players[0];//TODO 1
+        if (this.playerYellowTurn) return this.players[1];
         return this.players[0];
     }
 
@@ -156,7 +156,7 @@ export class FourWinsGame extends GameLobby {
         if (draw) {
             this.emit('end', this);
         } else {
-            this.winner = this.players[this.playerYellowTurn ? 0 : 0];//TODO 1 0
+            this.winner = this.players[this.playerYellowTurn ? 1 : 0];
             this.emit('end', this);
         }
     }

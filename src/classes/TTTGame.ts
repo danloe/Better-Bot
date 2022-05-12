@@ -13,6 +13,12 @@ const winningCombinations = [
     [2, 4, 6]
 ];
 
+/*
+🔳⭕🔳
+❌⭕🔳
+🔳❌🔳
+*/
+
 export class TTTGame extends GameLobby {
     public readonly charField = '🔳';
     public readonly charX = '❌';
