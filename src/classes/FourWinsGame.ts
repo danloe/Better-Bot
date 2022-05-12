@@ -2,27 +2,26 @@ import { TextBasedChannel, User } from 'discord.js';
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
 
-const winningCombinations = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-];
+/*
+⚪⚪⚪⚪⚪⚪⚪
+⚪⚪⚪⚪⚪⚪⚪
+⚪⚪⚪⚪⚪⚪⚪
+⚪⚪⚪⚪⚪⚪⚪
+⚪⚪⚪🔴⚪⚪⚪
+⚪⚪🔴🟡⚪⚪⚪
+1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣
+*/
 
-export class TTTGame extends GameLobby {
-    public readonly charField = '🔳';
-    public readonly charX = '❌';
-    public readonly charO = '⭕';
-    gameField: string[] = [];
+export class FourWinsGame extends GameLobby {
+    public readonly charField = '⚪';
+    public readonly charRed = '🔴';
+    public readonly charYellow = '🟡';
+    gameField: string[][] = [];
     playerOturn: boolean = false;
     winner: User | null = null;
 
     public constructor(host: User, channel: TextBasedChannel) {
-        super(GameType.TicTacToe, host, channel, 2, 2);
+        super(GameType.FourWins, host, channel, 2, 2);
 
         this.createGameField();
         this.state = GameState.Waiting;
@@ -36,20 +35,18 @@ export class TTTGame extends GameLobby {
 
     createGameField() {
         this.gameField = [
-            this.charField,
-            this.charField,
-            this.charField,
-            this.charField,
-            this.charField,
-            this.charField,
-            this.charField,
-            this.charField,
-            this.charField
+        [this.charField, this.charField, this.charField, this.charField, this.charField, this.charField, this.charField],
+        [this.charField, this.charField, this.charField, this.charField, this.charField, this.charField, this.charField],
+        [this.charField, this.charField, this.charField, this.charField, this.charField, this.charField, this.charField],
+        [this.charField, this.charField, this.charField, this.charField, this.charField, this.charField, this.charField],
+        [this.charField, this.charField, this.charField, this.charField, this.charField, this.charField, this.charField],
+        [this.charField, this.charField, this.charField, this.charField, this.charField, this.charField, this.charField]
         ];
     }
 
-    placeMark(index: number) {
-        this.gameField[index] = this.playerOturn ? this.charO : this.charX;
+/*
+    placeMark(column: number) {
+        this.gameField[][] = this.playerOturn ? this.charYellow : this.charRed;
         if (this.checkWin()) {
             this.endGame(false);
         } else if (this.isDraw()) {
@@ -62,7 +59,7 @@ export class TTTGame extends GameLobby {
     checkWin(): boolean {
         return winningCombinations.some((combination) => {
             return combination.every((index) => {
-                return this.gameField[index] === (this.playerOturn ? this.charO : this.charX);
+                return this.gameField[index] === (this.playerOturn ? this.charYellow : this.charRed);
             });
         });
     }
@@ -88,4 +85,5 @@ export class TTTGame extends GameLobby {
         this.playerOturn = !this.playerOturn;
         this.emit('tick', this);
     }
+*/
 }
