@@ -17,6 +17,7 @@ import { GameState } from '../../classes/GameLobby';
 import { FourWinsGame } from '../../classes/FourWinsGame';
 
 const fwThumbnail = 'https://www.dropbox.com/s/0jq0iqts4a9vque/fourwins.png?dl=1';
+const interactionTimeout = 60_000;
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('fourwins').setDescription('Start a game of four wins.'),
@@ -36,13 +37,9 @@ export const command: Command = {
                     );
                     await replyDefer(interaction);
 
-                    // A PLAYER JOINED OR LEFT
+                    // A PLAYER JOINED
                     lobby.on('join', async (game: FourWinsGame) => {
                         console.log(`[FourWins] ${game.players[game.players.length - 1].username} joined`);
-                        let players = '';
-                        game.players.forEach((player) => {
-                            players = players + '<@' + player.id + '>';
-                        });
                         let embedmsg = getLobbyMessageEmbed(game, '`Waiting for more players...`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('fw_join').setLabel('Join').setStyle('PRIMARY'),
@@ -50,32 +47,39 @@ export const command: Command = {
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: 60000
+                            time: interactionTimeout
                         });
 
                         collector.on('collect', async (button) => {
                             try {
+                                await button.deferUpdate();
                                 if (button.user.id === interaction.user.id) {
-                                    if (button.customId === 'fw_cancel') {
+                                    if (button.customId === 'fw_join_cancel') {
                                         let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
 
                                         client.gameManager.destroyLobby(interaction.user);
-                                        collector.off('end', endListener);
                                         collector.stop();
                                     }
                                 } else {
-                                    game.join(button.user);
+                                    if (button.customId === 'fw_join_join') {
+                                        game.join(button.user);
+                                        collector.stop();
+                                    } else if (button.customId === 'fw_join_cancel') {
+                                        await button.reply(createErrorEmbed("`⛔ This button isn't for you.`", true));
+                                    }
                                 }
-                                await button.update(' ');
                             } catch (err) {
                                 console.log(err);
                             }
                         });
 
-                        const endListener = async (_collected: any) => {
+                        collector.on('end', async (_: any, reason: string) => {
                             try {
-                                if (game.state === GameState.Waiting || game.state === GameState.Ready) {
+                                if (
+                                    reason === 'time' &&
+                                    (game.state === GameState.Waiting || game.state === GameState.Ready)
+                                ) {
                                     let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
                                     client.gameManager.destroyLobby(interaction.user);
@@ -83,8 +87,7 @@ export const command: Command = {
                             } catch (err) {
                                 console.log(err);
                             }
-                        };
-                        collector.on('end', endListener);
+                        });
 
                         await interaction.editReply({ embeds: [embedmsg], components: [row] });
                     });
@@ -92,41 +95,44 @@ export const command: Command = {
                     // GAME READY TO START
                     lobby.on('ready', async (game: FourWinsGame) => {
                         console.log('[FourWins] Ready');
-                        let players = '';
-                        game.players.forEach((player) => {
-                            players = players + '<@' + player.id + '>';
-                        });
                         let embedmsg = getLobbyMessageEmbed(game, '`Minimum player count reached. The game is ready.`');
                         const row = new MessageActionRow().addComponents([
-                            new MessageButton().setCustomId('fw_cancel').setLabel('Cancel Game').setStyle('DANGER'),
-                            new MessageButton().setCustomId('fw_start').setLabel('Start Game').setStyle('SUCCESS')
+                            new MessageButton().setCustomId('fw_ready_join').setLabel('Join').setStyle('PRIMARY'),
+                            new MessageButton()
+                                .setCustomId('fw_ready_cancel')
+                                .setLabel('Cancel Game')
+                                .setStyle('DANGER'),
+                            new MessageButton().setCustomId('fw_ready_start').setLabel('Start Game').setStyle('SUCCESS')
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: 60000
+                            time: interactionTimeout
                         });
 
                         collector.on('collect', async (button) => {
                             try {
                                 if (button.user.id === interaction.user.id) {
-                                    if (button.customId === 'fw_start') {
-                                        await button.update(' ');
+                                    await button.deferUpdate();
+                                    if (button.customId === 'fw_ready_start') {
                                         game.start();
-                                    } else if (button.customId === 'fw_cancel') {
-                                        await button.update(' ');
+                                    } else if (button.customId === 'fw_ready_cancel') {
                                         let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
 
                                         client.gameManager.destroyLobby(interaction.user);
                                     }
-                                    collector.off('end', endListener);
                                     collector.stop();
                                 } else {
                                     try {
-                                        await replyInteraction(
-                                            button,
-                                            createErrorEmbed("`⛔ This button isn't for you.`", true)
-                                        );
+                                        if (button.customId === 'fw_ready_join') {
+                                            await button.deferUpdate();
+                                            game.join(button.user);
+                                            collector.stop();
+                                        } else {
+                                            await button.reply(
+                                                createErrorEmbed("`⛔ This button isn't for you.`", true)
+                                            );
+                                        }
                                     } catch (err) {
                                         console.log(err);
                                     }
@@ -136,9 +142,12 @@ export const command: Command = {
                             }
                         });
 
-                        const endListener = async (_collected: any) => {
+                        collector.on('end', async (_: any, reason: string) => {
                             try {
-                                if (game.state === GameState.Waiting || game.state === GameState.Ready) {
+                                if (
+                                    reason === 'time' &&
+                                    (game.state === GameState.Waiting || game.state === GameState.Ready)
+                                ) {
                                     let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
                                     client.gameManager.destroyLobby(interaction.user);
@@ -146,8 +155,7 @@ export const command: Command = {
                             } catch (err) {
                                 console.log(err);
                             }
-                        };
-                        collector.on('end', endListener);
+                        });
 
                         await interaction.editReply({ embeds: [embedmsg], components: [row] });
                     });
@@ -160,26 +168,23 @@ export const command: Command = {
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: 60000
+                            time: interactionTimeout
                         });
 
                         collector.on('collect', async (button) => {
                             try {
                                 if (button.user.id === game.getTurnPlayer().id) {
-                                    await button.update(' ');
+                                    await button.deferUpdate();
                                     game.placeMark(parseInt(button.customId.replace('fw_', '')));
-                                    collector.off('end', endListener);
                                     collector.stop();
                                 } else {
                                     try {
                                         if (game.players.includes(button.user)) {
-                                            await replyInteraction(
-                                                button,
+                                            await button.reply(
                                                 createErrorEmbed("`💤 It is the other player's turn.`", true)
                                             );
                                         } else {
-                                            await replyInteraction(
-                                                button,
+                                            await button.reply(
                                                 createErrorEmbed("`⛔ These buttons aren't for you.`", true)
                                             );
                                         }
@@ -192,9 +197,9 @@ export const command: Command = {
                             }
                         });
 
-                        const endListener = async (_collected: any) => {
+                        collector.on('end', async (_: any, reason: string) => {
                             try {
-                                if (game.state === GameState.Started) {
+                                if (reason === 'time' && game.state === GameState.Started) {
                                     let embedmsg = getLobbyMessageEmbed(
                                         game,
                                         '<@' +
@@ -208,8 +213,7 @@ export const command: Command = {
                             } catch (err) {
                                 console.log(err);
                             }
-                        };
-                        collector.on('end', endListener);
+                        });
                     });
 
                     // GAME TICK
@@ -220,27 +224,24 @@ export const command: Command = {
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: 60000
+                            time: interactionTimeout
                         });
 
                         collector.on('collect', async (button) => {
                             try {
                                 if (button.user.id === game.getTurnPlayer().id) {
-                                    await button.update(' ');
+                                    await button.deferUpdate();
                                     game.placeMark(parseInt(button.customId.replace('fw_', '')));
-                                    collector.off('end', endListener);
                                     collector.stop();
                                 } else {
                                     1;
                                     try {
                                         if (game.players.includes(button.user)) {
-                                            await replyInteraction(
-                                                button,
+                                            await button.reply(
                                                 createErrorEmbed("`💤 It is the other player's turn.`", true)
                                             );
                                         } else {
-                                            await replyInteraction(
-                                                button,
+                                            await button.reply(
                                                 createErrorEmbed("`⛔ These buttons aren't for you.`", true)
                                             );
                                         }
@@ -253,9 +254,9 @@ export const command: Command = {
                             }
                         });
 
-                        const endListener = async (_collected: any) => {
+                        collector.on('end', async (_: any, reason: string) => {
                             try {
-                                if (game.state === GameState.Started) {
+                                if (reason === 'time' && game.state === GameState.Started) {
                                     let embedmsg = getLobbyMessageEmbed(
                                         game,
                                         '<@' +
@@ -269,8 +270,7 @@ export const command: Command = {
                             } catch (err) {
                                 console.log(err);
                             }
-                        };
-                        collector.on('end', endListener);
+                        });
                     });
 
                     // GAME OVER
@@ -319,7 +319,7 @@ function getLobbyMessageEmbed(game: FourWinsGame, message: string) {
         .setTitle('Four Wins')
         .setDescription(message)
         .setThumbnail(fwThumbnail)
-        .addField(`Players: ${game.players.length} of ${game.maxPlayers} [min:${game.minPlayers}]`, players);
+        .addField(`Players: ${game.players.length} of ${game.maxPlayers} [min ${game.minPlayers}]`, players);
 }
 
 function getGameFieldMessage(game: FourWinsGame): string | MessagePayload | WebhookEditMessageOptions {

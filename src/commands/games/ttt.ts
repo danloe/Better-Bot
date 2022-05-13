@@ -59,7 +59,7 @@ export const command: Command = {
                                 if (button.user.id === interaction.user.id) {
                                     if (button.customId === 'ttt_join_cancel') {
                                         let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
-                                        await replyInteraction(interaction, { embeds: [embedmsg], components: [] });
+                                        await interaction.editReply({ embeds: [embedmsg], components: [] });
 
                                         client.gameManager.destroyLobby(interaction.user);
                                         collector.stop();
@@ -67,6 +67,7 @@ export const command: Command = {
                                 } else {
                                     if (button.customId === 'ttt_join_join') {
                                         game.join(button.user);
+                                        collector.stop();
                                     } else if (button.customId === 'ttt_join_cancel') {
                                         await button.reply(createErrorEmbed("`⛔ This button isn't for you.`", true));
                                     }
@@ -79,9 +80,8 @@ export const command: Command = {
                         collector.on('end', async (_: any, reason: string) => {
                             try {
                                 if (
-                                    reason === 'time' ||
-                                    game.state === GameState.Waiting ||
-                                    game.state === GameState.Ready
+                                    reason === 'time' &&
+                                    (game.state === GameState.Waiting || game.state === GameState.Ready)
                                 ) {
                                     let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
@@ -123,7 +123,7 @@ export const command: Command = {
                                         game.start();
                                     } else if (button.customId === 'ttt_ready_cancel') {
                                         let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
-                                        await replyInteraction(interaction, { embeds: [embedmsg], components: [] });
+                                        await interaction.editReply({ embeds: [embedmsg], components: [] });
 
                                         client.gameManager.destroyLobby(interaction.user);
                                     }
@@ -133,6 +133,7 @@ export const command: Command = {
                                         if (button.customId === 'ttt_ready_join') {
                                             await button.deferUpdate();
                                             game.join(button.user);
+                                            collector.stop();
                                         } else {
                                             await button.reply(
                                                 createErrorEmbed("`⛔ This button isn't for you.`", true)
@@ -150,9 +151,8 @@ export const command: Command = {
                         collector.on('end', async (_: any, reason: string) => {
                             try {
                                 if (
-                                    reason === 'time' ||
-                                    game.state === GameState.Waiting ||
-                                    game.state === GameState.Ready
+                                    reason === 'time' &&
+                                    (game.state === GameState.Waiting || game.state === GameState.Ready)
                                 ) {
                                     let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
@@ -205,7 +205,7 @@ export const command: Command = {
 
                         collector.on('end', async (_: any, reason: string) => {
                             try {
-                                if (reason === 'time' || game.state === GameState.Started) {
+                                if (reason === 'time' && game.state === GameState.Started) {
                                     let embedmsg = getLobbyMessageEmbed(
                                         game,
                                         '<@' +
@@ -261,7 +261,7 @@ export const command: Command = {
 
                         collector.on('end', async (_: any, reason: string) => {
                             try {
-                                if (reason === 'time' || game.state === GameState.Started) {
+                                if (reason === 'time' && game.state === GameState.Started) {
                                     let embedmsg = getLobbyMessageEmbed(
                                         game,
                                         '<@' +
@@ -324,7 +324,7 @@ function getLobbyMessageEmbed(game: TTTGame, message: string) {
         .setTitle('Tic Tac Toe')
         .setDescription(message)
         .setThumbnail(tttThumbnail)
-        .addField(`Players: ${game.players.length} of ${game.maxPlayers} [min:${game.minPlayers}]`, players);
+        .addField(`Players: ${game.players.length} of ${game.maxPlayers} [min ${game.minPlayers}]`, players);
 }
 
 function getGameFieldMessage(game: TTTGame): string | MessagePayload | WebhookEditMessageOptions {
