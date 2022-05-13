@@ -17,7 +17,6 @@ import { GameType } from '../../classes/GameManager';
 import { GameState } from '../../classes/GameLobby';
 
 const tttThumbnail = 'https://www.dropbox.com/s/fkqrplz0duuqto9/ttt.png?dl=1';
-const interactionTimeout = 60_000;
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('tictactoe').setDescription('Start a game of tic tac toe.'),
@@ -50,7 +49,7 @@ export const command: Command = {
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: interactionTimeout
+                            time: game.interactionTimeout
                         });
 
                         collector.on('collect', async (button) => {
@@ -112,7 +111,7 @@ export const command: Command = {
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: interactionTimeout
+                            time: game.interactionTimeout
                         });
 
                         collector.on('collect', async (button) => {
@@ -174,7 +173,7 @@ export const command: Command = {
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: interactionTimeout
+                            time: game.interactionTimeout
                         });
 
                         collector.on('collect', async (button) => {
@@ -230,7 +229,7 @@ export const command: Command = {
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: interactionTimeout
+                            time: game.interactionTimeout
                         });
 
                         collector.on('collect', async (button) => {

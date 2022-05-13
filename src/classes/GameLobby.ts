@@ -10,8 +10,9 @@ export class GameLobby extends EventEmitter {
     public state: GameState = GameState.Waiting;
     public minPlayers = 1;
     public maxPlayers = 1;
+    public interactionTimeout = 60_000;
 
-    public constructor(game: GameType, host: User, channel: TextBasedChannel, minPlayers: number, maxPlayers: number) {
+    public constructor(game: GameType, host: User, channel: TextBasedChannel, minPlayers: number, maxPlayers: number, interactionTimeout: number = 60_000) {
         super();
 
         this.game = game;
@@ -19,6 +20,7 @@ export class GameLobby extends EventEmitter {
         this.channel = channel;
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
+        this.interactionTimeout = interactionTimeout;
     }
 
     join(user: User) {

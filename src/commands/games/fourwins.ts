@@ -12,12 +12,11 @@ import {
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
 import { createEmbed, createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
+import { FourWinsGame } from '../../classes/FourWinsGame';
 import { GameType } from '../../classes/GameManager';
 import { GameState } from '../../classes/GameLobby';
-import { FourWinsGame } from '../../classes/FourWinsGame';
 
 const fwThumbnail = 'https://www.dropbox.com/s/0jq0iqts4a9vque/fourwins.png?dl=1';
-const interactionTimeout = 60_000;
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('fourwins').setDescription('Start a game of four wins.'),
@@ -47,7 +46,7 @@ export const command: Command = {
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: interactionTimeout
+                            time: game.interactionTimeout
                         });
 
                         collector.on('collect', async (button) => {
@@ -106,7 +105,7 @@ export const command: Command = {
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: interactionTimeout
+                            time: game.interactionTimeout
                         });
 
                         collector.on('collect', async (button) => {
@@ -168,7 +167,7 @@ export const command: Command = {
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: interactionTimeout
+                            time: game.interactionTimeout
                         });
 
                         collector.on('collect', async (button) => {
@@ -224,7 +223,7 @@ export const command: Command = {
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: interactionTimeout
+                            time: game.interactionTimeout
                         });
 
                         collector.on('collect', async (button) => {
