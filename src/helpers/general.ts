@@ -5,7 +5,7 @@ export async function replyInteraction(
     options: string | MessagePayload | WebhookEditMessageOptions
 ) {
     try {
-        if (interaction instanceof ButtonInteraction || interaction.replied) {
+        if (interaction.replied) {
             await interaction.followUp(options);
         } else {
             if (interaction.deferred) {
