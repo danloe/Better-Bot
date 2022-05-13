@@ -57,9 +57,9 @@ export const command: Command = {
                                         bulk.size +
                                         ' messages by` ' +
                                         `${user}` +
-                                        (bulk.size < amount!)
-                                        ? '\nMessages older than 14 days cannot be bulk deleted.'
-                                        : ''
+                                        (bulk.size < amount!
+                                            ? '\n`⚠️ Messages older than 14 days cannot be bulk deleted.`'
+                                            : '`')
                                 )
                             );
                         } else {
@@ -69,9 +69,12 @@ export const command: Command = {
                                 interaction,
                                 createEmbed(
                                     ' ',
-                                    '`🚮 Successfully deleted ' + bulk.size + ' messages.`' + (bulk.size < amount!)
-                                        ? '\nMessages older than 14 days cannot be bulk deleted.'
-                                        : ''
+                                    '`🚮 Successfully deleted ' +
+                                        bulk.size +
+                                        ' messages.' +
+                                        (bulk.size < amount!
+                                            ? '\n⚠️ Messages older than 14 days cannot be bulk deleted.`'
+                                            : '`')
                                 )
                             );
                         }
