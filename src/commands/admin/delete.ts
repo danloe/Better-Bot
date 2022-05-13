@@ -2,11 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, GuildMember, Message, TextChannel } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import {
-    createEmbed,
-    createErrorEmbed,
-    replyInteraction,
-} from '../../helpers';
+import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -52,17 +48,31 @@ export const command: Command = {
                                 },
                                 { count: 0 }
                             );
-                            const bulk = await channel.bulkDelete(userMessages);
+                            const bulk = await channel.bulkDelete(userMessages, true);
                             await replyInteraction(
                                 interaction,
-                                createEmbed(' ', '`🚮 Successfully deleted ' + bulk.size + ' messages by` ' + `${user}`)
+                                createEmbed(
+                                    ' ',
+                                    '`🚮 Successfully deleted ' +
+                                        bulk.size +
+                                        ' messages by` ' +
+                                        `${user}` +
+                                        (bulk.size < amount!)
+                                        ? '\nMessages older than 14 days cannot be bulk deleted.'
+                                        : ''
+                                )
                             );
                         } else {
                             // No User given
-                            const bulk = await channel.bulkDelete(amount!);
+                            const bulk = await channel.bulkDelete(amount!, true);
                             await replyInteraction(
                                 interaction,
-                                createEmbed(' ', '`🚮 Successfully deleted ' + bulk.size + ' messages.`')
+                                createEmbed(
+                                    ' ',
+                                    '`🚮 Successfully deleted ' + bulk.size + ' messages.`' + (bulk.size < amount!)
+                                        ? '\nMessages older than 14 days cannot be bulk deleted.'
+                                        : ''
+                                )
                             );
                         }
                     } else {

@@ -42,8 +42,8 @@ export const command: Command = {
                         console.log(`[FourWins] ${game.players[game.players.length - 1].username} joined`);
                         let embedmsg = getLobbyMessageEmbed(game, '`Waiting for more players...`');
                         const row = new MessageActionRow().addComponents([
-                            new MessageButton().setCustomId('fw_join').setLabel('Join').setStyle('PRIMARY'),
-                            new MessageButton().setCustomId('fw_cancel').setLabel('Cancel Game').setStyle('DANGER')
+                            new MessageButton().setCustomId('fw_join_join').setLabel('Join').setStyle('PRIMARY'),
+                            new MessageButton().setCustomId('fw_join_cancel').setLabel('Cancel Game').setStyle('DANGER')
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
