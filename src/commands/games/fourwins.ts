@@ -312,7 +312,7 @@ export const command: Command = {
 function getLobbyMessageEmbed(game: FourWinsGame, message: string) {
     let players = '';
     game.players.forEach((player) => {
-        players = players + '<@' + player.id + '>';
+        players = players + '<@' + player.id + '> ';
     });
     return new MessageEmbed()
         .setColor('#403075')
