@@ -318,7 +318,7 @@ export const command: Command = {
 
                         collector.on('collect', async (button) => {
                             try {
-                                if (button.user.id === opponent.id) {
+                                if (button.user.id === opponent!.id) {
                                     if (button.customId === 'ttt_challenge_accept') {
                                         await button.deferUpdate();
 
