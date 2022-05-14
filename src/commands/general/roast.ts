@@ -4,6 +4,60 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
 import { createErrorEmbed } from '../../helpers';
 
+export const command: Command = {
+    data: new SlashCommandBuilder()
+        .setName('roast')
+        .setDescription('Roast yourself or someone else.')
+        .addUserOption((option) => option.setName('user').setDescription('The user to roast').setRequired(true)),
+    run: async (
+        client: BetterClient,
+        interaction?: CommandInteraction | ButtonInteraction,
+        message?: Message,
+        args?: string[]
+    ) => {
+        new Promise<void>(async (done, error) => {
+            if (interaction) {
+                let i = Math.floor(Math.random() * answers.length);
+                let user =
+                    interaction instanceof CommandInteraction
+                        ? interaction.options.getUser('user')
+                        : interaction.member?.user;
+                await interaction
+                    .reply({
+                        content: `${user!} ${answers[i]}`,
+                        options: {
+                            tts: true
+                        }
+                    })
+                    .then(done)
+                    .catch(async (err) => {
+                        await interaction.editReply(createErrorEmbed('🚩 Error roasting: `' + err + '`'));
+                        error(err);
+                    });
+            }
+
+            if (message) {
+                let author: any = message.author;
+
+                if (args!.length > 0) {
+                    if (args![0].toLowerCase() != 'me') author = args![0];
+
+                    let i = Math.floor(Math.random() * answers.length);
+                    await message.channel.send({
+                        content: `${author} ${answers[i]}`,
+                        options: {
+                            tts: true
+                        }
+                    });
+                } else {
+                    await message.channel.send(`${author} You need to mention someone with *@[name]*`);
+                    return;
+                }
+            }
+        });
+    }
+};
+
 const answers = [
     'My phone battery lasts longer than your relationships.',
     'Oh you’re talking to me, I thought you only talked behind my back.',
@@ -74,57 +128,3 @@ const answers = [
     'I’d like to talk to you but I left my English-to-Dumbass Dictionary at home.',
     'You don’t like me, then fuck off. Problem solved.'
 ];
-
-export const command: Command = {
-    data: new SlashCommandBuilder()
-        .setName('roast')
-        .setDescription('Roast yourself or someone else.')
-        .addUserOption((option) => option.setName('user').setDescription('The user to roast').setRequired(true)),
-    run: async (
-        client: BetterClient,
-        interaction?: CommandInteraction | ButtonInteraction,
-        message?: Message,
-        args?: string[]
-    ) => {
-        new Promise<void>(async (done, error) => {
-            if (interaction) {
-                let i = Math.floor(Math.random() * answers.length);
-                let user =
-                    interaction instanceof CommandInteraction
-                        ? interaction.options.getUser('user')
-                        : interaction.member?.user;
-                await interaction
-                    .reply({
-                        content: `${user!} ${answers[i]}`,
-                        options: {
-                            tts: true
-                        }
-                    })
-                    .then(done)
-                    .catch(async (err) => {
-                        await interaction.editReply(createErrorEmbed('🚩 Error roasting: `' + err + '`'));
-                        error(err);
-                    });
-            }
-
-            if (message) {
-                let author: any = message.author;
-
-                if (args!.length > 0) {
-                    if (args![0].toLowerCase() != 'me') author = args![0];
-
-                    let i = Math.floor(Math.random() * answers.length);
-                    await message.channel.send({
-                        content: `${author} ${answers[i]}`,
-                        options: {
-                            tts: true
-                        }
-                    });
-                } else {
-                    await message.channel.send(`${author} You need to mention someone with *@[name]*`);
-                    return;
-                }
-            }
-        });
-    }
-};

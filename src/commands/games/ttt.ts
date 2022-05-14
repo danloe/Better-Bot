@@ -7,6 +7,7 @@ import {
     MessageButton,
     MessageEmbed,
     MessagePayload,
+    User,
     WebhookEditMessageOptions
 } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
@@ -14,12 +15,17 @@ import BetterClient from '../../client';
 import { createEmbed, createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
 import { TTTGame } from '../../classes/TTTGame';
 import { GameType } from '../../classes/GameManager';
-import { GameState } from '../../classes/GameLobby';
+import { GameLobby, GameState } from '../../classes/GameLobby';
 
 const tttThumbnail = 'https://www.dropbox.com/s/fkqrplz0duuqto9/ttt.png?dl=1';
 
 export const command: Command = {
-    data: new SlashCommandBuilder().setName('tictactoe').setDescription('Start a game of tic tac toe.'),
+    data: new SlashCommandBuilder()
+        .setName('tictactoe')
+        .setDescription('Start a game of tic tac toe.')
+        .addUserOption((option) =>
+            option.setName('opponent').setDescription('Do you want to challenge a specific user?').setRequired(false)
+        ),
     run: (
         client: BetterClient,
         interaction?: CommandInteraction | ButtonInteraction,
@@ -29,6 +35,8 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction instanceof CommandInteraction) {
                 try {
+                    let opponent = interaction.options.getUser('opponent');
+
                     const lobby = await client.gameManager.createLobby(
                         GameType.TicTacToe,
                         interaction,
@@ -294,8 +302,69 @@ export const command: Command = {
                         client.gameManager.destroyLobby(interaction.user);
                     });
 
-                    // Join the games lobby as host
-                    lobby.join(interaction.user);
+                    if (opponent) {
+                        // Send a challenge message
+                        await interaction.reply(
+                            getChallengeMessage(
+                                interaction.user,
+                                opponent,
+                                '⚔️ <@' + interaction.user.id + '> `challenged you to a game of TicTacToe!`'
+                            )
+                        );
+
+                        const collector = interaction.channel!.createMessageComponentCollector({
+                            componentType: 'BUTTON',
+                            time: lobby.interactionTimeout
+                        });
+
+                        collector.on('collect', async (button) => {
+                            try {
+                                if (button.user.id === 'ttt_challenge_accept') {
+                                    await button.deferUpdate();
+
+                                    lobby.join(opponent!);
+                                    collector.stop();
+                                } else if (button.user.id === 'ttt_challenge_decline') {
+                                    await button.deferUpdate();
+
+                                    let embedmsg = getLobbyMessageEmbed(lobby, '`The game challenge was declined.`');
+                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
+
+                                    client.gameManager.destroyLobby(interaction.user);
+                                    collector.stop();
+                                } else {
+                                    try {
+                                        await button.reply(
+                                            createErrorEmbed("`⛔ These buttons aren't for you.`", true)
+                                        );
+                                    } catch (err) {
+                                        console.log(err);
+                                    }
+                                }
+                            } catch (err) {
+                                console.log(err);
+                            }
+                        });
+
+                        collector.on('end', async (_: any, reason: string) => {
+                            try {
+                                if (reason === 'time' && lobby.state === GameState.Waiting) {
+                                    let embedmsg = getLobbyMessageEmbed(
+                                        lobby,
+                                        '<@' + opponent!.id + '>` has not accepted the challenge. The game is closed.`'
+                                    );
+                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
+
+                                    client.gameManager.destroyLobby(interaction.user);
+                                }
+                            } catch (err) {
+                                console.log(err);
+                            }
+                        });
+                    } else {
+                        // open game lobby
+                        lobby.open();
+                    }
                     done();
                 } catch (err) {
                     try {
@@ -313,7 +382,7 @@ export const command: Command = {
         })
 };
 
-function getLobbyMessageEmbed(game: TTTGame, message: string) {
+function getLobbyMessageEmbed(game: GameLobby, message: string) {
     let players = '';
     game.players.forEach((player) => {
         players = players + '<@' + player.id + '> ';
@@ -324,6 +393,27 @@ function getLobbyMessageEmbed(game: TTTGame, message: string) {
         .setDescription(message)
         .setThumbnail(tttThumbnail)
         .addField(`Players: ${game.players.length} of ${game.maxPlayers} [min ${game.minPlayers}]`, players);
+}
+
+function getChallengeMessage(
+    challenger: User,
+    opponent: User,
+    message: string
+): string | MessagePayload | WebhookEditMessageOptions {
+    let embedmsg = new MessageEmbed()
+        .setColor('#403075')
+        .setTitle('Tic Tac Toe')
+        .setAuthor({ name: challenger.username, iconURL: challenger.avatarURL() || '' })
+        .setDescription(`<@${opponent.id}> ${message}`)
+        .setThumbnail(tttThumbnail);
+    const row1 = new MessageActionRow().addComponents([
+        new MessageButton().setCustomId('ttt_challenge_accept').setLabel('Accept').setStyle('SUCCESS'),
+        new MessageButton().setCustomId('ttt_challenge_decline').setLabel('Decline').setStyle('DANGER')
+    ]);
+    return {
+        embeds: [embedmsg],
+        components: [row1]
+    };
 }
 
 function getGameFieldMessage(game: TTTGame): string | MessagePayload | WebhookEditMessageOptions {
