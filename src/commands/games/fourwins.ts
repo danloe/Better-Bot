@@ -401,13 +401,13 @@ function getLobbyMessageEmbed(game: GameLobby, message: string) {
 function getChallengeMessage(opponent: User, message: string): string | MessagePayload | WebhookEditMessageOptions {
     let embedmsg = new MessageEmbed()
         .setColor('#403075')
-        .setTitle('Tic Tac Toe')
+        .setTitle('Four Wins')
         .setAuthor({ name: opponent.username, iconURL: opponent.avatarURL() || '' })
         .setDescription(message)
         .setThumbnail(fwThumbnail);
     const row1 = new MessageActionRow().addComponents([
-        new MessageButton().setCustomId('ttt_challenge_accept').setLabel('Accept').setStyle('SUCCESS'),
-        new MessageButton().setCustomId('ttt_challenge_decline').setLabel('Decline').setStyle('DANGER')
+        new MessageButton().setCustomId('fw_challenge_accept').setLabel('Accept').setStyle('SUCCESS'),
+        new MessageButton().setCustomId('fw_challenge_decline').setLabel('Decline').setStyle('DANGER')
     ]);
     return {
         content: `<@${opponent.id}>`,
