@@ -55,6 +55,11 @@ export class TTTGame extends GameLobby {
     }
 
     placeMark(index: number) {
+        if (this.gameField[index] !== this.charField) {
+            this.emit('tick', this);
+            return;
+        } 
+
         this.gameField[index] = this.playerOturn ? this.charO : this.charX;
         if (this.checkWin()) {
             this.endGame(false);
