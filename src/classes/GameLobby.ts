@@ -12,15 +12,27 @@ export class GameLobby extends EventEmitter {
     public maxPlayers = 1;
     public interactionTimeout = 60_000;
 
-    public constructor(game: GameType, host: User, channel: TextBasedChannel, minPlayers: number, maxPlayers: number, interactionTimeout: number = 60_000) {
+    public constructor(
+        game: GameType,
+        host: User,
+        channel: TextBasedChannel,
+        minPlayers: number,
+        maxPlayers: number,
+        interactionTimeout: number = 60_000
+    ) {
         super();
 
         this.game = game;
         this.host = host;
+        this.players.push(host);
         this.channel = channel;
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
         this.interactionTimeout = interactionTimeout;
+    }
+
+    open() {
+        this.emit('join', this);
     }
 
     join(user: User) {
