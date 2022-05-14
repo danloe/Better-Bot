@@ -304,9 +304,8 @@ export const command: Command = {
 
                     if (opponent) {
                         // Send a challenge message
-                        await interaction.reply(
+                        await interaction.editReply(
                             getChallengeMessage(
-                                interaction.user,
                                 opponent,
                                 '⚔️ <@' + interaction.user.id + '> `challenged you to a game of TicTacToe!`'
                             )
@@ -319,19 +318,28 @@ export const command: Command = {
 
                         collector.on('collect', async (button) => {
                             try {
-                                if (button.user.id === 'ttt_challenge_accept') {
-                                    await button.deferUpdate();
+                                if (button.user.id === opponent.id) {
+                                    if (button.customId === 'ttt_challenge_accept') {
+                                        await button.deferUpdate();
 
-                                    lobby.join(opponent!);
-                                    collector.stop();
-                                } else if (button.user.id === 'ttt_challenge_decline') {
-                                    await button.deferUpdate();
+                                        lobby.join(button.user);
+                                        collector.stop();
+                                    } else if (button.customId === 'ttt_challenge_decline') {
+                                        await button.deferUpdate();
 
-                                    let embedmsg = getLobbyMessageEmbed(lobby, '`The game challenge was declined.`');
-                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
+                                        let embedmsg = getLobbyMessageEmbed(
+                                            lobby,
+                                            '`The game challenge was declined.`'
+                                        );
+                                        await interaction.editReply({
+                                            content: ' ',
+                                            embeds: [embedmsg],
+                                            components: []
+                                        });
 
-                                    client.gameManager.destroyLobby(interaction.user);
-                                    collector.stop();
+                                        client.gameManager.destroyLobby(interaction.user);
+                                        collector.stop();
+                                    }
                                 } else {
                                     try {
                                         await button.reply(
@@ -351,9 +359,9 @@ export const command: Command = {
                                 if (reason === 'time' && lobby.state === GameState.Waiting) {
                                     let embedmsg = getLobbyMessageEmbed(
                                         lobby,
-                                        '<@' + opponent!.id + '>` has not accepted the challenge. The game is closed.`'
+                                        '<@' + opponent!.id + '> `has not accepted the challenge. The game is closed.`'
                                     );
-                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
+                                    await interaction.editReply({ content: ' ', embeds: [embedmsg], components: [] });
 
                                     client.gameManager.destroyLobby(interaction.user);
                                 }
@@ -395,22 +403,19 @@ function getLobbyMessageEmbed(game: GameLobby, message: string) {
         .addField(`Players: ${game.players.length} of ${game.maxPlayers} [min ${game.minPlayers}]`, players);
 }
 
-function getChallengeMessage(
-    challenger: User,
-    opponent: User,
-    message: string
-): string | MessagePayload | WebhookEditMessageOptions {
+function getChallengeMessage(opponent: User, message: string): string | MessagePayload | WebhookEditMessageOptions {
     let embedmsg = new MessageEmbed()
         .setColor('#403075')
         .setTitle('Tic Tac Toe')
-        .setAuthor({ name: challenger.username, iconURL: challenger.avatarURL() || '' })
-        .setDescription(`<@${opponent.id}> ${message}`)
+        .setAuthor({ name: opponent.username, iconURL: opponent.avatarURL() || '' })
+        .setDescription(message)
         .setThumbnail(tttThumbnail);
     const row1 = new MessageActionRow().addComponents([
         new MessageButton().setCustomId('ttt_challenge_accept').setLabel('Accept').setStyle('SUCCESS'),
         new MessageButton().setCustomId('ttt_challenge_decline').setLabel('Decline').setStyle('DANGER')
     ]);
     return {
+        content: `<@${opponent.id}>`,
         embeds: [embedmsg],
         components: [row1]
     };
@@ -430,55 +435,19 @@ function getGameFieldMessage(game: TTTGame): string | MessagePayload | WebhookEd
             }`
         );
     const row1 = new MessageActionRow().addComponents([
-        new MessageButton()
-            .setCustomId('ttt_0')
-            .setLabel(game.gameField[0])
-            .setStyle('SECONDARY')
-            .setDisabled(game.gameField[0] !== game.charField),
-        new MessageButton()
-            .setCustomId('ttt_1')
-            .setLabel(game.gameField[1])
-            .setStyle('SECONDARY')
-            .setDisabled(game.gameField[1] !== game.charField),
-        new MessageButton()
-            .setCustomId('ttt_2')
-            .setLabel(game.gameField[2])
-            .setStyle('SECONDARY')
-            .setDisabled(game.gameField[2] !== game.charField)
+        new MessageButton().setCustomId('ttt_0').setLabel(game.gameField[0]).setStyle('SECONDARY'),
+        new MessageButton().setCustomId('ttt_1').setLabel(game.gameField[1]).setStyle('SECONDARY'),
+        new MessageButton().setCustomId('ttt_2').setLabel(game.gameField[2]).setStyle('SECONDARY')
     ]);
     const row2 = new MessageActionRow().addComponents([
-        new MessageButton()
-            .setCustomId('ttt_3')
-            .setLabel(game.gameField[3])
-            .setStyle('SECONDARY')
-            .setDisabled(game.gameField[3] !== game.charField),
-        new MessageButton()
-            .setCustomId('ttt_4')
-            .setLabel(game.gameField[4])
-            .setStyle('SECONDARY')
-            .setDisabled(game.gameField[4] !== game.charField),
-        new MessageButton()
-            .setCustomId('ttt_5')
-            .setLabel(game.gameField[5])
-            .setStyle('SECONDARY')
-            .setDisabled(game.gameField[5] !== game.charField)
+        new MessageButton().setCustomId('ttt_3').setLabel(game.gameField[3]).setStyle('SECONDARY'),
+        new MessageButton().setCustomId('ttt_4').setLabel(game.gameField[4]).setStyle('SECONDARY'),
+        new MessageButton().setCustomId('ttt_5').setLabel(game.gameField[5]).setStyle('SECONDARY')
     ]);
     const row3 = new MessageActionRow().addComponents([
-        new MessageButton()
-            .setCustomId('ttt_6')
-            .setLabel(game.gameField[6])
-            .setStyle('SECONDARY')
-            .setDisabled(game.gameField[6] !== game.charField),
-        new MessageButton()
-            .setCustomId('ttt_7')
-            .setLabel(game.gameField[7])
-            .setStyle('SECONDARY')
-            .setDisabled(game.gameField[7] !== game.charField),
-        new MessageButton()
-            .setCustomId('ttt_8')
-            .setLabel(game.gameField[8])
-            .setStyle('SECONDARY')
-            .setDisabled(game.gameField[8] !== game.charField)
+        new MessageButton().setCustomId('ttt_6').setLabel(game.gameField[6]).setStyle('SECONDARY'),
+        new MessageButton().setCustomId('ttt_7').setLabel(game.gameField[7]).setStyle('SECONDARY'),
+        new MessageButton().setCustomId('ttt_8').setLabel(game.gameField[8]).setStyle('SECONDARY')
     ]);
     return {
         embeds: [embedmsg],
