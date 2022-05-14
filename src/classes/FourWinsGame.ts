@@ -93,7 +93,7 @@ export class FourWinsGame extends GameLobby {
     }
 
     placeMark(columnIndex: number) {
-        for (let y = this.gameField.length - 1; y > 0; y--) {
+        for (let y = this.gameField.length - 1; y >= 0; y--) {
             if (this.gameField[y][columnIndex] === this.charField) {
                 this.gameField[y][columnIndex] = this.playerYellowTurn ? this.charYellow : this.charRed;
                 if (this.checkWin(y, columnIndex)) {

@@ -164,7 +164,11 @@ export const command: Command = {
                             }
                         });
 
-                        await interaction.editReply({ embeds: [embedmsg], components: [row] });
+                        await interaction.editReply({
+                            content: '<@' + lobby.host.id + '>',
+                            embeds: [embedmsg],
+                            components: [row]
+                        });
                     });
 
                     // GAME STARTED
@@ -283,7 +287,7 @@ export const command: Command = {
                     // GAME OVER
                     lobby.on('end', async (game: FourWinsGame) => {
                         console.log('[FourWins] Game Over');
-                        const gameFieldMessage = getGameFieldMessage(game);
+                        const gameFieldMessage = getGameFieldMessage(game, true);
                         await interaction.editReply(gameFieldMessage);
 
                         if (game.winner) {
@@ -416,7 +420,10 @@ function getChallengeMessage(opponent: User, message: string): string | MessageP
     };
 }
 
-function getGameFieldMessage(game: FourWinsGame): string | MessagePayload | WebhookEditMessageOptions {
+function getGameFieldMessage(
+    game: FourWinsGame,
+    noButtons: boolean = false
+): string | MessagePayload | WebhookEditMessageOptions {
     let fieldString = '';
     for (let y = 0; y < game.gameField.length; y++) {
         for (let x = 0; x < game.gameField[0].length; x++) {
@@ -486,7 +493,8 @@ function getGameFieldMessage(game: FourWinsGame): string | MessagePayload | Webh
             .setDisabled(game.gameField[0][6] !== game.charField)
     ]);
     return {
+        content: ' ',
         embeds: [embedmsg],
-        components: [row1, row2]
+        components: noButtons ? [] : [row1, row2]
     };
 }
