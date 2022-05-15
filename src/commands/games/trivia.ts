@@ -365,6 +365,8 @@ function getLobbyMessageEmbed(game: TriviaGame, message: string) {
                     questionCount = String(game.categoryInfo.questionCounts.forHard);
                     break;
             }
+        } else {
+            questionCount = String(game.categoryInfo.questionCounts.total);
         }
         embedmsg.addField('Question Pool:', questionCount, true);
     }
