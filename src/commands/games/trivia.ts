@@ -327,7 +327,7 @@ export const command: Command = {
                     try {
                         await replyInteraction(
                             interaction,
-                            createErrorEmbed('🚩 Error creating a tic tac toe game: `' + err + '`')
+                            createErrorEmbed('🚩 Error creating a trivia game: `' + err + '`')
                         );
                     } catch (err2) {
                         console.log(err2);
@@ -440,10 +440,26 @@ function getGameOverMessage(game: TriviaGame): string | MessagePayload | Webhook
     }
     const sortedStats = new Map([...stats.entries()].sort((a, b) => b[1] - a[1]));
 
+    let winners = '🎉 <@' + String([...sortedStats][0][0].id) + '> ';
+    let one = true;
+    for (let [key, value] of sortedStats) {
+        if (key.id !== [...sortedStats][0][0].id) {
+            if (value == [...sortedStats][0][1]) {
+                one = false;
+                winners = winners + '& <@' + String(key.id) + '> ';
+            }
+        }
+    }
+    if (one) {
+        winners = winners + 'has won the game!';
+    } else {
+        winners = winners + 'have won the game!';
+    }
+
     let embedmsg = new MessageEmbed()
         .setColor('#403075')
         .setTitle('Trivia')
-        .setDescription('🎉 <@' + [...sortedStats][0][0].id + '> has won the game!')
+        .setDescription(winners)
         .setThumbnail(triviaThumbnail);
 
     let i = 1;
