@@ -66,10 +66,9 @@ export const command: Command = {
                                 if (button.user.id === interaction.user.id) {
                                     await button.deferUpdate();
                                     if (button.customId === 'ttt_join_cancel') {
+                                        client.gameManager.destroyLobby(interaction.user);
                                         let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
-
-                                        client.gameManager.destroyLobby(interaction.user);
                                         collector.stop();
                                     }
                                 } else {
@@ -92,9 +91,9 @@ export const command: Command = {
                                     reason === 'time' &&
                                     (game.state === GameState.Waiting || game.state === GameState.Ready)
                                 ) {
+                                    client.gameManager.destroyLobby(interaction.user);
                                     let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
-                                    client.gameManager.destroyLobby(interaction.user);
                                 }
                             } catch (err) {
                                 console.log(err);
@@ -131,10 +130,9 @@ export const command: Command = {
                                     if (button.customId === 'ttt_ready_start') {
                                         game.start();
                                     } else if (button.customId === 'ttt_ready_cancel') {
+                                        client.gameManager.destroyLobby(interaction.user);
                                         let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
-
-                                        client.gameManager.destroyLobby(interaction.user);
                                     }
                                     collector.stop();
                                 } else {
@@ -163,9 +161,9 @@ export const command: Command = {
                                     reason === 'time' &&
                                     (game.state === GameState.Waiting || game.state === GameState.Ready)
                                 ) {
+                                    client.gameManager.destroyLobby(interaction.user);
                                     let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
-                                    client.gameManager.destroyLobby(interaction.user);
                                 }
                             } catch (err) {
                                 console.log(err);
@@ -215,6 +213,7 @@ export const command: Command = {
                         collector.on('end', async (_: any, reason: string) => {
                             try {
                                 if (reason === 'time' && game.state === GameState.Started) {
+                                    client.gameManager.destroyLobby(interaction.user);
                                     let embedmsg = getLobbyMessageEmbed(
                                         game,
                                         '<@' +
@@ -222,8 +221,6 @@ export const command: Command = {
                                             '>` has not executed his move. The game is closed.`'
                                     );
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
-
-                                    client.gameManager.destroyLobby(interaction.user);
                                 }
                             } catch (err) {
                                 console.log(err);
@@ -271,6 +268,7 @@ export const command: Command = {
                         collector.on('end', async (_: any, reason: string) => {
                             try {
                                 if (reason === 'time' && game.state === GameState.Started) {
+                                    client.gameManager.destroyLobby(interaction.user);
                                     let embedmsg = getLobbyMessageEmbed(
                                         game,
                                         '<@' +
@@ -278,8 +276,6 @@ export const command: Command = {
                                             '>` has not executed his move. The game is closed.`'
                                     );
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
-
-                                    client.gameManager.destroyLobby(interaction.user);
                                 }
                             } catch (err) {
                                 console.log(err);
@@ -301,6 +297,7 @@ export const command: Command = {
                                 .setThumbnail(tttThumbnail);
                             await interaction.followUp({ embeds: [embedmsg] });
                         } else {
+                            client.gameManager.destroyLobby(interaction.user);
                             let embedmsg = new MessageEmbed()
                                 .setColor('#403075')
                                 .setTitle('Tic Tac Toe - Game Over')
@@ -308,8 +305,6 @@ export const command: Command = {
                                 .setThumbnail(tttThumbnail);
                             await interaction.followUp({ embeds: [embedmsg] });
                         }
-
-                        client.gameManager.destroyLobby(interaction.user);
                     });
 
                     if (opponent) {
@@ -336,7 +331,7 @@ export const command: Command = {
                                         collector.stop();
                                     } else if (button.customId === 'ttt_challenge_decline') {
                                         await button.deferUpdate();
-
+                                        client.gameManager.destroyLobby(interaction.user);
                                         let embedmsg = getLobbyMessageEmbed(
                                             lobby,
                                             '`The game challenge was declined.`'
@@ -346,8 +341,6 @@ export const command: Command = {
                                             embeds: [embedmsg],
                                             components: []
                                         });
-
-                                        client.gameManager.destroyLobby(interaction.user);
                                         collector.stop();
                                     }
                                 } else {
@@ -367,13 +360,12 @@ export const command: Command = {
                         collector.on('end', async (_: any, reason: string) => {
                             try {
                                 if (reason === 'time' && lobby.state === GameState.Waiting) {
+                                    client.gameManager.destroyLobby(interaction.user);
                                     let embedmsg = getLobbyMessageEmbed(
                                         lobby,
                                         '<@' + opponent!.id + '> `has not accepted the challenge. The game is closed.`'
                                     );
                                     await interaction.editReply({ content: ' ', embeds: [embedmsg], components: [] });
-
-                                    client.gameManager.destroyLobby(interaction.user);
                                 }
                             } catch (err) {
                                 console.log(err);
