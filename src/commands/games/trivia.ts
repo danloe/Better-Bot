@@ -225,6 +225,7 @@ export const command: Command = {
 
                     // GAME START
                     lobby.on('start', async (game: TriviaGame) => {
+                        console.log('[Trivia] Game Start');
                         await lobby.getQuestions();
                         lobby.nextRound();
                     });
