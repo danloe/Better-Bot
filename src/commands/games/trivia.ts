@@ -174,7 +174,7 @@ export const command: Command = {
 
                         collector.on('collect', async (button) => {
                             try {
-                                if (button.user.id !== interaction.user.id) {
+                                if (button.user.id === interaction.user.id) {
                                     await button.deferUpdate();
                                     if (button.customId === 'ready_start') {
                                         game.start();
