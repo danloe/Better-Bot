@@ -37,24 +37,17 @@ export class GameLobby extends EventEmitter {
             this.state = GameState.Ready;
             this.emit('ready', this);
         } else {
+            this.state = GameState.Waiting;
             this.emit('join', this);
         }
     }
 
     join(user: User) {
-        if (this.state !== GameState.Waiting) return;
-        if (this.players.includes(user)) {
-            this.emit('join', this);
-            return;
+        if (this.state !== GameState.Waiting && this.state !== GameState.Ready) return;
+        if (!this.players.includes(user)) {
+            if (this.players.length < this.maxPlayers) this.players.push(user);
         }
-
-        if (this.players.length < this.maxPlayers) this.players.push(user);
-        if (this.players.length >= this.minPlayers && this.players.length <= this.maxPlayers) {
-            this.state = GameState.Ready;
-            this.emit('ready', this);
-        } else {
-            this.emit('join', this);
-        }
+        this.open();
     }
 
     start() {
