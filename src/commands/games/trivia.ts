@@ -132,7 +132,9 @@ export const command: Command = {
                                         game.join(button.user);
                                         collector.stop();
                                     } else if (button.customId === 'join_cancel') {
-                                        await button.reply(createErrorEmbed("`⛔ This button isn't for you.`", true));
+                                        await button.reply(
+                                            createErrorEmbed('`⛔ Only the host can cancel the game.`', true)
+                                        );
                                     }
                                 }
                             } catch (err) {
@@ -193,7 +195,10 @@ export const command: Command = {
                                             collector.stop();
                                         } else {
                                             await button.reply(
-                                                createErrorEmbed("`⛔ This button isn't for you.`", true)
+                                                createErrorEmbed(
+                                                    '`⛔ Only the host can cancel or start the game.`',
+                                                    true
+                                                )
                                             );
                                         }
                                     } catch (err) {
@@ -272,18 +277,8 @@ export const command: Command = {
 
                         collector.on('end', async (_: any, reason: string) => {
                             try {
-                                if (reason === 'time' && game.answerGiven.length == 0) {
-                                    if (game.answerGiven.length == 0) {
-                                        let embedmsg = getLobbyMessageEmbed(
-                                            game,
-                                            '`No one has answered. The game is closed.`'
-                                        );
-                                        await interaction.editReply({ embeds: [embedmsg], components: [] });
-
-                                        client.gameManager.destroyLobby(interaction.user);
-                                    } else {
-                                        game.nextRound();
-                                    }
+                                if (reason === 'time') {
+                                    game.displayAnswer();
                                 }
                             } catch (err) {
                                 console.log(err);
@@ -300,6 +295,29 @@ export const command: Command = {
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
                             time: answerDisplayTime
+                        });
+
+                        collector.on('collect', async (button) => {
+                            try {
+                                if (button.user.id === interaction.user.id) {
+                                    await button.deferUpdate();
+                                    let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
+                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
+
+                                    client.gameManager.destroyLobby(interaction.user);
+                                    collector.stop();
+                                } else {
+                                    try {
+                                        await button.reply(
+                                            createErrorEmbed('`⛔ Only the host can cancel the game.`', true)
+                                        );
+                                    } catch (err) {
+                                        console.log(err);
+                                    }
+                                }
+                            } catch (err) {
+                                console.log(err);
+                            }
                         });
 
                         collector.on('end', async (_: any, reason: string) => {
@@ -357,17 +375,17 @@ function getLobbyMessageEmbed(game: TriviaGame, message: string) {
         if (game.difficulty) {
             switch (game.difficulty) {
                 case 'easy':
-                    questionCount = String(game.categoryInfo.questionCounts.forEasy);
+                    questionCount = String(game.categoryInfo!.questionCounts.forEasy);
                     break;
                 case 'medium':
-                    questionCount = String(game.categoryInfo.questionCounts.forMedium);
+                    questionCount = String(game.categoryInfo!.questionCounts.forMedium);
                     break;
                 case 'hard':
-                    questionCount = String(game.categoryInfo.questionCounts.forHard);
+                    questionCount = String(game.categoryInfo!.questionCounts.forHard);
                     break;
             }
         } else {
-            questionCount = String(game.categoryInfo.questionCounts.total);
+            questionCount = String(game.categoryInfo!.questionCounts.total);
         }
         embedmsg.addField('Question Pool:', questionCount, true);
     }
@@ -422,39 +440,48 @@ function getAnswerMessage(game: TriviaGame): string | MessagePayload | WebhookEd
         .setDescription(
             'Question: `' + game.question!.value + '`\n' + 'Answer: `' + game.question!.correctAnswer + '`'
         );
+    const row = new MessageActionRow().addComponents([
+        new MessageButton().setCustomId('answer_cancel').setLabel('Cancel Game').setStyle('DANGER')
+    ]);
     return {
         content: ' ',
         embeds: [embedmsg],
-        components: []
+        components: [row]
     };
 }
 
 function getGameOverMessage(game: TriviaGame): string | MessagePayload | WebhookEditMessageOptions {
     let stats = new Map<User, number>();
+    let winners = '';
+    let sortedStats: Map<User, number>;
 
-    for (let [key, value] of game.answers) {
-        let score = 0;
-        value.forEach((answer) => {
-            score = score + Number(answer);
-        });
-        stats.set(key, score);
-    }
-    const sortedStats = new Map([...stats.entries()].sort((a, b) => b[1] - a[1]));
+    if (game.answers.size > 0) {
+        for (let [key, value] of game.answers) {
+            let score = 0;
+            value.forEach((answer) => {
+                score = score + Number(answer);
+            });
+            stats.set(key, score);
+        }
+        sortedStats = new Map([...stats.entries()].sort((a, b) => b[1] - a[1]));
 
-    let winners = '🎉 <@' + String([...sortedStats][0][0].id) + '> ';
-    let one = true;
-    for (let [key, value] of sortedStats) {
-        if (key.id !== [...sortedStats][0][0].id) {
-            if (value == [...sortedStats][0][1]) {
-                one = false;
-                winners = winners + '& <@' + String(key.id) + '> ';
+        winners = '🎉 <@' + String([...sortedStats][0][0].id) + '> ';
+        let one = true;
+        for (let [key, value] of sortedStats) {
+            if (key.id !== [...sortedStats][0][0].id) {
+                if (value == [...sortedStats][0][1]) {
+                    one = false;
+                    winners = winners + '& <@' + String(key.id) + '> ';
+                }
             }
         }
-    }
-    if (one) {
-        winners = winners + 'has won the game!';
+        if (one) {
+            winners = winners + 'has won the game!';
+        } else {
+            winners = winners + 'have won the game!';
+        }
     } else {
-        winners = winners + 'have won the game!';
+        winners = 'No one has played. Everyone is a loser!';
     }
 
     let embedmsg = new MessageEmbed()
@@ -463,10 +490,15 @@ function getGameOverMessage(game: TriviaGame): string | MessagePayload | Webhook
         .setDescription(winners)
         .setThumbnail(triviaThumbnail);
 
-    let i = 1;
-    for (let [key, value] of sortedStats) {
-        embedmsg.addField(String(i) + '.', '<@' + key.id + '>: ' + String(value) + (value == 1 ? ' Point' : ' Points'));
-        i++;
+    if (game.answers.size > 0) {
+        let i = 1;
+        for (let [key, value] of sortedStats!) {
+            embedmsg.addField(
+                String(i) + '.',
+                '<@' + key.id + '>: ' + String(value) + (value == 1 ? ' Point' : ' Points')
+            );
+            i++;
+        }
     }
 
     return {
