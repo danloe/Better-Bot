@@ -12,7 +12,7 @@ import { Category, CategoryData, getQuestions, Question, QuestionDifficulty, Que
 
 */
 
-export const questionAnswerTimeout: number = 15_000;
+export const questionAnswerTimeout: number = 20_000;
 export const answerDisplayTime: number = 5_000;
 
 export class TriviaGame extends GameLobby {

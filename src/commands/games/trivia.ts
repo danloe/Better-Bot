@@ -443,7 +443,8 @@ function getGameOverMessage(game: TriviaGame): string | MessagePayload | Webhook
     let embedmsg = new MessageEmbed()
         .setColor('#403075')
         .setTitle('Trivia')
-        .setDescription('🎉 <@' + [...sortedStats][0][0].id + '> has won the game!');
+        .setDescription('🎉 <@' + [...sortedStats][0][0].id + '> has won the game!')
+        .setThumbnail(triviaThumbnail);
 
     let i = 1;
     for (let [key, value] of sortedStats) {
