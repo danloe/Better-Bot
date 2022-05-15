@@ -53,7 +53,7 @@ export const command: Command = {
                                 interaction,
                                 createEmbed(
                                     ' ',
-                                    '`🚮 Successfully deleted ' +
+                                    '`🚮 Deleted ' +
                                         bulk.size +
                                         ' messages by` ' +
                                         `${user}` +
@@ -69,7 +69,7 @@ export const command: Command = {
                                 interaction,
                                 createEmbed(
                                     ' ',
-                                    '`🚮 Successfully deleted ' +
+                                    '`🚮 Deleted ' +
                                         bulk.size +
                                         ' messages.' +
                                         (bulk.size < amount!
