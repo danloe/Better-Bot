@@ -35,6 +35,8 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction instanceof CommandInteraction) {
                 try {
+                    await replyDefer(interaction);
+                    
                     let opponent = interaction.options.getUser('opponent');
 
                     const lobby = await client.gameManager.createLobby(
@@ -42,7 +44,6 @@ export const command: Command = {
                         interaction,
                         interaction.user
                     );
-                    await replyDefer(interaction);
 
                     // A PLAYER JOINED
                     lobby.on('join', async (game: TTTGame) => {

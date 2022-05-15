@@ -3,6 +3,7 @@ import BetterClient from '../client';
 import { GameLobby } from './GameLobby';
 import { TTTGame } from './TTTGame';
 import { FourWinsGame } from './FourWinsGame';
+import { TriviaGame } from './TriviaGame';
 
 export class GameManager {
     client: BetterClient;
@@ -12,7 +13,7 @@ export class GameManager {
         this.client = client;
     }
 
-    createLobby(gameType: GameType, interaction: CommandInteraction, host: User) {
+    createLobby(gameType: GameType, interaction: CommandInteraction, host: User, minPlayers = 1, maxPlayers = 1) {
         return new Promise<GameLobby>(async (done, error) => {
             try {
                 let lobby = this.games.get(host.id);
@@ -27,9 +28,12 @@ export class GameManager {
                     case GameType.FourWins:
                         lobby = new FourWinsGame(host, interaction.channel!);
                         break;
+                    case GameType.Trivia:
+                        lobby = new TriviaGame(host, interaction.channel!, minPlayers, maxPlayers);
+                        break;
                 }
-                this.games.set(host.id, lobby);
-                done(lobby);
+                this.games.set(host.id, lobby!);
+                done(lobby!);
             } catch (err) {
                 console.log(err);
                 error(err);
@@ -44,5 +48,6 @@ export class GameManager {
 
 export enum GameType {
     TicTacToe,
-    FourWins
+    FourWins,
+    Trivia
 }

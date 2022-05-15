@@ -35,6 +35,8 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction instanceof CommandInteraction) {
                 try {
+                    await replyDefer(interaction);
+                    
                     let opponent = interaction.options.getUser('opponent');
 
                     const lobby = await client.gameManager.createLobby(
@@ -42,15 +44,14 @@ export const command: Command = {
                         interaction,
                         interaction.user
                     );
-                    await replyDefer(interaction);
 
                     // A PLAYER JOINED
                     lobby.on('join', async (game: FourWinsGame) => {
                         console.log(`[FourWins] ${game.players[game.players.length - 1].username} joined`);
                         let embedmsg = getLobbyMessageEmbed(game, '`Waiting for more players...`');
                         const row = new MessageActionRow().addComponents([
-                            new MessageButton().setCustomId('fw_join_join').setLabel('Join').setStyle('PRIMARY'),
-                            new MessageButton().setCustomId('fw_join_cancel').setLabel('Cancel Game').setStyle('DANGER')
+                            new MessageButton().setCustomId('join_join').setLabel('Join').setStyle('PRIMARY'),
+                            new MessageButton().setCustomId('join_cancel').setLabel('Cancel Game').setStyle('DANGER')
                         ]);
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
@@ -61,7 +62,7 @@ export const command: Command = {
                             try {
                                 await button.deferUpdate();
                                 if (button.user.id === interaction.user.id) {
-                                    if (button.customId === 'fw_join_cancel') {
+                                    if (button.customId === 'join_cancel') {
                                         let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
 
@@ -69,10 +70,10 @@ export const command: Command = {
                                         collector.stop();
                                     }
                                 } else {
-                                    if (button.customId === 'fw_join_join') {
+                                    if (button.customId === 'join_join') {
                                         game.join(button.user);
                                         collector.stop();
-                                    } else if (button.customId === 'fw_join_cancel') {
+                                    } else if (button.customId === 'join_cancel') {
                                         await button.reply(createErrorEmbed("`⛔ This button isn't for you.`", true));
                                     }
                                 }
