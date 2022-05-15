@@ -36,7 +36,7 @@ export const command: Command = {
         .addStringOption((option) =>
             option
                 .setName('difficulty')
-                .setDescription('What difficulty?')
+                .setDescription('Which question difficulty?')
                 .addChoices(
                     { name: 'easy', value: 'easy' },
                     { name: 'medium', value: 'medium' },
@@ -47,14 +47,14 @@ export const command: Command = {
         .addStringOption((option) =>
             option
                 .setName('type')
-                .setDescription('What type?')
+                .setDescription('What question answers type?')
                 .addChoices({ name: 'yes / no', value: 'boolean' }, { name: 'multiple choice', value: 'multiple' })
                 .setRequired(false)
         )
         .addStringOption((option) =>
             option
                 .setName('category')
-                .setDescription('Which category?')
+                .setDescription('Which question category?')
                 .addChoices(...getCategoryOptions())
                 .setRequired(false)
         )
@@ -370,7 +370,7 @@ function getLobbyMessageEmbed(game: TriviaGame, message: string) {
     }
     if (game.difficulty) embedmsg.addField('Difficulty:', game.difficulty, true);
     if (game.type) embedmsg.addField('Type:', game.type, true);
-    if (game.category) embedmsg.addField('Category:', game.category.prettyName, false);
+    if (game.category) embedmsg.addField('Category:', game.category.prettyName, true);
     embedmsg.addField(`Players: ${game.players.length} of ${game.maxPlayers} [min ${game.minPlayers}]`, players, false);
     return embedmsg;
 }
