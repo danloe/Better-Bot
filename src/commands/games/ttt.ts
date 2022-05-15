@@ -291,9 +291,9 @@ export const command: Command = {
                         const gameFieldMessage = getGameFieldMessage(game);
                         await interaction.editReply(gameFieldMessage);
 
-                        if (game.winner) {
+                        if (game.winners.length > 0) {
                             await interaction.followUp(
-                                createEmbed('Game Over', '🎉 <@' + game.winner.id + '> has won the game!')
+                                createEmbed('Game Over', '🎉 <@' + game.winners[0].id + '> has won the game!')
                             );
                         } else {
                             await interaction.followUp(createEmbed('Game Over', '🫱🏼‍🫲🏼 Draw.'));
