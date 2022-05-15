@@ -18,7 +18,6 @@ export class FourWinsGame extends GameLobby {
     public readonly charYellow = '🟡';
     gameField: string[][] = [];
     playerYellowTurn: boolean = false;
-    winner: User | null = null;
 
     public constructor(host: User, channel: TextBasedChannel) {
         super(GameType.FourWins, host, channel, 2, 2);
@@ -157,7 +156,7 @@ export class FourWinsGame extends GameLobby {
         if (draw) {
             this.emit('end', this);
         } else {
-            this.winner = this.players[this.playerYellowTurn ? 1 : 0];
+            this.winners.push(this.players[this.playerYellowTurn ? 1 : 0]);
             this.emit('end', this);
         }
     }

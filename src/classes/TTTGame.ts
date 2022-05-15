@@ -25,7 +25,6 @@ export class TTTGame extends GameLobby {
     public readonly charO = '⭕';
     gameField: string[] = [];
     playerOturn: boolean = false;
-    winner: User | null = null;
 
     public constructor(host: User, channel: TextBasedChannel) {
         super(GameType.TicTacToe, host, channel, 2, 2);
@@ -90,7 +89,7 @@ export class TTTGame extends GameLobby {
         if (draw) {
             this.emit('end', this);
         } else {
-            this.winner = this.players[this.playerOturn ? 1 : 0];
+            this.winners.push(this.players[this.playerOturn ? 1 : 0]);
             this.emit('end', this);
         }
     }
