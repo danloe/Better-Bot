@@ -9,7 +9,7 @@ export class GameLobby extends EventEmitter {
     public channel: TextBasedChannel;
     public state: GameState = GameState.Waiting;
     public minPlayers = 1;
-    public maxPlayers = 1;    
+    public maxPlayers = 1;
     public winners: User[] = [];
     public interactionTimeout = 60_000;
 
