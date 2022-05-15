@@ -1,14 +1,7 @@
 import { TextBasedChannel, User } from 'discord.js';
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
-import {
-    Category,
-    CategoryData,
-    getQuestions,
-    Question,
-    QuestionDifficulty,
-    QuestionType,
-} from 'easy-trivia';
+import { Category, CategoryData, getQuestions, Question, QuestionDifficulty, QuestionType } from 'easy-trivia';
 
 /*
   _____ ____  _____     _____    _    
@@ -20,7 +13,7 @@ import {
 */
 
 export const questionAnswerTimeout: number = 15_000;
-export const answerDisplayTime: number = 3_000;
+export const answerDisplayTime: number = 5_000;
 
 export class TriviaGame extends GameLobby {
     amount: number = 10;
@@ -30,18 +23,13 @@ export class TriviaGame extends GameLobby {
     questions: Question[] = [];
     categoryInfo: CategoryData | undefined;
 
-    round: number = 1;
+    round: number = 0;
     question: Question | null = null;
     answers: Map<User, boolean[]> = new Map<User, boolean[]>();
     answerRequired: User[] = [];
     answerGiven: User[] = [];
 
-    public constructor(
-        host: User,
-        channel: TextBasedChannel,
-        minPlayers: number,
-        maxPlayers: number
-    ) {
+    public constructor(host: User, channel: TextBasedChannel, minPlayers: number, maxPlayers: number) {
         super(GameType.Trivia, host, channel, minPlayers, maxPlayers);
     }
 
@@ -62,6 +50,7 @@ export class TriviaGame extends GameLobby {
 
     answerQuestion(player: User, index: number) {
         this.answerGiven.push(player);
+        this.answerRequired.splice(this.answerRequired.indexOf(player), 1);
         let answers = this.answers.get(player);
         if (!answers) answers = [];
         answers?.push(this.question!.checkAnswer(this.question!.allAnswers[index]));
@@ -69,6 +58,8 @@ export class TriviaGame extends GameLobby {
 
         if (this.answerRequired.length == 0) {
             this.displayAnswer();
+        } else {
+            this.emit('question', this);
         }
     }
 
@@ -77,7 +68,7 @@ export class TriviaGame extends GameLobby {
     }
 
     nextRound() {
-        if(this.round < this.amount) {
+        if (this.round < this.amount) {
             this.round++;
             this.question = this.questions[this.round - 1];
             this.answerRequired = this.players.slice();

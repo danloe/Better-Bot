@@ -12,23 +12,11 @@ import {
 } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createEmbed, createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
+import { createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
 import { GameType } from '../../classes/GameManager';
-import { GameLobby, GameState } from '../../classes/GameLobby';
+import { GameState } from '../../classes/GameLobby';
 import { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
-import {
-    Category,
-    CategoryData,
-    CategoryName,
-    CategoryNamesPretty,
-    CategoryResolvable,
-    getQuestions,
-    Question,
-    QuestionDifficulties,
-    QuestionDifficulty,
-    QuestionType,
-    QuestionTypes
-} from 'easy-trivia';
+import { Category, CategoryNamesPretty, CategoryResolvable, QuestionDifficulty, QuestionType } from 'easy-trivia';
 import { answerDisplayTime, questionAnswerTimeout, TriviaGame } from '../../classes/TriviaGame';
 
 const triviaThumbnail = 'https://opentdb.com/images/logo-banner.png';
@@ -109,7 +97,10 @@ export const command: Command = {
                     lobby.amount = amount!;
                     lobby.difficulty = <QuestionDifficulty>difficulty!;
                     lobby.type = <QuestionType>type!;
-                    lobby.category = new Category(<CategoryResolvable>category!);
+                    if (category) {
+                        lobby.category = new Category(<CategoryResolvable>category);
+                        await lobby.getCategoryInfo();
+                    }
 
                     // A PLAYER JOINED
                     lobby.on('join', async (game: TriviaGame) => {
@@ -231,6 +222,12 @@ export const command: Command = {
                         await interaction.editReply({ embeds: [embedmsg], components: [row] });
                     });
 
+                    // GAME START
+                    lobby.on('start', async (game: TriviaGame) => {
+                        await lobby.getQuestions();
+                        lobby.nextRound();
+                    });
+
                     // GAME QUESTION
                     lobby.on('question', async (game: TriviaGame) => {
                         console.log('[Trivia] Game Question');
@@ -341,22 +338,44 @@ export const command: Command = {
         })
 };
 
-function getLobbyMessageEmbed(game: GameLobby, message: string) {
+function getLobbyMessageEmbed(game: TriviaGame, message: string) {
     let players = '';
     game.players.forEach((player) => {
         players = players + '<@' + player.id + '> ';
     });
-    return new MessageEmbed()
+    let embedmsg = new MessageEmbed()
         .setColor('#403075')
         .setTitle('Trivia')
         .setDescription(message)
-        .setThumbnail(triviaThumbnail)
-        .addField(`Players: ${game.players.length} of ${game.maxPlayers} [min ${game.minPlayers}]`, players);
+        .setThumbnail(triviaThumbnail);
+
+    if (game.category) embedmsg.addField('Category:', game.question!.category, true);
+    if (game.category) {
+        let questions: string;
+        if (game.difficulty) {
+            switch (game.difficulty) {
+                case 'easy':
+                    questions = String(game.categoryInfo.questionCounts.forEasy);
+                    break;
+                case 'medium':
+                    questions = String(game.categoryInfo.questionCounts.forMedium);
+                    break;
+                case 'hard':
+                    questions = String(game.categoryInfo.questionCounts.forHard);
+                    break;
+            }
+        }
+        embedmsg.addField('Category Questions:', questions, true);
+    }
+    if (game.difficulty) embedmsg.addField('Difficulty:', game.question!.difficulty, true);
+    if (game.type) embedmsg.addField('Type:', game.type, true);
+    embedmsg.addField(`Players: ${game.players.length} of ${game.maxPlayers} [min ${game.minPlayers}]`, players);
+    return embedmsg;
 }
 
 function getQuestionMessage(game: TriviaGame): string | MessagePayload | WebhookEditMessageOptions {
-    let requiredPlayers = '';
-    let answeredPlayers = '';
+    let requiredPlayers = '❔ ';
+    let answeredPlayers = '❕ ';
     game.answerRequired.forEach((player) => {
         requiredPlayers = requiredPlayers + '<@' + player.id + '> ';
     });
@@ -370,25 +389,24 @@ function getQuestionMessage(game: TriviaGame): string | MessagePayload | Webhook
         .setDescription('Question: `' + game.question!.value + '`')
         .addField('Category:', game.question!.category, true)
         .addField('Difficulty:', game.question!.difficulty, true)
-        .addField('Time:', game.question!.difficulty, true)
+        .addField('Time:', String(questionAnswerTimeout / 1000) + ' seconds', true)
         .addField('Answer awaited:', requiredPlayers, false)
-        .addField('Answer given:', String(questionAnswerTimeout / 1000) + ' seconds', false);
+        .addField('Answer given:', answeredPlayers, false);
 
-    let rows = [];
+    let components: MessageButton[] = [];
     for (let i = 0; i < game.question!.allAnswers!.length!; i++) {
-        rows.push(
-            new MessageActionRow().addComponents([
-                new MessageButton()
-                    .setCustomId('trivia_' + String(i))
-                    .setLabel(String(i) + ': ' + game.question?.allAnswers[i])
-                    .setStyle('PRIMARY')
-            ])
+        components.push(
+            new MessageButton()
+                .setCustomId('trivia_' + String(i))
+                .setLabel(game.question!.allAnswers[i])
+                .setStyle('PRIMARY')
         );
     }
+    let row = new MessageActionRow().addComponents([...components]);
     return {
         content: ' ',
         embeds: [embedmsg],
-        components: rows
+        components: [row]
     };
 }
 
@@ -423,8 +441,10 @@ function getGameOverMessage(game: TriviaGame): string | MessagePayload | Webhook
         .setTitle('Trivia')
         .setDescription('🎉 <@' + [...sortedStats][0][0].id + '> has won the game!');
 
+    let i = 1;
     for (let [key, value] of sortedStats) {
-        embedmsg.addField('<@' + key.id + '>', String(value) + ' Points');
+        embedmsg.addField(String(i) + '.', '<@' + key.id + '>: ' + String(value) + (value == 1 ? ' Point' : ' Points'));
+        i++;
     }
 
     return {

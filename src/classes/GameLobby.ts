@@ -33,7 +33,12 @@ export class GameLobby extends EventEmitter {
     }
 
     open() {
-        this.emit('join', this);
+        if (this.players.length >= this.minPlayers && this.players.length <= this.maxPlayers) {
+            this.state = GameState.Ready;
+            this.emit('ready', this);
+        } else {
+            this.emit('join', this);
+        }
     }
 
     join(user: User) {
