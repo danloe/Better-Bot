@@ -117,8 +117,8 @@ export const command: Command = {
 
                         collector.on('collect', async (button) => {
                             try {
-                                await button.deferUpdate();
                                 if (button.user.id === interaction.user.id) {
+                                    await button.deferUpdate();
                                     if (button.customId === 'join_cancel') {
                                         let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
@@ -128,6 +128,7 @@ export const command: Command = {
                                     }
                                 } else {
                                     if (button.customId === 'join_join') {
+                                        await button.deferUpdate();
                                         game.join(button.user);
                                         collector.stop();
                                     } else if (button.customId === 'join_cancel') {
@@ -274,7 +275,7 @@ export const command: Command = {
                                     if (game.answerGiven.length == 0) {
                                         let embedmsg = getLobbyMessageEmbed(
                                             game,
-                                            'No one has answered. The game is closed.`'
+                                            '`No one has answered. The game is closed.`'
                                         );
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
 
@@ -349,27 +350,28 @@ function getLobbyMessageEmbed(game: TriviaGame, message: string) {
         .setDescription(message)
         .setThumbnail(triviaThumbnail);
 
-    if (game.category) embedmsg.addField('Category:', game.question!.category, true);
+    embedmsg.addField('Questions:', String(game.amount), true);
     if (game.category) {
-        let questions: string;
+        let questionCount: string;
         if (game.difficulty) {
             switch (game.difficulty) {
                 case 'easy':
-                    questions = String(game.categoryInfo.questionCounts.forEasy);
+                    questionCount = String(game.categoryInfo.questionCounts.forEasy);
                     break;
                 case 'medium':
-                    questions = String(game.categoryInfo.questionCounts.forMedium);
+                    questionCount = String(game.categoryInfo.questionCounts.forMedium);
                     break;
                 case 'hard':
-                    questions = String(game.categoryInfo.questionCounts.forHard);
+                    questionCount = String(game.categoryInfo.questionCounts.forHard);
                     break;
             }
         }
-        embedmsg.addField('Category Questions:', questions, true);
+        embedmsg.addField('Question Pool:', questionCount, true);
     }
-    if (game.difficulty) embedmsg.addField('Difficulty:', game.question!.difficulty, true);
+    if (game.difficulty) embedmsg.addField('Difficulty:', game.difficulty, true);
     if (game.type) embedmsg.addField('Type:', game.type, true);
-    embedmsg.addField(`Players: ${game.players.length} of ${game.maxPlayers} [min ${game.minPlayers}]`, players);
+    if (game.category) embedmsg.addField('Category:', game.category.prettyName, false);
+    embedmsg.addField(`Players: ${game.players.length} of ${game.maxPlayers} [min ${game.minPlayers}]`, players, false);
     return embedmsg;
 }
 
