@@ -53,7 +53,7 @@ export class TriviaGame extends GameLobby {
         this.answerRequired.splice(this.answerRequired.indexOf(player), 1);
         let answers = this.answers.get(player);
         if (!answers) answers = [];
-        answers?.push(this.question!.checkAnswer(<string>this.question.allAnswers[index]));
+        answers!.push(this.question!.checkAnswer(<string>this.question!.allAnswers[index]));
         this.answers.set(player, answers);
 
         if (this.answerRequired.length == 0) {

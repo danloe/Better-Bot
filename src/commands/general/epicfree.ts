@@ -24,7 +24,7 @@ export const command: Command = {
 
                     const games: any = await getGames('DE', true);
                     if (games) {
-                        games.currentGames.forEach(async (game) => {
+                        games.currentGames.forEach(async (game: any) => {
                             if (game.price.lineOffers) {
                                 let date = new Date(game.promotions.promotionalOffers[0].promotionalOffers[0].endDate);
                                 let endDate = date.toLocaleDateString('de');
@@ -33,7 +33,7 @@ export const command: Command = {
                                 let startDate = date.toLocaleDateString('de');
 
                                 let image = '';
-                                game.keyImages.forEach((element) => {
+                                game.keyImages.forEach((element: any) => {
                                     if (element.type === 'OfferImageWide') {
                                         image = element.url;
                                     }
@@ -48,7 +48,7 @@ export const command: Command = {
                                     .addField('Valid until:', endDate, true)
                                     .addField('Original Price:', game.price.totalPrice.fmtPrice.originalPrice, true);
 
-                                await interaction.channel.send({ content: ' ', embeds: [embedmsg] });
+                                await interaction.channel!.send({ content: ' ', embeds: [embedmsg] });
                             }
                             await interaction.editReply({
                                 embeds: [
