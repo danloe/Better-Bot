@@ -36,7 +36,7 @@ export const command: Command = {
             if (interaction instanceof CommandInteraction) {
                 try {
                     await replyDefer(interaction);
-                    
+
                     let opponent = interaction.options.getUser('opponent');
 
                     const lobby = await client.gameManager.createLobby(
@@ -63,8 +63,8 @@ export const command: Command = {
 
                         collector.on('collect', async (button) => {
                             try {
-                                await button.deferUpdate();
                                 if (button.user.id === interaction.user.id) {
+                                    await button.deferUpdate();
                                     if (button.customId === 'ttt_join_cancel') {
                                         let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
@@ -74,6 +74,7 @@ export const command: Command = {
                                     }
                                 } else {
                                     if (button.customId === 'ttt_join_join') {
+                                        await button.deferUpdate();
                                         game.join(button.user);
                                         collector.stop();
                                     } else if (button.customId === 'ttt_join_cancel') {
