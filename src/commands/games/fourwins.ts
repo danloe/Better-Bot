@@ -293,11 +293,19 @@ export const command: Command = {
                         await interaction.editReply(gameFieldMessage);
 
                         if (game.winners.length > 0) {
-                            await interaction.followUp(
-                                createEmbed('Game Over', '🎉 <@' + game.winners[0].id + '> has won the game!')
-                            );
+                            let embedmsg = new MessageEmbed()
+                                .setColor('#403075')
+                                .setTitle('Four Wins - Game Over')
+                                .setDescription('🎉 <@' + game.winners[0].id + '> `has won the game!`')
+                                .setThumbnail(fwThumbnail);
+                            await interaction.followUp({ embeds: [embedmsg] });
                         } else {
-                            await interaction.followUp(createEmbed('Game Over', '🫱🏼‍🫲🏼 Draw.'));
+                            let embedmsg = new MessageEmbed()
+                                .setColor('#403075')
+                                .setTitle('Tic Tac Toe - Game Over')
+                                .setDescription('`🫱🏼‍🫲🏼 Draw.`')
+                                .setThumbnail(fwThumbnail);
+                            await interaction.followUp({ embeds: [embedmsg] });
                         }
 
                         client.gameManager.destroyLobby(interaction.user);
