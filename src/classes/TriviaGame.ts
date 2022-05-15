@@ -1,7 +1,7 @@
 import { TextBasedChannel, User } from 'discord.js';
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
-import { Category, CategoryData, getQuestions, Question, QuestionDifficulty, QuestionType } from 'easy-trivia';
+import { Category, CategoryData, getQuestions, Question, QuestionDifficulty, QuestionType } from 'open-trivia-db';
 
 /*
   _____ ____  _____     _____    _    
@@ -53,7 +53,7 @@ export class TriviaGame extends GameLobby {
         this.answerRequired.splice(this.answerRequired.indexOf(player), 1);
         let answers = this.answers.get(player);
         if (!answers) answers = [];
-        answers?.push(this.question!.checkAnswer(this.question!.allAnswers[index]));
+        answers?.push(this.question!.checkAnswer(<string>this.question.allAnswers[index]));
         this.answers.set(player, answers);
 
         if (this.answerRequired.length == 0) {

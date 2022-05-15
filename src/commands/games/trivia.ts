@@ -16,7 +16,7 @@ import { createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
 import { GameType } from '../../classes/GameManager';
 import { GameState } from '../../classes/GameLobby';
 import { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
-import { Category, CategoryNamesPretty, CategoryResolvable, QuestionDifficulty, QuestionType } from 'easy-trivia';
+import { Category, CategoryNamesPretty, CategoryResolvable, QuestionDifficulty, QuestionType } from 'open-trivia-db';
 import { answerDisplayTime, questionAnswerTimeout, TriviaGame } from '../../classes/TriviaGame';
 
 const triviaThumbnail = 'https://opentdb.com/images/logo-banner.png';
@@ -402,7 +402,7 @@ function getQuestionMessage(game: TriviaGame): string | MessagePayload | Webhook
         components.push(
             new MessageButton()
                 .setCustomId('trivia_' + String(i))
-                .setLabel(game.question!.allAnswers[i])
+                .setLabel(<string>game.question!.allAnswers[i])
                 .setStyle('PRIMARY')
         );
     }
