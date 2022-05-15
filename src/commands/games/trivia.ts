@@ -121,9 +121,8 @@ export const command: Command = {
                                     await button.deferUpdate();
                                     if (button.customId === 'join_cancel') {
                                         let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
-                                        await interaction.editReply({ embeds: [embedmsg], components: [] });
-
                                         client.gameManager.destroyLobby(interaction.user);
+                                        await interaction.editReply({ embeds: [embedmsg], components: [] });
                                         collector.stop();
                                     }
                                 } else {
@@ -149,8 +148,8 @@ export const command: Command = {
                                     (game.state === GameState.Waiting || game.state === GameState.Ready)
                                 ) {
                                     let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
-                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
                                     client.gameManager.destroyLobby(interaction.user);
+                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
                                 }
                             } catch (err) {
                                 console.log(err);
@@ -182,9 +181,8 @@ export const command: Command = {
                                         game.start();
                                     } else if (button.customId === 'ready_cancel') {
                                         let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
-                                        await interaction.editReply({ embeds: [embedmsg], components: [] });
-
                                         client.gameManager.destroyLobby(interaction.user);
+                                        await interaction.editReply({ embeds: [embedmsg], components: [] });
                                     }
                                     collector.stop();
                                 } else {
@@ -217,8 +215,8 @@ export const command: Command = {
                                     (game.state === GameState.Waiting || game.state === GameState.Ready)
                                 ) {
                                     let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
-                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
                                     client.gameManager.destroyLobby(interaction.user);
+                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
                                 }
                             } catch (err) {
                                 console.log(err);
@@ -302,9 +300,9 @@ export const command: Command = {
                                 if (button.user.id === interaction.user.id) {
                                     await button.deferUpdate();
                                     let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
+                                    client.gameManager.destroyLobby(interaction.user);
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
 
-                                    client.gameManager.destroyLobby(interaction.user);
                                     collector.stop();
                                 } else {
                                     try {
@@ -335,8 +333,8 @@ export const command: Command = {
                     lobby.on('end', async (game: TriviaGame) => {
                         console.log('[Trivia] Game Over');
                         const gameMessage = getGameOverMessage(game);
-                        await interaction.editReply(gameMessage);
                         client.gameManager.destroyLobby(interaction.user);
+                        await interaction.editReply(gameMessage);
                     });
 
                     // open game lobby
