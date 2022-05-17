@@ -3,7 +3,7 @@ import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
 import {
-    checkEmbedString,
+    checkEmbedString as getPrettyEmbedString,
     createEmbed,
     createErrorEmbed,
     getTrackTypeColor,
@@ -17,7 +17,11 @@ export const command: Command = {
         .setName('play')
         .setDescription('Play or Queue a Song.')
         .addStringOption((option) =>
-            option.setName('input').setDescription('URL to a File or Search Text').setRequired(true).setAutocomplete(true)
+            option
+                .setName('input')
+                .setDescription('URL to a File or Search Text')
+                .setRequired(true)
+                .setAutocomplete(true)
         )
         .addStringOption((option) =>
             option
@@ -62,10 +66,10 @@ export const command: Command = {
                             false,
                             getTrackTypeColor(track.type),
                             [
-                                { name: 'Description', value: checkEmbedString(track.description) },
+                                { name: 'Description', value: getPrettyEmbedString(track.description) },
                                 { name: 'Source', value: getTrackSourceString(track), inline: true },
                                 { name: 'Duration', value: secondsToDurationString(track.duration), inline: true },
-                                { name: 'Uploaded', value: checkEmbedString(track.uploaded), inline: true }
+                                { name: 'Uploaded', value: getPrettyEmbedString(track.uploaded), inline: true }
                             ],
                             track.artworkUrl,
                             track.displayUrl,

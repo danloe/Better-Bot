@@ -1,9 +1,5 @@
 import { EmbedFooterData } from '@discordjs/builders';
-import {
-    ColorResolvable,
-    EmbedFieldData,
-    MessageEmbed,
-} from 'discord.js';
+import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
 import { Track, TrackType } from '../classes/Track';
 
 export function createEmbed(
@@ -111,8 +107,11 @@ export function secondsToDurationString(seconds: number): string {
 export function checkEmbedString(string: string): string {
     try {
         if (string == null || string == undefined || string == '') return 'Unknown';
-        if (string == 'null') return 'No description.'
-        if (string.length > 200) return string.substring(0, 199) + '[...]';
+        if (string == 'null') return 'No description.';
+        if (string.length > 220) {
+            let substr = string.substring(0, 219);
+            return substr.substring(0, substr.lastIndexOf(' ')) + ' [...]';
+        }
         return string;
     } catch (error) {
         return 'Unknown';
