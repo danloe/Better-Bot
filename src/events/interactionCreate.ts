@@ -1,6 +1,6 @@
 import { Command, Event } from '../interfaces';
 import BetterClient from '../client';
-import { getAutocompleteSuggestions } from '../helpers/ytautocomplete';
+import { getYouTubeSuggestions } from '../helpers/autocomplete';
 
 export const event: Event = {
     name: 'interactionCreate',
@@ -30,7 +30,7 @@ export const event: Event = {
                             );
                             let choices: any;
                             let response = [];
-                            choices = await getAutocompleteSuggestions(focusedOption.value);
+                            choices = await getYouTubeSuggestions(focusedOption.value);
                             choices.forEach((choice: string) => {
                                 response.push({ name: choice, value: choice });
                             });
