@@ -56,13 +56,27 @@ export const command: Command = {
                     }
                     if (!announce) announce = false;
                     const track = await client.musicManager.play(interaction, input!, announce, skip, next);
+                    let addedText = '';
+                    if (skip)
+                        addedText =
+                            '`➕ Track was added and is playing now [' +
+                            (client.musicManager.queues.get(interaction.guildId!)!.length - 1) +
+                            ' in queue]`';
+                    if (next)
+                        addedText =
+                            '`➕ Track was added and is next in queue [' +
+                            client.musicManager.queues.get(interaction.guildId!)!.length +
+                            ' in queue]`';
+                    if (!skip && !next)
+                        addedText =
+                            '`➕ Track was added [' +
+                            client.musicManager.queues.get(interaction.guildId!)!.length +
+                            ' in queue]`';
                     await replyInteraction(
                         interaction,
                         createEmbed(
                             track.name,
-                            '`➕ Track was added [' +
-                                client.musicManager.queues.get(interaction.guildId!)!.length +
-                                ' in queue]`',
+                            addedText,
                             false,
                             getTrackTypeColor(track.type),
                             [
