@@ -2,7 +2,7 @@ import http from 'node:http';
 
 const AutocompleteURL = 'http://suggestqueries.google.com/complete/search?client=firefox&ds=yt&q=';
 
-export function getAutocompleteQueries(query: string) {
+export function getAutocompleteSuggestions(query: string) {
     return new Promise<any>(async (resolve, reject) => {
         http.get(AutocompleteURL + query, function (res) {
             let rawData = '';
