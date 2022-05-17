@@ -16,6 +16,8 @@ export const event: Event = {
             } catch (error) {
                 console.error(error);
             }
+
+        // AUTO COMPLETE
         } else if (interaction.isAutocomplete()) {
             try {
                 if (interaction.commandName === 'play') {
