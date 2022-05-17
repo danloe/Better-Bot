@@ -22,7 +22,7 @@ export const event: Event = {
                     const focusedOption = interaction.options.getFocused(true);
 
                     if (focusedOption.name === 'input') {
-                        if (!(String(focusedOption.value).trim() === '')) {
+                        if (!(String(focusedOption.value).trim() === '') && !String(focusedOption.value).startsWith('http')) {
                             console.log(
                                 `${interaction.user.tag} triggered an autocomplete [${interaction.commandName}: ${focusedOption.value}]`
                             );
