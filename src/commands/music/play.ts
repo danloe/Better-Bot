@@ -17,7 +17,7 @@ export const command: Command = {
         .setName('play')
         .setDescription('Play or Queue a Song.')
         .addStringOption((option) =>
-            option.setName('input').setDescription('URL to a File or Search Text').setRequired(true)
+            option.setName('input').setDescription('URL to a File or Search Text').setRequired(true).setAutocomplete(true)
         )
         .addStringOption((option) =>
             option

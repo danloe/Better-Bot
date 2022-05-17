@@ -1,23 +1,44 @@
 import { Command, Event } from '../interfaces';
 import BetterClient from '../client';
+import { getAutocompleteQueries } from '../helpers/ytautocomplete';
 
 export const event: Event = {
     name: 'interactionCreate',
     run: async (client: BetterClient, interaction: any) => {
-        console.log(
-            `${interaction.user.tag} triggered an interaction.${
-                interaction.isCommand() ? ` [${interaction.commandName}]` : ''
-            }`
-        );
-
         // COMMAND
         if (interaction.isCommand()) {
+            console.log(`${interaction.user.tag} triggered an interaction. [${interaction.commandName}]`);
+
             const command = client.commands.get(interaction.commandName);
             if (!command) return;
             try {
                 await (command as Command).run(client, interaction);
             } catch (error) {
                 console.error(error);
+            }
+        } else if (interaction.isAutocomplete()) {
+            try {
+                if (interaction.commandName === 'play') {
+                    const focusedOption = interaction.options.getFocused(true);
+                    let choices: any;
+                    let response = [];
+
+                    if (focusedOption.name === 'input') {
+                        if (!(String(focusedOption.value).trim() === '')) {
+                            console.log(
+                                `${interaction.user.tag} triggered an autocomplete. [${interaction.commandName}:${focusedOption.value}]`
+                            );
+                            choices = await getAutocompleteQueries(focusedOption.value);
+
+                            choices.forEach((choice: string) => {
+                                response.push({ name: choice, value: choice });
+                            });
+                            await interaction.respond(response);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log(error);
             }
         }
 
