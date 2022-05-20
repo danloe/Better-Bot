@@ -301,7 +301,7 @@ export const command: Command = {
                             let embedmsg = new MessageEmbed()
                                 .setColor('#403075')
                                 .setTitle('Tic Tac Toe - Game Over')
-                                .setDescription('`🫱🏼‍🫲🏼 Draw.`')
+                                .setDescription('`🫱🏼‍🫲🏼 Draw`')
                                 .setThumbnail(tttThumbnail);
                             await interaction.followUp({ embeds: [embedmsg] });
                         }

@@ -300,7 +300,7 @@ export const command: Command = {
                             let embedmsg = new MessageEmbed()
                                 .setColor('#403075')
                                 .setTitle('Four Wins - Game Over')
-                                .setDescription('`🫱🏼‍🫲🏼 Draw.`')
+                                .setDescription('`🫱🏼‍🫲🏼 Draw`')
                                 .setThumbnail(fwThumbnail);
                             await interaction.followUp({ embeds: [embedmsg] });
                         }
