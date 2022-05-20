@@ -19,6 +19,12 @@ import { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
 import { Category, CategoryNamesPretty, CategoryResolvable, QuestionDifficulty, QuestionType } from 'open-trivia-db';
 import { answerDisplayTime, questionAnswerTimeout, TriviaGame } from '../../classes/TriviaGame';
 
+/*
+TODO
+- TTSVoice read questions option
+- Question timeout option
+*/
+
 const triviaThumbnail = 'https://opentdb.com/images/logo-banner.png';
 
 export const command: Command = {
