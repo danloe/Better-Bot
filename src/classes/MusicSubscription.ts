@@ -35,7 +35,7 @@ export class MusicSubscription {
     public autoplay = true;
     public pausedForVoice = false;
     public announcement = false;
-    private nextTrackResource = undefined;
+    private nextTrackResource: AudioResource<Track> | undefined;
 
     public constructor(voiceConnection: VoiceConnection, queue: Queue, autoplay: boolean = true) {
         this.voiceConnection = voiceConnection;
@@ -132,7 +132,7 @@ export class MusicSubscription {
                     this.audioPlayer.unpause();
                 } else if (this.announcement) {
                     this.announcement = false;
-                    this.audioPlayer.play(this.nextTrackResource);
+                    this.audioPlayer.play(this.nextTrackResource!);
                 }
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
@@ -252,7 +252,23 @@ const announcements = [
     "I don't wanna anounce this, I do it anyways. "
 ];
 
+const postAnnouncements = [
+    ', listen closely.',
+    ", don't laugh.",
+    ', I love that.',
+    ', oh god not again.',
+    ', groovy!',
+    ', why do you do this?',
+    ", that's my jam!"
+];
+
 function getAnnouncementString(trackName: string): string {
-    let i = Math.floor(Math.random() * announcements.length);
-    return announcements[i] + trackName;
+    let i = 0;
+    if (Math.random() > 0.4) {
+        i = Math.floor(Math.random() * announcements.length);
+        return announcements[i] + trackName;
+    } else {
+        i = Math.floor(Math.random() * postAnnouncements.length);
+        return trackName + postAnnouncements[i];
+    }
 }
