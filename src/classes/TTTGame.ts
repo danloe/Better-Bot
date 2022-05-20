@@ -2,6 +2,12 @@ import { TextBasedChannel, User } from 'discord.js';
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
 
+/*
+🔳⭕🔳
+❌⭕🔳
+🔳❌🔳
+*/
+
 const winningCombinations = [
     [0, 1, 2],
     [3, 4, 5],
@@ -12,12 +18,6 @@ const winningCombinations = [
     [0, 4, 8],
     [2, 4, 6]
 ];
-
-/*
-🔳⭕🔳
-❌⭕🔳
-🔳❌🔳
-*/
 
 export class TTTGame extends GameLobby {
     public readonly charField = '🔳';
