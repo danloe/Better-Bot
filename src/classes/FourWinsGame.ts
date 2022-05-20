@@ -145,7 +145,7 @@ export class FourWinsGame extends GameLobby {
     }
 
     isDraw(): boolean {
-        for (let i = 0; i < this.gameField[0].length - 1; i++) {
+        for (let i = 0; i < this.gameField[0].length; i++) {
             if (this.gameField[0][i] === this.charField) return false;
         }
         return true;
