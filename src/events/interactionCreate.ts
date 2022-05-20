@@ -29,7 +29,7 @@ export const event: Event = {
                                 `${interaction.user.tag} triggered an autocomplete [${interaction.commandName}: ${focusedOption.value}]`
                             );
                             let choices: any;
-                            let response = [];
+                            let response: any = [];
                             choices = await getYouTubeSuggestions(focusedOption.value);
                             choices.forEach((choice: string) => {
                                 response.push({ name: choice, value: choice });
