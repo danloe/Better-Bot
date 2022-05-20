@@ -6,7 +6,9 @@ import {
     AudioPlayerStatus,
     AudioResource,
     createAudioPlayer,
+    createAudioResource,
     entersState,
+    StreamType,
     VoiceConnection,
     VoiceConnectionDisconnectReason,
     VoiceConnectionState,
@@ -16,6 +18,8 @@ import { promisify } from 'node:util';
 import { Track } from './Track';
 import { Queue } from './Queue';
 import { TextBasedChannel } from 'discord.js';
+const discordTTS = require('discord-tts');
+//import discordTTS from 'discord-tts';
 
 const wait = promisify(setTimeout);
 
@@ -30,6 +34,8 @@ export class MusicSubscription {
     public readyLock = false;
     public autoplay = true;
     public pausedForVoice = false;
+    public announcement = false;
+    private nextTrackResource = undefined;
 
     public constructor(voiceConnection: VoiceConnection, queue: Queue, autoplay: boolean = true) {
         this.voiceConnection = voiceConnection;
@@ -124,6 +130,9 @@ export class MusicSubscription {
                 if (this.pausedForVoice) {
                     this.pausedForVoice = false;
                     this.audioPlayer.unpause();
+                } else if (this.announcement) {
+                    this.announcement = false;
+                    this.audioPlayer.play(this.nextTrackResource);
                 }
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
@@ -193,8 +202,23 @@ export class MusicSubscription {
             const nextTrack = this.queue.dequeue();
             try {
                 // Attempt to convert the Track into an AudioResource (i.e. start streaming the video)
-                const resource = await nextTrack.createAudioResource();
-                this.audioPlayer.play(resource);
+                this.nextTrackResource = await nextTrack.createAudioResource();
+                if (nextTrack.announce) {
+                    const stream = discordTTS.getVoiceStream(getAnnouncementString(nextTrack.name), {
+                        lang: 'en',
+                        slow: false
+                    });
+                    const voiceAudioResource = createAudioResource(stream, {
+                        inputType: StreamType.Arbitrary,
+                        inlineVolume: true
+                    });
+
+                    this.voiceConnection.subscribe(this.voicePlayer);
+                    this.voicePlayer.play(voiceAudioResource);
+                    this.announcement = true;
+                } else {
+                    this.audioPlayer.play(this.nextTrackResource);
+                }
                 this.currentTrack = nextTrack;
                 this.queueLock = false;
             } catch (error) {
@@ -207,4 +231,28 @@ export class MusicSubscription {
             console.log(err);
         }
     }
+}
+
+const announcements = [
+    'Next track is ',
+    'Next up, ',
+    'Now playing, ',
+    'Coming up next is ',
+    'Listen closely to ',
+    'Now coming, ',
+    'Shut up, here is ',
+    'Stop talking, this is ',
+    'Hey Listen',
+    "Rythm's not up, let me give you a hug. ",
+    "Rythm's gone, my time has come. ",
+    'Alright, Rythms lazy, listen to me baby. ',
+    "Rythm's not doing shit, let me play this hit. ",
+    'Hey Listen',
+    "Rhytm who? Nothing that I can't do! ",
+    "I don't wanna anounce this, I do it anyways. "
+];
+
+function getAnnouncementString(trackName: string): string {
+    let i = Math.floor(Math.random() * announcements.length);
+    return announcements[i] + trackName;
 }
