@@ -36,6 +36,7 @@ export class MusicSubscription {
     public pausedForVoice = false;
     public announcement = false;
     private nextTrackResource: AudioResource<Track> | undefined;
+    private connectionTimeoutObj: NodeJS.Timeout;
 
     public constructor(voiceConnection: VoiceConnection, queue: Queue, autoplay: boolean = true) {
         this.voiceConnection = voiceConnection;
@@ -112,9 +113,18 @@ export class MusicSubscription {
             if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
                 // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
                 // The queue is then processed to start playing the next track, if one is available.
+
+                // Start connection timeout check
+                this.connectionTimeoutObj = setTimeout(() => {
+                    if (this.audioPlayer.state.status !== AudioPlayerStatus.Playing) {
+                        this.voiceConnection.destroy();
+                    }
+                }, 60_000);
                 this.processQueue();
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
+                // Stop connection timeout check
+                clearTimeout(this.connectionTimeoutObj);
             } else if (newState.status === AudioPlayerStatus.Paused) {
                 // If the Playing state has been entered, then the player was paused.
             }
