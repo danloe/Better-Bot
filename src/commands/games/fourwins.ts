@@ -299,7 +299,7 @@ export const command: Command = {
                             client.gameManager.destroyLobby(interaction.user);
                             let embedmsg = new MessageEmbed()
                                 .setColor('#403075')
-                                .setTitle('Tic Tac Toe - Game Over')
+                                .setTitle('Four Wins - Game Over')
                                 .setDescription('`🫱🏼‍🫲🏼 Draw.`')
                                 .setThumbnail(fwThumbnail);
                             await interaction.followUp({ embeds: [embedmsg] });
@@ -381,7 +381,7 @@ export const command: Command = {
                     try {
                         await replyInteraction(
                             interaction,
-                            createErrorEmbed('🚩 Error creating a tic tac toe game: `' + err + '`')
+                            createErrorEmbed('🚩 Error creating a Four Wins game: `' + err + '`')
                         );
                     } catch (err2) {
                         console.log(err2);
