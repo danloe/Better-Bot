@@ -36,6 +36,7 @@ export class TriviaGame extends GameLobby {
     answerRequired: User[] = [];
     answerGiven: User[] = [];
     questionAnswerTime = 20;
+    readQuestions = false;
 
     public constructor(host: User, channel: TextBasedChannel, minPlayers: number, maxPlayers: number) {
         super(GameType.Trivia, host, channel, minPlayers, maxPlayers);

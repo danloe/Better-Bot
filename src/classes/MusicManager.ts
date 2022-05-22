@@ -7,7 +7,7 @@ import {
     getYouTubeTrack,
     replyInteraction
 } from '../helpers';
-import { ButtonInteraction, CommandInteraction, GuildMember, Snowflake } from 'discord.js';
+import { ButtonInteraction, CommandInteraction, GuildMember, Snowflake, VoiceChannel } from 'discord.js';
 import BetterClient from '../client';
 import { MusicSubscription } from './MusicSubscription';
 import { Queue } from './Queue';
@@ -458,14 +458,24 @@ export class MusicManager {
     /**
      * Returns for subscription and queue if available
      */
+    getSubscriptionAndQueue(guildId: Snowflake): [MusicSubscription | undefined, Queue | undefined];
     getSubscriptionAndQueue(
         interaction: CommandInteraction | ButtonInteraction
-    ): [MusicSubscription | undefined, Queue | undefined] {
-        if (!interaction.guildId) return [undefined, undefined];
-        const subscription = this.subscriptions.get(interaction.guildId);
-        const queue = this.queues.get(interaction.guildId);
-        if(subscription) subscription.lastChannel = interaction.channel || undefined;
-        return [subscription, queue];
+    ): [MusicSubscription | undefined, Queue | undefined];
+
+    getSubscriptionAndQueue(input: any): [MusicSubscription | undefined, Queue | undefined] {
+        if (input instanceof CommandInteraction || input instanceof ButtonInteraction) {
+            if (!input.guildId) return [undefined, undefined];
+            const subscription = this.subscriptions.get(input.guildId);
+            const queue = this.queues.get(input.guildId);
+            if (subscription) subscription.lastChannel = input.channel || undefined;
+            return [subscription, queue];
+        } else {
+            if (!input) return [undefined, undefined];
+            const subscription = this.subscriptions.get(input);
+            const queue = this.queues.get(input);
+            return [subscription, queue];
+        }
     }
 }
 

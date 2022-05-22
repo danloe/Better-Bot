@@ -9,11 +9,6 @@ import { Category, CategoryNamesPretty, CategoryResolvable, QuestionDifficulty, 
 import { answerDisplayTime, TriviaGame } from '../../classes/TriviaGame';
 import { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
 
-/*
-TODO
-- TTSVoice read questions option
-*/
-
 export const command: Command = {
     data: new SlashCommandBuilder()
         .setName('trivia')
@@ -59,6 +54,12 @@ export const command: Command = {
                 .setMaxValue(10)
                 .setRequired(false)
         )
+        .addBooleanOption((option) =>
+            option
+                .setName('voice')
+                .setDescription('Activate TTS over voice to read the questions? Host must be in voice channel!')
+                .setRequired(false)
+        )
         .addIntegerOption((option) =>
             option
                 .setName('time')
@@ -87,8 +88,10 @@ export const command: Command = {
                     if (!categoryOption) categoryOption = null;
                     let maxPlayersOption = interaction.options.getInteger('players');
                     if (!maxPlayersOption) maxPlayersOption = 10;
-                    let timeOption = interaction.options.getInteger('time') * 1000;
-                    if (!timeOption) maxPlayersOption = 20 * 1000;
+                    let voiceOption = interaction.options.getBoolean('voice');
+                    if (!voiceOption) voiceOption = false;
+                    let timeOption = interaction.options.getInteger('time');
+                    if (!timeOption) timeOption = 20;
 
                     const lobby = (await client.gameManager.createLobby(
                         GameType.Trivia,
@@ -100,7 +103,8 @@ export const command: Command = {
                     lobby.amount = amount!;
                     lobby.difficulty = <QuestionDifficulty>difficultyOption!;
                     lobby.type = <QuestionType>typeOption!;
-                    lobby.questionAnswerTime = timeOption!;
+                    lobby.readQuestions = voiceOption;
+                    lobby.questionAnswerTime = timeOption! * 1000;
                     if (categoryOption) {
                         lobby.category = new Category(<CategoryResolvable>categoryOption);
                         await lobby.getCategoryInfo();
@@ -239,6 +243,8 @@ export const command: Command = {
                     lobby.on('question', async (game: TriviaGame) => {
                         const gameMessage = game.getQuestionMessage();
                         await interaction.editReply(gameMessage);
+
+                        if (game.readQuestions) await client.musicManager.say(interaction, game.question!.value, 'en');
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
