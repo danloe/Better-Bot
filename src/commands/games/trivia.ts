@@ -3,10 +3,8 @@ import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Messa
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
 import { createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
-import { GameType } from '../../classes/GameManager';
-import { GameState } from '../../classes/GameLobby';
 import { Category, CategoryNamesPretty, CategoryResolvable, QuestionDifficulty, QuestionType } from 'open-trivia-db';
-import { answerDisplayTime, TriviaGame } from '../../classes/TriviaGame';
+import { answerDisplayTime, TriviaGame, GameType, GameState } from '../../classes';
 import { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
 
 export const command: Command = {

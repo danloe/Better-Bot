@@ -1,6 +1,6 @@
 import { EmbedFooterData } from '@discordjs/builders';
 import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
-import { Track, TrackType } from '../classes/Track';
+import { Track, TrackType } from '../classes';
 
 export function createEmbed(
     title: string,

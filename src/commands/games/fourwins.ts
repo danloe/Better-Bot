@@ -12,9 +12,7 @@ import {
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
 import { createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
-import { FourWinsGame } from '../../classes/FourWinsGame';
-import { GameType } from '../../classes/GameManager';
-import { GameState } from '../../classes/GameLobby';
+import { FourWinsGame, GameType, GameState } from '../../classes';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
