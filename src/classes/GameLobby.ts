@@ -70,7 +70,7 @@ export class GameLobby extends EventEmitter {
     getChallengeMessage(opponent: User, message: string): string | MessagePayload | WebhookEditMessageOptions {
         let embedmsg = new MessageEmbed()
             .setColor('#403075')
-            .setTitle('Tic Tac Toe')
+            .setTitle(this.name)
             .setAuthor({ name: opponent.username, iconURL: opponent.avatarURL() || '' })
             .setDescription(message)
             .setThumbnail(this.thumbnail);
