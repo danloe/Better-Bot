@@ -100,7 +100,6 @@ export const command: Command = {
 
                     // GAME READY TO START
                     lobby.on('ready', async (game: TTTGame) => {
-                        console.log('[TTT] Ready');
                         let embedmsg = game.getLobbyMessageEmbed('`Minimum player count reached. The game is ready.`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('ttt_ready_join').setLabel('Join').setStyle('PRIMARY'),
@@ -170,7 +169,6 @@ export const command: Command = {
 
                     // GAME STARTED
                     lobby.on('start', async (game: TTTGame) => {
-                        console.log('[TTT] Started');
                         const gameFieldMessage = game.getGameFieldMessage();
                         await interaction.editReply(gameFieldMessage);
 
@@ -224,7 +222,6 @@ export const command: Command = {
 
                     // GAME TICK
                     lobby.on('tick', async (game: TTTGame) => {
-                        console.log('[TTT] Game Tick');
                         const gameFieldMessage = game.getGameFieldMessage();
                         await interaction.editReply(gameFieldMessage);
 
@@ -278,7 +275,6 @@ export const command: Command = {
 
                     // GAME OVER
                     lobby.on('end', async (game: TTTGame) => {
-                        console.log('[TTT] Game Over');
                         const gameFieldMessage = game.getGameFieldMessage();
                         await interaction.editReply(gameFieldMessage);
 

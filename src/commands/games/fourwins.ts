@@ -99,7 +99,6 @@ export const command: Command = {
 
                     // GAME READY TO START
                     lobby.on('ready', async (game: FourWinsGame) => {
-                        console.log('[FourWins] Ready');
                         let embedmsg = game.getLobbyMessageEmbed('`Minimum player count reached. The game is ready.`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('fw_ready_join').setLabel('Join').setStyle('PRIMARY'),
@@ -170,7 +169,6 @@ export const command: Command = {
 
                     // GAME STARTED
                     lobby.on('start', async (game: FourWinsGame) => {
-                        console.log('[FourWins] Started');
                         const gameFieldMessage = getGameFieldMessage(game);
                         await interaction.editReply(gameFieldMessage);
 
@@ -224,7 +222,6 @@ export const command: Command = {
 
                     // GAME TICK
                     lobby.on('tick', async (game: FourWinsGame) => {
-                        console.log('[FourWins] Game Tick');
                         const gameFieldMessage = getGameFieldMessage(game);
                         await interaction.editReply(gameFieldMessage);
 
@@ -279,7 +276,6 @@ export const command: Command = {
 
                     // GAME OVER
                     lobby.on('end', async (game: FourWinsGame) => {
-                        console.log('[FourWins] Game Over');
                         const gameFieldMessage = getGameFieldMessage(game, true);
                         await interaction.editReply(gameFieldMessage);
 

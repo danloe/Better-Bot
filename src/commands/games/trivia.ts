@@ -165,7 +165,6 @@ export const command: Command = {
 
                     // GAME READY TO START
                     lobby.on('ready', async (game: TriviaGame) => {
-                        console.log('[Trivia] Ready');
                         let embedmsg = game.getLobbyMessageEmbed('`Minimum player count reached. The game is ready.`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('ready_join').setLabel('Join').setStyle('PRIMARY'),
@@ -232,14 +231,12 @@ export const command: Command = {
 
                     // GAME START
                     lobby.on('start', async (game: TriviaGame) => {
-                        console.log('[Trivia] Game Start');
                         await lobby.getQuestions();
                         lobby.nextRound();
                     });
 
                     // GAME QUESTION
                     lobby.on('question', async (game: TriviaGame) => {
-                        console.log('[Trivia] Game Question');
                         const gameMessage = game.getQuestionMessage();
                         await interaction.editReply(gameMessage);
 
@@ -290,7 +287,6 @@ export const command: Command = {
 
                     // GAME ANSWER
                     lobby.on('answer', async (game: TriviaGame) => {
-                        console.log('[Trivia] Game Answer');
                         const gameMessage = game.getAnswerMessage();
                         await interaction.editReply(gameMessage);
 
@@ -335,7 +331,6 @@ export const command: Command = {
 
                     // GAME OVER
                     lobby.on('end', async (game: TriviaGame) => {
-                        console.log('[Trivia] Game Over');
                         const gameMessage = game.getGameOverMessage();
                         client.gameManager.destroyLobby(interaction.user);
                         await interaction.editReply(gameMessage);
