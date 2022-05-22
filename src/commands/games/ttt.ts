@@ -40,7 +40,6 @@ export const command: Command = {
 
                     // A PLAYER JOINED
                     lobby.on('join', async (game: TTTGame) => {
-                        console.log(`[TTT] ${game.players[game.players.length - 1].username} joined`);
                         let embedmsg = game.getLobbyMessageEmbed('`Waiting for more players...`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('ttt_join_join').setLabel('Join').setStyle('PRIMARY'),

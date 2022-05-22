@@ -42,7 +42,6 @@ export const command: Command = {
 
                     // A PLAYER JOINED
                     lobby.on('join', async (game: FourWinsGame) => {
-                        console.log(`[FourWins] ${game.players[game.players.length - 1].username} joined`);
                         let embedmsg = game.getLobbyMessageEmbed('`Waiting for more players...`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('join_join').setLabel('Join').setStyle('PRIMARY'),
