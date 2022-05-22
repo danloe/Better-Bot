@@ -242,9 +242,10 @@ export const command: Command = {
                         const gameMessage = game.getQuestionMessage();
                         await interaction.editReply(gameMessage);
 
-                        if (game.readQuestions && !game.questionRead)
+                        if (game.readQuestions && !game.questionRead) {
                             client.musicManager.say(interaction, game.question!.value, 'en');
-                        game.questionRead = true;
+                            game.questionRead = true;
+                        }
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
