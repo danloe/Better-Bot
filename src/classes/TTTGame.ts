@@ -1,4 +1,12 @@
-import { TextBasedChannel, User } from 'discord.js';
+import {
+    MessageActionRow,
+    MessageButton,
+    MessageEmbed,
+    MessagePayload,
+    TextBasedChannel,
+    User,
+    WebhookEditMessageOptions
+} from 'discord.js';
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
 
@@ -28,6 +36,8 @@ export class TTTGame extends GameLobby {
 
     public constructor(host: User, channel: TextBasedChannel) {
         super(GameType.TicTacToe, host, channel, 2, 2);
+        this.name = 'Tic Tac Toe';
+        this.thumbnail = 'https://www.dropbox.com/s/fkqrplz0duuqto9/ttt.png?dl=1';
 
         this.createGameField();
         this.state = GameState.Waiting;
@@ -97,5 +107,52 @@ export class TTTGame extends GameLobby {
     swapTurns() {
         this.playerOturn = !this.playerOturn;
         this.emit('tick', this);
+    }
+
+    getLobbyMessageEmbed(message: string) {
+        let players = '';
+        this.players.forEach((player) => {
+            players = players + '<@' + player.id + '> ';
+        });
+        return new MessageEmbed()
+            .setColor('#403075')
+            .setTitle('Tic Tac Toe')
+            .setDescription(message)
+            .setThumbnail(this.thumbnail)
+            .addField(`Players: ${this.players.length} of ${this.maxPlayers} [min ${this.minPlayers}]`, players);
+    }
+
+    getGameFieldMessage(): string | MessagePayload | WebhookEditMessageOptions {
+        let embedmsg = new MessageEmbed()
+            .setColor('#403075')
+            .setTitle('Tic Tac Toe')
+            .setDescription(
+                '<@' + this.players[0].id + '>`' + this.charX + ' vs ' + this.charO + '`<@' + this.players[1].id + '>'
+            )
+            .addField(
+                `Player Turn`,
+                `<@${this.playerOturn ? this.players[1].id : this.players[0].id}> ${
+                    this.playerOturn ? this.charO : this.charX
+                }`
+            );
+        const row1 = new MessageActionRow().addComponents([
+            new MessageButton().setCustomId('ttt_0').setLabel(this.gameField[0]).setStyle('SECONDARY'),
+            new MessageButton().setCustomId('ttt_1').setLabel(this.gameField[1]).setStyle('SECONDARY'),
+            new MessageButton().setCustomId('ttt_2').setLabel(this.gameField[2]).setStyle('SECONDARY')
+        ]);
+        const row2 = new MessageActionRow().addComponents([
+            new MessageButton().setCustomId('ttt_3').setLabel(this.gameField[3]).setStyle('SECONDARY'),
+            new MessageButton().setCustomId('ttt_4').setLabel(this.gameField[4]).setStyle('SECONDARY'),
+            new MessageButton().setCustomId('ttt_5').setLabel(this.gameField[5]).setStyle('SECONDARY')
+        ]);
+        const row3 = new MessageActionRow().addComponents([
+            new MessageButton().setCustomId('ttt_6').setLabel(this.gameField[6]).setStyle('SECONDARY'),
+            new MessageButton().setCustomId('ttt_7').setLabel(this.gameField[7]).setStyle('SECONDARY'),
+            new MessageButton().setCustomId('ttt_8').setLabel(this.gameField[8]).setStyle('SECONDARY')
+        ]);
+        return {
+            embeds: [embedmsg],
+            components: [row1, row2, row3]
+        };
     }
 }

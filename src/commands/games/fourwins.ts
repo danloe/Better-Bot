@@ -7,17 +7,14 @@ import {
     MessageButton,
     MessageEmbed,
     MessagePayload,
-    User,
     WebhookEditMessageOptions
 } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createEmbed, createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
+import { createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
 import { FourWinsGame } from '../../classes/FourWinsGame';
 import { GameType } from '../../classes/GameManager';
-import { GameLobby, GameState } from '../../classes/GameLobby';
-
-const fwThumbnail = 'https://www.dropbox.com/s/0jq0iqts4a9vque/fourwins.png?dl=1';
+import { GameState } from '../../classes/GameLobby';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -39,16 +36,16 @@ export const command: Command = {
 
                     let opponent = interaction.options.getUser('opponent');
 
-                    const lobby = await client.gameManager.createLobby(
+                    const lobby = (await client.gameManager.createLobby(
                         GameType.FourWins,
                         interaction,
                         interaction.user
-                    );
+                    )) as FourWinsGame;
 
                     // A PLAYER JOINED
                     lobby.on('join', async (game: FourWinsGame) => {
                         console.log(`[FourWins] ${game.players[game.players.length - 1].username} joined`);
-                        let embedmsg = getLobbyMessageEmbed(game, '`Waiting for more players...`');
+                        let embedmsg = game.getLobbyMessageEmbed('`Waiting for more players...`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('join_join').setLabel('Join').setStyle('PRIMARY'),
                             new MessageButton().setCustomId('join_cancel').setLabel('Cancel Game').setStyle('DANGER')
@@ -64,7 +61,7 @@ export const command: Command = {
                                     await button.deferUpdate();
                                     if (button.customId === 'join_cancel') {
                                         client.gameManager.destroyLobby(interaction.user);
-                                        let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
+                                        let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
                                         collector.stop();
                                     }
@@ -89,7 +86,7 @@ export const command: Command = {
                                     (game.state === GameState.Waiting || game.state === GameState.Ready)
                                 ) {
                                     client.gameManager.destroyLobby(interaction.user);
-                                    let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
+                                    let embedmsg = game.getLobbyMessageEmbed('`The game lobby timed out.`');
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
                                 }
                             } catch (err) {
@@ -103,7 +100,7 @@ export const command: Command = {
                     // GAME READY TO START
                     lobby.on('ready', async (game: FourWinsGame) => {
                         console.log('[FourWins] Ready');
-                        let embedmsg = getLobbyMessageEmbed(game, '`Minimum player count reached. The game is ready.`');
+                        let embedmsg = game.getLobbyMessageEmbed('`Minimum player count reached. The game is ready.`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('fw_ready_join').setLabel('Join').setStyle('PRIMARY'),
                             new MessageButton()
@@ -125,7 +122,7 @@ export const command: Command = {
                                         game.start();
                                     } else if (button.customId === 'fw_ready_cancel') {
                                         client.gameManager.destroyLobby(interaction.user);
-                                        let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
+                                        let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
                                     }
                                     collector.stop();
@@ -156,7 +153,7 @@ export const command: Command = {
                                     (game.state === GameState.Waiting || game.state === GameState.Ready)
                                 ) {
                                     client.gameManager.destroyLobby(interaction.user);
-                                    let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
+                                    let embedmsg = game.getLobbyMessageEmbed('`The game lobby timed out.`');
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
                                 }
                             } catch (err) {
@@ -211,8 +208,7 @@ export const command: Command = {
                         collector.on('end', async (_: any, reason: string) => {
                             try {
                                 if (reason === 'time' && game.state === GameState.Started) {
-                                    let embedmsg = getLobbyMessageEmbed(
-                                        game,
+                                    let embedmsg = game.getLobbyMessageEmbed(
                                         '<@' +
                                             game.getTurnPlayer().id +
                                             '>` has not executed his move. The game is closed.`'
@@ -267,8 +263,7 @@ export const command: Command = {
                         collector.on('end', async (_: any, reason: string) => {
                             try {
                                 if (reason === 'time' && game.state === GameState.Started) {
-                                    let embedmsg = getLobbyMessageEmbed(
-                                        game,
+                                    let embedmsg = game.getLobbyMessageEmbed(
                                         '<@' +
                                             game.getTurnPlayer().id +
                                             '> `has not executed his move. The game is closed.`'
@@ -293,7 +288,7 @@ export const command: Command = {
                                 .setColor('#403075')
                                 .setTitle('Four Wins - Game Over')
                                 .setDescription('🎉 <@' + game.winners[0].id + '> `has won the game!`')
-                                .setThumbnail(fwThumbnail);
+                                .setThumbnail(game.thumbnail);
                             await interaction.followUp({ embeds: [embedmsg] });
                         } else {
                             client.gameManager.destroyLobby(interaction.user);
@@ -301,7 +296,7 @@ export const command: Command = {
                                 .setColor('#403075')
                                 .setTitle('Four Wins - Game Over')
                                 .setDescription('`🫱🏼‍🫲🏼 Draw`')
-                                .setThumbnail(fwThumbnail);
+                                .setThumbnail(game.thumbnail);
                             await interaction.followUp({ embeds: [embedmsg] });
                         }
                     });
@@ -309,7 +304,7 @@ export const command: Command = {
                     if (opponent) {
                         // Send a challenge message
                         await interaction.editReply(
-                            getChallengeMessage(
+                            lobby.getChallengeMessage(
                                 opponent,
                                 '⚔️ <@' + interaction.user.id + '> `challenged you to a game of Four Wins!`'
                             )
@@ -323,19 +318,16 @@ export const command: Command = {
                         collector.on('collect', async (button) => {
                             try {
                                 if (button.user.id === opponent!.id) {
-                                    if (button.customId === 'fw_challenge_accept') {
+                                    if (button.customId === 'challenge_accept') {
                                         await button.deferUpdate();
 
                                         lobby.join(button.user);
                                         collector.stop();
-                                    } else if (button.customId === 'fw_challenge_decline') {
+                                    } else if (button.customId === 'challenge_decline') {
                                         await button.deferUpdate();
 
                                         client.gameManager.destroyLobby(interaction.user);
-                                        let embedmsg = getLobbyMessageEmbed(
-                                            lobby,
-                                            '`The game challenge was declined.`'
-                                        );
+                                        let embedmsg = lobby.getLobbyMessageEmbed('`The game challenge was declined.`');
                                         await interaction.editReply({
                                             content: ' ',
                                             embeds: [embedmsg],
@@ -362,8 +354,7 @@ export const command: Command = {
                             try {
                                 if (reason === 'time' && lobby.state === GameState.Waiting) {
                                     client.gameManager.destroyLobby(interaction.user);
-                                    let embedmsg = getLobbyMessageEmbed(
-                                        lobby,
+                                    let embedmsg = lobby.getLobbyMessageEmbed(
                                         '<@' + opponent!.id + '> `has not accepted the challenge. The game is closed.`'
                                     );
                                     await interaction.editReply({ content: ' ', embeds: [embedmsg], components: [] });
@@ -392,37 +383,6 @@ export const command: Command = {
             }
         })
 };
-
-function getLobbyMessageEmbed(game: GameLobby, message: string) {
-    let players = '';
-    game.players.forEach((player) => {
-        players = players + '<@' + player.id + '> ';
-    });
-    return new MessageEmbed()
-        .setColor('#403075')
-        .setTitle('Four Wins')
-        .setDescription(message)
-        .setThumbnail(fwThumbnail)
-        .addField(`Players: ${game.players.length} of ${game.maxPlayers} [min ${game.minPlayers}]`, players);
-}
-
-function getChallengeMessage(opponent: User, message: string): string | MessagePayload | WebhookEditMessageOptions {
-    let embedmsg = new MessageEmbed()
-        .setColor('#403075')
-        .setTitle('Four Wins')
-        .setAuthor({ name: opponent.username, iconURL: opponent.avatarURL() || '' })
-        .setDescription(message)
-        .setThumbnail(fwThumbnail);
-    const row1 = new MessageActionRow().addComponents([
-        new MessageButton().setCustomId('fw_challenge_accept').setLabel('Accept').setStyle('SUCCESS'),
-        new MessageButton().setCustomId('fw_challenge_decline').setLabel('Decline').setStyle('DANGER')
-    ]);
-    return {
-        content: `<@${opponent.id}>`,
-        embeds: [embedmsg],
-        components: [row1]
-    };
-}
 
 function getGameFieldMessage(
     game: FourWinsGame,

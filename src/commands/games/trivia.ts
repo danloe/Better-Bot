@@ -1,31 +1,18 @@
 import { Command } from '../../interfaces';
-import {
-    ButtonInteraction,
-    CommandInteraction,
-    Message,
-    MessageActionRow,
-    MessageButton,
-    MessageEmbed,
-    MessagePayload,
-    User,
-    WebhookEditMessageOptions
-} from 'discord.js';
+import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
 import { createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
 import { GameType } from '../../classes/GameManager';
 import { GameState } from '../../classes/GameLobby';
-import { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
 import { Category, CategoryNamesPretty, CategoryResolvable, QuestionDifficulty, QuestionType } from 'open-trivia-db';
-import { answerDisplayTime, questionAnswerTimeout, TriviaGame } from '../../classes/TriviaGame';
+import { answerDisplayTime, TriviaGame } from '../../classes/TriviaGame';
+import { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
 
 /*
 TODO
 - TTSVoice read questions option
-- Question timeout option
 */
-
-const triviaThumbnail = 'https://opentdb.com/images/logo-banner.png';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -71,6 +58,14 @@ export const command: Command = {
                 .setMinValue(1)
                 .setMaxValue(10)
                 .setRequired(false)
+        )
+        .addIntegerOption((option) =>
+            option
+                .setName('time')
+                .setDescription('How many seconds for each question?')
+                .setMinValue(5)
+                .setMaxValue(60)
+                .setRequired(false)
         ),
     run: (
         client: BetterClient,
@@ -84,34 +79,37 @@ export const command: Command = {
                     await replyDefer(interaction);
 
                     let amount = interaction.options.getInteger('amount');
-                    let difficulty = interaction.options.getString('difficulty');
-                    if (!difficulty) difficulty = null;
-                    let type = interaction.options.getString('type');
-                    if (!type) type = null;
-                    let category = interaction.options.getString('category');
-                    if (!category) category = null;
-                    let maxPlayers = interaction.options.getInteger('players');
-                    if (!maxPlayers) maxPlayers = 10;
+                    let difficultyOption = interaction.options.getString('difficulty');
+                    if (!difficultyOption) difficultyOption = null;
+                    let typeOption = interaction.options.getString('type');
+                    if (!typeOption) typeOption = null;
+                    let categoryOption = interaction.options.getString('category');
+                    if (!categoryOption) categoryOption = null;
+                    let maxPlayersOption = interaction.options.getInteger('players');
+                    if (!maxPlayersOption) maxPlayersOption = 10;
+                    let timeOption = interaction.options.getInteger('time');
+                    if (!timeOption) maxPlayersOption = 20;
 
                     const lobby = (await client.gameManager.createLobby(
                         GameType.Trivia,
                         interaction,
                         interaction.user,
                         1,
-                        maxPlayers
+                        maxPlayersOption
                     )) as TriviaGame;
                     lobby.amount = amount!;
-                    lobby.difficulty = <QuestionDifficulty>difficulty!;
-                    lobby.type = <QuestionType>type!;
-                    if (category) {
-                        lobby.category = new Category(<CategoryResolvable>category);
+                    lobby.difficulty = <QuestionDifficulty>difficultyOption!;
+                    lobby.type = <QuestionType>typeOption!;
+                    lobby.questionAnswerTime = timeOption!;
+                    if (categoryOption) {
+                        lobby.category = new Category(<CategoryResolvable>categoryOption);
                         await lobby.getCategoryInfo();
                     }
 
                     // A PLAYER JOINED
                     lobby.on('join', async (game: TriviaGame) => {
                         console.log(`[Trivia] ${game.players[game.players.length - 1].username} joined`);
-                        let embedmsg = getLobbyMessageEmbed(game, '`Waiting for more players...`');
+                        let embedmsg = game.getLobbyMessageEmbed('`Waiting for more players...`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('join_join').setLabel('Join').setStyle('PRIMARY'),
                             new MessageButton().setCustomId('join_cancel').setLabel('Cancel Game').setStyle('DANGER')
@@ -126,7 +124,7 @@ export const command: Command = {
                                 if (button.user.id === interaction.user.id) {
                                     await button.deferUpdate();
                                     if (button.customId === 'join_cancel') {
-                                        let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
+                                        let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
                                         client.gameManager.destroyLobby(interaction.user);
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
                                         collector.stop();
@@ -153,7 +151,7 @@ export const command: Command = {
                                     reason === 'time' &&
                                     (game.state === GameState.Waiting || game.state === GameState.Ready)
                                 ) {
-                                    let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
+                                    let embedmsg = game.getLobbyMessageEmbed('`The game lobby timed out.`');
                                     client.gameManager.destroyLobby(interaction.user);
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
                                 }
@@ -168,7 +166,7 @@ export const command: Command = {
                     // GAME READY TO START
                     lobby.on('ready', async (game: TriviaGame) => {
                         console.log('[Trivia] Ready');
-                        let embedmsg = getLobbyMessageEmbed(game, '`Minimum player count reached. The game is ready.`');
+                        let embedmsg = game.getLobbyMessageEmbed('`Minimum player count reached. The game is ready.`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('ready_join').setLabel('Join').setStyle('PRIMARY'),
                             new MessageButton().setCustomId('ready_cancel').setLabel('Cancel Game').setStyle('DANGER'),
@@ -186,7 +184,7 @@ export const command: Command = {
                                     if (button.customId === 'ready_start') {
                                         game.start();
                                     } else if (button.customId === 'ready_cancel') {
-                                        let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
+                                        let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
                                         client.gameManager.destroyLobby(interaction.user);
                                         await interaction.editReply({ embeds: [embedmsg], components: [] });
                                     }
@@ -220,7 +218,7 @@ export const command: Command = {
                                     reason === 'time' &&
                                     (game.state === GameState.Waiting || game.state === GameState.Ready)
                                 ) {
-                                    let embedmsg = getLobbyMessageEmbed(game, '`The game lobby timed out.`');
+                                    let embedmsg = game.getLobbyMessageEmbed('`The game lobby timed out.`');
                                     client.gameManager.destroyLobby(interaction.user);
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
                                 }
@@ -242,12 +240,12 @@ export const command: Command = {
                     // GAME QUESTION
                     lobby.on('question', async (game: TriviaGame) => {
                         console.log('[Trivia] Game Question');
-                        const gameMessage = getQuestionMessage(game);
+                        const gameMessage = game.getQuestionMessage();
                         await interaction.editReply(gameMessage);
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: questionAnswerTimeout
+                            time: game.questionAnswerTime
                         });
 
                         collector.on('collect', async (button) => {
@@ -293,7 +291,7 @@ export const command: Command = {
                     // GAME ANSWER
                     lobby.on('answer', async (game: TriviaGame) => {
                         console.log('[Trivia] Game Answer');
-                        const gameMessage = getAnswerMessage(game);
+                        const gameMessage = game.getAnswerMessage();
                         await interaction.editReply(gameMessage);
 
                         const collector = interaction.channel!.createMessageComponentCollector({
@@ -305,7 +303,7 @@ export const command: Command = {
                             try {
                                 if (button.user.id === interaction.user.id) {
                                     await button.deferUpdate();
-                                    let embedmsg = getLobbyMessageEmbed(game, '`The game was canceled.`');
+                                    let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
                                     client.gameManager.destroyLobby(interaction.user);
                                     await interaction.editReply({ embeds: [embedmsg], components: [] });
 
@@ -338,7 +336,7 @@ export const command: Command = {
                     // GAME OVER
                     lobby.on('end', async (game: TriviaGame) => {
                         console.log('[Trivia] Game Over');
-                        const gameMessage = getGameOverMessage(game);
+                        const gameMessage = game.getGameOverMessage();
                         client.gameManager.destroyLobby(interaction.user);
                         await interaction.editReply(gameMessage);
                     });
@@ -361,156 +359,6 @@ export const command: Command = {
             }
         })
 };
-
-function getLobbyMessageEmbed(game: TriviaGame, message: string) {
-    let players = '';
-    game.players.forEach((player) => {
-        players = players + '<@' + player.id + '> ';
-    });
-    let embedmsg = new MessageEmbed()
-        .setColor('#403075')
-        .setTitle('Trivia')
-        .setDescription(message)
-        .setThumbnail(triviaThumbnail);
-
-    embedmsg.addField('Questions:', String(game.amount), true);
-    if (game.category) {
-        let questionCount: string;
-        if (game.difficulty) {
-            switch (game.difficulty) {
-                case 'easy':
-                    questionCount = String(game.categoryInfo!.questionCounts.forEasy);
-                    break;
-                case 'medium':
-                    questionCount = String(game.categoryInfo!.questionCounts.forMedium);
-                    break;
-                case 'hard':
-                    questionCount = String(game.categoryInfo!.questionCounts.forHard);
-                    break;
-            }
-        } else {
-            questionCount = String(game.categoryInfo!.questionCounts.total);
-        }
-        embedmsg.addField('Question Pool:', questionCount, true);
-    }
-    if (game.difficulty) embedmsg.addField('Difficulty:', game.difficulty, true);
-    if (game.type) embedmsg.addField('Type:', game.type, true);
-    if (game.category) embedmsg.addField('Category:', game.category.prettyName, true);
-    embedmsg.addField(`Players: ${game.players.length} of ${game.maxPlayers} [min ${game.minPlayers}]`, players, false);
-    return embedmsg;
-}
-
-function getQuestionMessage(game: TriviaGame): string | MessagePayload | WebhookEditMessageOptions {
-    let requiredPlayers = '❔ ';
-    let answeredPlayers = '❕ ';
-    game.answerRequired.forEach((player) => {
-        requiredPlayers = requiredPlayers + '<@' + player.id + '> ';
-    });
-    game.answerGiven.forEach((player) => {
-        answeredPlayers = answeredPlayers + '<@' + player.id + '> ';
-    });
-
-    let embedmsg = new MessageEmbed()
-        .setColor('#403075')
-        .setTitle('Trivia')
-        .setDescription('Question: `' + game.question!.value + '`')
-        .addField('Category:', game.question!.category, true)
-        .addField('Difficulty:', game.question!.difficulty, true)
-        .addField('Time:', String(questionAnswerTimeout / 1000) + ' seconds', true)
-        .addField('Answer awaited:', requiredPlayers, false)
-        .addField('Answer given:', answeredPlayers, false);
-
-    let components: MessageButton[] = [];
-    for (let i = 0; i < game.question!.allAnswers!.length!; i++) {
-        components.push(
-            new MessageButton()
-                .setCustomId('trivia_' + String(i))
-                .setLabel(<string>game.question!.allAnswers[i])
-                .setStyle('PRIMARY')
-        );
-    }
-    let row = new MessageActionRow().addComponents([...components]);
-    return {
-        content: ' ',
-        embeds: [embedmsg],
-        components: [row]
-    };
-}
-
-function getAnswerMessage(game: TriviaGame): string | MessagePayload | WebhookEditMessageOptions {
-    let embedmsg = new MessageEmbed()
-        .setColor('#403075')
-        .setTitle('Trivia')
-        .setDescription(
-            'Question: `' + game.question!.value + '`\n' + 'Answer: `' + game.question!.correctAnswer + '`'
-        );
-    const row = new MessageActionRow().addComponents([
-        new MessageButton().setCustomId('answer_cancel').setLabel('Cancel Game').setStyle('DANGER')
-    ]);
-    return {
-        content: ' ',
-        embeds: [embedmsg],
-        components: [row]
-    };
-}
-
-function getGameOverMessage(game: TriviaGame): string | MessagePayload | WebhookEditMessageOptions {
-    let stats = new Map<User, number>();
-    let winners = '';
-    let sortedStats: Map<User, number>;
-
-    if (game.answers.size > 0) {
-        for (let [key, value] of game.answers) {
-            let score = 0;
-            value.forEach((answer) => {
-                score = score + Number(answer);
-            });
-            stats.set(key, score);
-        }
-        sortedStats = new Map([...stats.entries()].sort((a, b) => b[1] - a[1]));
-
-        winners = '🎉 <@' + String([...sortedStats][0][0].id) + '> ';
-        let one = true;
-        for (let [key, value] of sortedStats) {
-            if (key.id !== [...sortedStats][0][0].id) {
-                if (value == [...sortedStats][0][1]) {
-                    one = false;
-                    winners = winners + '& <@' + String(key.id) + '> ';
-                }
-            }
-        }
-        if (one) {
-            winners = winners + 'has won the game!';
-        } else {
-            winners = winners + 'have won the game!';
-        }
-    } else {
-        winners = 'No one has played. Everyone is a loser!';
-    }
-
-    let embedmsg = new MessageEmbed()
-        .setColor('#403075')
-        .setTitle('Trivia')
-        .setDescription(winners)
-        .setThumbnail(triviaThumbnail);
-
-    if (game.answers.size > 0) {
-        let i = 1;
-        for (let [key, value] of sortedStats!) {
-            embedmsg.addField(
-                String(i) + '.',
-                '<@' + key.id + '>: ' + String(value) + (value == 1 ? ' Point' : ' Points')
-            );
-            i++;
-        }
-    }
-
-    return {
-        content: ' ',
-        embeds: [embedmsg],
-        components: []
-    };
-}
 
 function getCategoryOptions(): APIApplicationCommandOptionChoice<string>[] {
     let options = [];
