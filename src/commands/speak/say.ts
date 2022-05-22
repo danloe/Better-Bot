@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createErrorEmbed, replyInteraction } from '../../helpers';
+import { createErrorEmbed, safeReply } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -36,11 +36,11 @@ export const command: Command = {
                     let lang = interaction instanceof CommandInteraction ? interaction.options.getString('lang') : 'en';
                     if (!lang) lang = 'en';
                     await client.musicManager.say(interaction, input!, lang!);
-                    await replyInteraction(interaction, '`🗨️' + getLanguageEmoji(lang) + ' ' + input + '`');
+                    await safeReply(interaction, '`🗨️' + getLanguageEmoji(lang) + ' ' + input + '`');
                     done();
                 } catch (err) {
                     try {
-                        await replyInteraction(
+                        await safeReply(
                             interaction,
                             createErrorEmbed('🚩 Error saying something: `' + err + '`')
                         );

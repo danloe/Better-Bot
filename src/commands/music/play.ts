@@ -8,7 +8,7 @@ import {
     createErrorEmbed,
     getTrackTypeColor,
     getTrackTypeString as getTrackSourceString,
-    replyInteraction,
+    safeReply,
     secondsToDurationString
 } from '../../helpers';
 
@@ -73,7 +73,7 @@ export const command: Command = {
                             client.musicManager.queues.get(interaction.guildId!)!.length +
                             ' in queue]`';
                     }
-                    await replyInteraction(
+                    await safeReply(
                         interaction,
                         createEmbed(
                             track.name,
@@ -97,7 +97,7 @@ export const command: Command = {
                     done();
                 } catch (err) {
                     try {
-                        await replyInteraction(interaction, createErrorEmbed('🚩 Error adding track: `' + err + '`'));
+                        await safeReply(interaction, createErrorEmbed('🚩 Error adding track: `' + err + '`'));
                     } catch (err2) {
                         console.log(err2);
                     }

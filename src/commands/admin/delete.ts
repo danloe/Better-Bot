@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, GuildMember, Message, TextChannel } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
+import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -49,7 +49,7 @@ export const command: Command = {
                                 { count: 0 }
                             );
                             const bulk = await channel.bulkDelete(userMessages, true);
-                            await replyInteraction(
+                            await safeReply(
                                 interaction,
                                 createEmbed(
                                     ' ',
@@ -65,7 +65,7 @@ export const command: Command = {
                         } else {
                             // No User given
                             const bulk = await channel.bulkDelete(amount!, true);
-                            await replyInteraction(
+                            await safeReply(
                                 interaction,
                                 createEmbed(
                                     ' ',
@@ -80,7 +80,7 @@ export const command: Command = {
                         }
                     } else {
                         // No permission
-                        await replyInteraction(
+                        await safeReply(
                             interaction,
                             createEmbed(' ', '`⛔ You do not have access permission for this command!`')
                         );
@@ -88,7 +88,7 @@ export const command: Command = {
                     done();
                 } catch (err) {
                     try {
-                        await replyInteraction(
+                        await safeReply(
                             interaction,
                             createErrorEmbed('🚩 Error deleting messages: `' + err + '`')
                         );

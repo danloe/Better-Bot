@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createEmbed, createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
+import { createEmbed, createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 import { getGames } from 'epic-free-games';
 
 export const command: Command = {
@@ -20,7 +20,7 @@ export const command: Command = {
                 try {
                     if (interaction instanceof ButtonInteraction) return;
 
-                    replyDefer(interaction);
+                    safeDeferReply(interaction);
 
                     const games: any = await getGames('DE', true);
                     if (games) {
@@ -66,7 +66,7 @@ export const command: Command = {
                     done();
                 } catch (err) {
                     try {
-                        await replyInteraction(
+                        await safeReply(
                             interaction,
                             createErrorEmbed('🚩 Error showing Epic Games Free Games: `' + err + '`')
                         );

@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
+import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -31,7 +31,7 @@ export const command: Command = {
 
                     if (splitInput.length == 1) {
                         let i = Math.floor(Math.random() * answers.length);
-                        await replyInteraction(
+                        await safeReply(
                             interaction,
                             createEmbed(
                                 'Decision',
@@ -49,13 +49,13 @@ export const command: Command = {
                         for (let i = 0; i < splitInput.length; i++) {
                             embedmsg.addField(splitInput[i], i == iDecision ? '✅' : '❌', true);
                         }
-                        await replyInteraction(interaction, { embeds: [embedmsg] });
+                        await safeReply(interaction, { embeds: [embedmsg] });
                         done();
                         return;
                     }
                 } catch (err) {
                     try {
-                        await replyInteraction(interaction, createErrorEmbed('🚩 Error deciding: `' + err + '`'));
+                        await safeReply(interaction, createErrorEmbed('🚩 Error deciding: `' + err + '`'));
                     } catch (err2) {
                         console.log(err2);
                     }

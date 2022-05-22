@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
+import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 import { Category, CategoryNamesPretty, CategoryResolvable, QuestionDifficulty, QuestionType } from 'open-trivia-db';
 import { answerDisplayTime, TriviaGame, GameType, GameState } from '../../classes';
 import { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
@@ -75,7 +75,7 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction instanceof CommandInteraction) {
                 try {
-                    await replyDefer(interaction);
+                    await safeDeferReply(interaction);
 
                     let amount = interaction.options.getInteger('amount');
                     let difficultyOption = interaction.options.getString('difficulty');
@@ -347,7 +347,7 @@ export const command: Command = {
                     done();
                 } catch (err) {
                     try {
-                        await replyInteraction(
+                        await safeReply(
                             interaction,
                             createErrorEmbed('🚩 Error creating a trivia game: `' + err + '`')
                         );

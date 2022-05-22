@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
+import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('stop').setDescription('Stop audio playback.'),
@@ -15,14 +15,14 @@ export const command: Command = {
         if (interaction) {
             try {
                 await client.musicManager.stop(interaction);
-                await replyInteraction(
+                await safeReply(
                     interaction,
                     createEmbed('Stopped', '`✅ The audio playback has stopped.`', false)
                 );
                 done();
             } catch (err) {
                 try {
-                    await replyInteraction(
+                    await safeReply(
                         interaction,
                         createErrorEmbed('🚩 Error stopping the track: `' + err + '`')
                     );

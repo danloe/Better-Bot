@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
+import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 import { command as skip } from './skip';
 import { command as clear } from './clear';
 import { command as shuffle } from './shuffle';
@@ -80,7 +80,7 @@ export const command: Command = {
 
                         collector.on('collect', async (button) => {
                             try {
-                                await replyDefer(button);
+                                await safeDeferReply(button);
                                 if (button.user.id === interaction.user.id) {
                                     switch (button.customId) {
                                         case 'queue_previous':
@@ -99,7 +99,7 @@ export const command: Command = {
                                     }
                                 } else {
                                     try {
-                                        await replyInteraction(
+                                        await safeReply(
                                             button,
                                             createErrorEmbed("`⛔ These buttons aren't for you.`", true)
                                         );
@@ -123,7 +123,7 @@ export const command: Command = {
                             }
                         });
 
-                        await replyInteraction(interaction, {
+                        await safeReply(interaction, {
                             embeds: [embedmsg],
                             components: [row]
                         });
@@ -131,7 +131,7 @@ export const command: Command = {
                     }
                 } catch (err) {
                     try {
-                        await replyInteraction(
+                        await safeReply(
                             interaction,
                             createErrorEmbed('🚩 Error showing the queue: `' + err + '`')
                         );

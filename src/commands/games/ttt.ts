@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createErrorEmbed, replyDefer, replyInteraction } from '../../helpers';
+import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 import { TTTGame, GameType, GameState } from '../../classes';
 
 export const command: Command = {
@@ -28,7 +28,7 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction instanceof CommandInteraction) {
                 try {
-                    await replyDefer(interaction);
+                    await safeDeferReply(interaction);
 
                     let opponent = interaction.options.getUser('opponent');
 
@@ -361,7 +361,7 @@ export const command: Command = {
                     done();
                 } catch (err) {
                     try {
-                        await replyInteraction(
+                        await safeReply(
                             interaction,
                             createErrorEmbed('🚩 Error creating a tic tac toe game: `' + err + '`')
                         );
