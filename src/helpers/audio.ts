@@ -1,7 +1,7 @@
 import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
-import { Track, TrackType } from '../classes/Track';
+import { Track, TrackType } from '../classes';
 import https from 'node:https';
 import { timeStringToDurationString as timeStringToSecondsNumber } from './message';
 
