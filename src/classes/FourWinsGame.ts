@@ -1,4 +1,4 @@
-import { TextBasedChannel, User } from 'discord.js';
+import { MessageEmbed, TextBasedChannel, User } from 'discord.js';
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
 
@@ -21,6 +21,8 @@ export class FourWinsGame extends GameLobby {
 
     public constructor(host: User, channel: TextBasedChannel) {
         super(GameType.FourWins, host, channel, 2, 2);
+        this.name = 'Four Wins';
+        this.thumbnail = 'https://www.dropbox.com/s/0jq0iqts4a9vque/fourwins.png?dl=1';
 
         this.createGameField();
         this.state = GameState.Waiting;
@@ -164,5 +166,18 @@ export class FourWinsGame extends GameLobby {
     swapTurns() {
         this.playerYellowTurn = !this.playerYellowTurn;
         this.emit('tick', this);
+    }
+
+    getLobbyMessageEmbed(message: string) {
+        let players = '';
+        this.players.forEach((player) => {
+            players = players + '<@' + player.id + '> ';
+        });
+        return new MessageEmbed()
+            .setColor('#403075')
+            .setTitle('Four Wins')
+            .setDescription(message)
+            .setThumbnail(this.thumbnail)
+            .addField(`Players: ${this.players.length} of ${this.maxPlayers} [min ${this.minPlayers}]`, players);
     }
 }

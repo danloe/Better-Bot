@@ -1,4 +1,12 @@
-import { TextBasedChannel, User } from 'discord.js';
+import {
+    MessageActionRow,
+    MessageButton,
+    MessageEmbed,
+    MessagePayload,
+    TextBasedChannel,
+    User,
+    WebhookEditMessageOptions
+} from 'discord.js';
 import { GameType } from './GameManager';
 import EventEmitter from 'node:events';
 
@@ -12,6 +20,8 @@ export class GameLobby extends EventEmitter {
     public maxPlayers = 1;
     public winners: User[] = [];
     public interactionTimeout = 60_000;
+    public name = '';
+    public thumbnail = '';
 
     public constructor(
         game: GameType,
@@ -55,6 +65,24 @@ export class GameLobby extends EventEmitter {
             this.state = GameState.Started;
             this.emit('start', this);
         }
+    }
+
+    getChallengeMessage(opponent: User, message: string): string | MessagePayload | WebhookEditMessageOptions {
+        let embedmsg = new MessageEmbed()
+            .setColor('#403075')
+            .setTitle('Tic Tac Toe')
+            .setAuthor({ name: opponent.username, iconURL: opponent.avatarURL() || '' })
+            .setDescription(message)
+            .setThumbnail(this.thumbnail);
+        const row1 = new MessageActionRow().addComponents([
+            new MessageButton().setCustomId('challenge_accept').setLabel('Accept').setStyle('SUCCESS'),
+            new MessageButton().setCustomId('challenge_decline').setLabel('Decline').setStyle('DANGER')
+        ]);
+        return {
+            content: `<@${opponent.id}>`,
+            embeds: [embedmsg],
+            components: [row1]
+        };
     }
 }
 

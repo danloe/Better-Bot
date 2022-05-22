@@ -36,7 +36,7 @@ export class MusicSubscription {
     public pausedForVoice = false;
     public announcement = false;
     private nextTrackResource: AudioResource<Track> | undefined;
-    private connectionTimeoutObj: NodeJS.Timeout;
+    private connectionTimeoutObj: NodeJS.Timeout | undefined;
 
     public constructor(voiceConnection: VoiceConnection, queue: Queue, autoplay: boolean = true) {
         this.voiceConnection = voiceConnection;
@@ -124,7 +124,7 @@ export class MusicSubscription {
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
                 // Stop connection timeout check
-                clearTimeout(this.connectionTimeoutObj);
+                clearTimeout(this.connectionTimeoutObj!);
             } else if (newState.status === AudioPlayerStatus.Paused) {
                 // If the Playing state has been entered, then the player was paused.
             }
