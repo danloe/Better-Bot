@@ -90,7 +90,7 @@ export class MusicManager {
                     queue!.queue(track);
                 }
 
-                if (!subscription || !subscription.voiceConnection) {
+                if (!subscription || !subscription.isVoiceConnectionReady()) {
                     if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                         const channel = interaction.member.voice.channel;
                         subscription = new MusicSubscription(
@@ -142,13 +142,14 @@ export class MusicManager {
     say(interaction: CommandInteraction | ButtonInteraction, phrase: string, lang: string = 'en') {
         return new Promise<void>(async (done, error) => {
             try {
+                console.log(interaction);
                 await deferReply(interaction, true);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
                 if (!queue) this.queues.set(interaction.guildId!, new Queue());
                 queue = this.queues.get(interaction.guildId!);
 
-                if (!subscription) {
+                if (!subscription || !subscription?.isVoiceConnectionReady()) {
                     if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                         const channel = interaction.member.voice.channel;
                         subscription = new MusicSubscription(
@@ -245,7 +246,7 @@ export class MusicManager {
                 await deferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
-                if (!subscription || !subscription.voiceConnection) {
+                if (!subscription || !subscription.isVoiceConnectionReady()) {
                     if (!queue) {
                         error('No queue.');
                         return;
@@ -458,24 +459,14 @@ export class MusicManager {
     /**
      * Returns for subscription and queue if available
      */
-    getSubscriptionAndQueue(guildId: Snowflake): [MusicSubscription | undefined, Queue | undefined];
     getSubscriptionAndQueue(
         interaction: CommandInteraction | ButtonInteraction
-    ): [MusicSubscription | undefined, Queue | undefined];
-
-    getSubscriptionAndQueue(input: any): [MusicSubscription | undefined, Queue | undefined] {
-        if (input instanceof CommandInteraction || input instanceof ButtonInteraction) {
-            if (!input.guildId) return [undefined, undefined];
-            const subscription = this.subscriptions.get(input.guildId);
-            const queue = this.queues.get(input.guildId);
-            if (subscription) subscription.lastChannel = input.channel || undefined;
-            return [subscription, queue];
-        } else {
-            if (!input) return [undefined, undefined];
-            const subscription = this.subscriptions.get(input);
-            const queue = this.queues.get(input);
-            return [subscription, queue];
-        }
+    ): [MusicSubscription | undefined, Queue | undefined] {
+        if (!interaction.guildId) return [undefined, undefined];
+        const subscription = this.subscriptions.get(interaction.guildId);
+        const queue = this.queues.get(interaction.guildId);
+        if (subscription) subscription.lastChannel = interaction.channel || undefined;
+        return [subscription, queue];
     }
 }
 

@@ -161,6 +161,14 @@ export class MusicSubscription {
     }
 
     /**
+     * Tells if the voice connection is established.
+     */
+    public isVoiceConnectionReady(): boolean {
+        if (this.voiceConnection.state.status === VoiceConnectionStatus.Ready) return true;
+        return false;
+    }
+
+    /**
      * Stops audio playback.
      */
     public stop() {
