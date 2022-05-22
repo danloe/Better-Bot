@@ -87,8 +87,8 @@ export const command: Command = {
                     if (!categoryOption) categoryOption = null;
                     let maxPlayersOption = interaction.options.getInteger('players');
                     if (!maxPlayersOption) maxPlayersOption = 10;
-                    let timeOption = interaction.options.getInteger('time');
-                    if (!timeOption) maxPlayersOption = 20;
+                    let timeOption = interaction.options.getInteger('time') * 1000;
+                    if (!timeOption) maxPlayersOption = 20 * 1000;
 
                     const lobby = (await client.gameManager.createLobby(
                         GameType.Trivia,
