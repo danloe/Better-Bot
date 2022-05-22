@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createEmbed, createErrorEmbed, replyInteraction } from '../../helpers';
+import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -32,11 +32,11 @@ export const command: Command = {
                         if (input == 0) msg = '`✅ Skipped to the next track';
                         msg = msg + ' [' + (queue.length - 1) + ' more in queue]`';
                     }
-                    await replyInteraction(interaction, createEmbed('Skipped', msg, false));
+                    await safeReply(interaction, createEmbed('Skipped', msg, false));
                     done();
                 } catch (err) {
                     try {
-                        await replyInteraction(
+                        await safeReply(
                             interaction,
                             createErrorEmbed('🚩 Error skipping track(s): `' + err + '`')
                         );

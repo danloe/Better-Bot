@@ -1,11 +1,11 @@
 import {
     createErrorEmbed,
-    replyDefer as deferReply,
+    safeDeferReply as deferReply,
     determineTrackType,
     getNewgroundsTrack,
     getSoundCloudTrack,
     getYouTubeTrack,
-    replyInteraction
+    safeReply
 } from '../helpers';
 import { ButtonInteraction, CommandInteraction, GuildMember, Snowflake, VoiceChannel } from 'discord.js';
 import BetterClient from '../client';
@@ -108,7 +108,7 @@ export class MusicManager {
                 }
 
                 if (!subscription) {
-                    await replyInteraction(
+                    await safeReply(
                         interaction,
                         createErrorEmbed(
                             '🚩 Could not join a voice channel: `You must first join a voice channel for me to follow you. ➡️ Then try the resume command.`'

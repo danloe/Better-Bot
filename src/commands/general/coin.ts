@@ -1,7 +1,7 @@
 import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { createErrorEmbed, replyInteraction } from '../../helpers';
+import { createErrorEmbed, safeReply } from '../../helpers';
 import BetterClient from '../../client';
 import { promisify } from 'node:util';
 
@@ -51,7 +51,7 @@ export const command: Command = {
                     done();
                 } catch (err) {
                     try {
-                        await replyInteraction(interaction, createErrorEmbed('🚩 Error flipping coin: `' + err + '`'));
+                        await safeReply(interaction, createErrorEmbed('🚩 Error flipping coin: `' + err + '`'));
                     } catch (err2) {
                         console.log(err2);
                     }
