@@ -37,6 +37,7 @@ export class TriviaGame extends GameLobby {
     answerGiven: User[] = [];
     questionAnswerTime = 20;
     readQuestions = false;
+    questionRead = true;
 
     public constructor(host: User, channel: TextBasedChannel, minPlayers: number, maxPlayers: number) {
         super(GameType.Trivia, host, channel, minPlayers, maxPlayers);
@@ -84,6 +85,7 @@ export class TriviaGame extends GameLobby {
             this.question = this.questions[this.round - 1];
             this.answerRequired = this.players.slice();
             this.answerGiven = [];
+            this.questionRead = false;
             this.emit('question', this);
         } else {
             this.state = GameState.Finished;
