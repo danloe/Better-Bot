@@ -5,6 +5,13 @@
 
 A discord bot, better than my last one. This time in Typescript.
 
+<br />
+<div align="center">
+  <a href="https://unsplash.com/photos/N2zxMUDwT4I">
+    <img src="https://unsplash.com/photos/N2zxMUDwT4I/download?ixid=MnwxMjA3fDB8MXxhbGx8N3x8fHx8fDJ8fDE2NTMyNzQzOTk&force=true&w=640" alt="Logo" width="300" height="300">
+  </a>
+</div>
+
 ## Features
 
 * Slash commands
@@ -119,3 +126,4 @@ Pull requests are also welcome. For major changes, please open an issue first to
 [issues-url]: https://github.com/danloe/Botterino/issues
 [license-shield]: https://img.shields.io/github/license/danloe/Botterino.svg?style=for-the-badge
 [license-url]: https://github.com/danloe/Botterino/blob/master/LICENSE
+[product-screenshot]: https://unsplash.com/photos/N2zxMUDwT4I
