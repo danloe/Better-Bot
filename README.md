@@ -30,7 +30,7 @@ A discord bot, better than my last one. This time in Typescript.
   * TicTacToe
   * Four Wins
   * Trivia
-* Admin Commands
+* Administrator Role Commands
   * Delete Messages
 * General & Fun Commands
   * Epic Free Games
