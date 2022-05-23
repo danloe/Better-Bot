@@ -142,7 +142,6 @@ export class MusicManager {
     say(interaction: CommandInteraction | ButtonInteraction, phrase: string, lang: string = 'en') {
         return new Promise<void>(async (done, error) => {
             try {
-                console.log(interaction);
                 await deferReply(interaction, true);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
