@@ -114,15 +114,21 @@ npm run deploy
 - [x] Add Readme
 - [x] Add autocomplete functionality
 - [ ] **Add music player controls as embed message**
+- [ ] Add mongoDB database support
 - [ ] Add more games
     - [x] Trivia
-    - [ ] ?  
+    - [ ] ...
+- [ ] Add more music functionalities
+    - [ ] YouTube playlists
+    - [ ] Add Spotify playlists as YouTube videos
+    - [ ] Play random songs from YouTube
 - [ ] Add platform support for music playback
     - [x] YouTube
     - [x] SoundCloud
     - [x] Newgrounds
-    - [ ] Instagram
     - [ ] TikTok
+    - [ ] Instagram?
+    - [ ] ...
 
 ## Contributing
 Suggestions for extensions or improvements are welcome.
