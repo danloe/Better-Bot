@@ -1,17 +1,20 @@
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+<div align="center">
+  
+  <a href="">[![Issues][issues-shield]][issues-url]
+  <a href="">[![MIT License][license-shield]][license-url]
+    
+</div>
 
 # Botterino
 
 A discord bot, better than my first one. This time in Typescript.
-
-<br />
 <div align="center">
+  <br />
   <a href="https://unsplash.com/photos/N2zxMUDwT4I">
-    <img src="https://unsplash.com/photos/N2zxMUDwT4I/download?ixid=MnwxMjA3fDB8MXxhbGx8N3x8fHx8fDJ8fDE2NTMyNzQzOTk&force=true&w=640" alt="Logo" width="300" height="300">
+    <img src="https://unsplash.com/photos/N2zxMUDwT4I/download?ixid=MnwxMjA3fDB8MXxhbGx8N3x8fHx8fDJ8fDE2NTMyNzQzOTk&force=true&w=640" alt="Logo" width="200" height="200">
   </a>
 </div>
-
+    
 ## Features
 
 * Slash commands
