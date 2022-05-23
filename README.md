@@ -31,7 +31,7 @@
   * Announces music tracks
   * Reads questions in Trivia games
 * Multiplayer Games
-  * TicTacToe
+  * Tic Tac Toe
   * Four Wins
   * Trivia
 * Administrator Role Commands
