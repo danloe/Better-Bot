@@ -54,19 +54,21 @@ You must have node.js installed with the latest node package manager.
 ### Installation
 
 1. Clone or download this repo
-2. Open the `.env` file in the root directory
-3. Replace `YOURTOKEN` with your [Discord Bot Token](https://discord.com/developers/applications):
+2. Open a terminal in the repo folder
+3. Install the required node_modules:
+
+```sh
+npm install
+```
+
+4. Create a file named `.env` in the root directory
+5. Add the following line and replace `YOURTOKEN` with your [Discord Application Public Key](https://discord.com/developers/applications):
 
 ```sh
 BOT_TOKEN="YOURTOKEN"
 ```
 
-4. Open a terminal in the repo folder
-5. Install the required node_modules:
 
-```sh
-npm install
-```
 
 ## Usage
 
@@ -80,17 +82,20 @@ run the following command in a terminal:
 ```sh
 npm run start
 ```
+For development:
+```sh
+npm run dev
+```
 
 ### Deploy guild slash commands
 
-Guild slash commands are only available in the guild deployed to.
-Send a message in a guild text channel.
+Guild slash commands are only available in the guild where they were deployed. Send the messages in a guild text channel.
 
-Deploy slash commands:
+Deploy slash commands to guild:
 ```
 >deploy
 ```
-Delete slash commands:
+Delete slash commands from guild:
 ```
 >clearcommands
 ```
@@ -109,15 +114,21 @@ npm run deploy
 - [x] Add Readme
 - [x] Add autocomplete functionality
 - [ ] **Add music player controls as embed message**
+- [ ] Add mongoDB database support
 - [ ] Add more games
     - [x] Trivia
-    - [ ] ?  
+    - [ ] ...
+- [ ] Add more music functionalities
+    - [ ] YouTube playlists
+    - [ ] Add Spotify playlists as YouTube videos
+    - [ ] Play random songs from YouTube
 - [ ] Add platform support for music playback
     - [x] YouTube
     - [x] SoundCloud
     - [x] Newgrounds
-    - [ ] Instagram
     - [ ] TikTok
+    - [ ] Instagram?
+    - [ ] ...
 
 ## Contributing
 Suggestions for extensions or improvements are welcome.
