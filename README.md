@@ -48,7 +48,7 @@ Follow these steps to get the bot up and running.
 
 ### Prerequisites
 
-* [nodejs](https://nodejs.org/) *v16.15 or higher*
+* [nodejs](https://nodejs.org/) (v16.15 or higher)
 * npm
   ```sh
   npm install npm@latest -g
