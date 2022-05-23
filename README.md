@@ -25,7 +25,7 @@ A discord bot, better than my last one. This time in Typescript.
 * TTS over voice connection
   * Says any text given in multiple languages
   * Announces music tracks
-  * Reads questions in trivia games
+  * Reads questions in Trivia games
 * Multiplayer Games
   * TicTacToe
   * Four Wins
