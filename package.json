@@ -1,7 +1,7 @@
 {
-  "name": "better-bot",
+  "name": "botterino",
   "version": "1.0.0",
-  "description": "A discord bot better than the last one.",
+  "description": "A discord bot for music, games and more...",
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/danloe/Better-Bot.git"
+    "url": "git+https://github.com/danloe/Botterino.git"
   },
   "keywords": [
     "discord",
@@ -22,9 +22,9 @@
   "author": "danloe",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/danloe/Better-Bot/issues"
+    "url": "https://github.com/danloe/Botterino/issues"
   },
-  "homepage": "https://github.com/danloe/Better-Bot#readme",
+  "homepage": "https://github.com/danloe/Botterino#readme",
   "dependencies": {
     "@discordjs/builders": "^0.13.0",
     "@discordjs/opus": "^0.7.0",
