@@ -20,6 +20,8 @@ A discord bot, better than my last one. This time in Typescript.
   * SoundCloud
   * Newgrounds
   * Direct Link To File
+* Autocomplete
+  * YouTube search suggestions
 * TTS over voice connection
   * Says any text given in multiple languages
   * Announces music tracks
