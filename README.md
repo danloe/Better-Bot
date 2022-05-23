@@ -126,7 +126,7 @@ Pull requests are also welcome. For major changes, please open an issue first to
 [issues-shield]: https://img.shields.io/github/issues/danloe/Botterino.svg?style=for-the-badge
 [issues-url]: https://github.com/danloe/Botterino/issues
 [typescript-shield]: https://img.shields.io/github/package-json/dependency-version/danloe/botterino/dev/typescript?style=for-the-badge
-[typescript-url]: https://www.npmjs.com/package/typescript
+[typescript-url]: https://github.com/Microsoft/TypeScript
 [discordjs-shield]: https://img.shields.io/github/package-json/dependency-version/danloe/botterino/discord.js?style=for-the-badge
 [discordjs-url]: https://github.com/discordjs/discord.js
 [license-shield]: https://img.shields.io/github/license/danloe/Botterino.svg?style=for-the-badge
