@@ -63,7 +63,7 @@ export class MusicManager {
 
                     case TrackType.DirectFile:
                         let domainName = args.match(/\w+(?=\.\w+\/)/gi)![0];
-                        let images = await google.image(domainName, { safe: false });
+                        let images = await google.image(domainName + ' logo | icon', { safe: false });
                         const imageUrl = images[0].url;
 
                         track = new Track(
