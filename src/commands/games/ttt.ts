@@ -61,8 +61,10 @@ export const command: Command = {
                                         client.gameManager.destroyLobby(interaction.user);
                                         let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
                                         await safeReply(interaction, { embeds: [embedmsg], components: [] });
-                                        collector.stop();
+                                    } else {
+                                        game.join(button.user);
                                     }
+                                    collector.stop();
                                 } else {
                                     if (button.customId === 'ttt_join_join') {
                                         await button.deferUpdate();
@@ -127,6 +129,8 @@ export const command: Command = {
                                         client.gameManager.destroyLobby(interaction.user);
                                         let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
                                         await safeReply(interaction, { embeds: [embedmsg], components: [] });
+                                    } else {
+                                        game.join(button.user);
                                     }
                                     collector.stop();
                                 } else {
