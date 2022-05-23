@@ -115,34 +115,6 @@ npm run deploy
 
 See all TODOs in the [Project](https://github.com/users/danloe/projects/1)
 
-- [x] Add Readme
-- [x] Add autocomplete functionality
-- [ ] **Add music player controls as embed message**
-- [ ] *Add mongoDB database support*
-- [ ] Use `config.json`
-- [ ] Add more games
-    - [x] Trivia
-    - [ ] **Find the Emoji**
-    - [ ] Guess...?
-    - [ ] Hangman
-    - [ ] Fast Typer
-    - [ ] Akinator
-    - [ ] ...
-- [ ] Add more music functionalities
-    - [ ] **YouTube playlists**
-    - [ ] **Add Spotify songs/playlists as YouTube video(s)**
-    - [ ] **Play random songs from YouTube**
-    - [ ] Seek tracks
-    - [ ] Change volume
-    - [ ] ...
-- [ ] Add platform support for music playback
-    - [x] YouTube
-    - [x] SoundCloud
-    - [x] Newgrounds
-    - [ ] TikTok
-    - [ ] *Instagram*
-    - [ ] ...
-
 ## Contributing
 Suggestions for extensions or improvements are welcome.
 
