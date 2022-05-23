@@ -1,9 +1,9 @@
 <div align="center">
   
   <a href="">[![Issues][issues-shield]][issues-url]
-  <a href="">[![MIT License][license-shield]][license-url]
   <a href="">[![Typescript][typescript-shield]][typescript-url]
   <a href="">[![DiscordJS][discordjs-shield]][discordjs-url]
+  <a href="">[![MIT License][license-shield]][license-url]
     
 </div>
 
