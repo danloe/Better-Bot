@@ -76,11 +76,7 @@ export class Track {
                         break;
                 }
                 const resource = createAudioResource(stream, { metadata: this, inputType: StreamType.Arbitrary });
-                if (resource) {
-                    resolve(resource);
-                } else {
-                    reject('Resource is not readable.');
-                }
+                resolve(resource);
             } catch (error) {
                 console.log(error);
                 reject(error);
