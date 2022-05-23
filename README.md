@@ -54,19 +54,21 @@ You must have node.js installed with the latest node package manager.
 ### Installation
 
 1. Clone or download this repo
-2. Create a file named `.env` in the root directory
-3. Add the following line and replace `YOURTOKEN` with your [Discord Application Public Key](https://discord.com/developers/applications):
+2. Open a terminal in the repo folder
+3. Install the required node_modules:
+
+```sh
+npm install
+```
+
+4. Create a file named `.env` in the root directory
+5. Add the following line and replace `YOURTOKEN` with your [Discord Application Public Key](https://discord.com/developers/applications):
 
 ```sh
 BOT_TOKEN="YOURTOKEN"
 ```
 
-4. Open a terminal in the repo folder
-5. Install the required node_modules:
 
-```sh
-npm install
-```
 
 ## Usage
 
@@ -79,6 +81,10 @@ Run the `start.bat` file to start the bot in a terminal
 run the following command in a terminal:
 ```sh
 npm run start
+```
+For development:
+```sh
+npm run dev
 ```
 
 ### Deploy guild slash commands
