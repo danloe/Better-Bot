@@ -62,7 +62,7 @@ npm install
 ```
 
 4. Create a file named `.env` in the root directory
-5. Add the following line and replace `YOURTOKEN` with your [Discord Application Public Key](https://discord.com/developers/applications):
+5. Add the following line and replace `YOURTOKEN` with your [Discord Bot Token](https://discord.com/developers/applications):
 
 ```sh
 BOT_TOKEN="YOURTOKEN"
