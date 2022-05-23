@@ -123,6 +123,7 @@ npm run deploy
     - [ ] Guess...?
     - [ ] Hangman
     - [ ] Fast Typer
+    - [ ] Akinator
     - [ ] ...
 - [ ] Add more music functionalities
     - [ ] **YouTube playlists**
