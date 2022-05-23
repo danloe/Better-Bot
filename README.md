@@ -32,9 +32,9 @@ A discord bot, better than my last one. This time in Typescript.
   * Trivia
 * Admin Commands
   * Delete Messages
-* Fun Commands
-  * Roast
+* General & Fun Commands
   * Epic Free Games
+  * Roast
   * Decide
   * Coin Flip
 
