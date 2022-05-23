@@ -36,6 +36,7 @@ export class MusicSubscription {
     public pausedForVoice = false;
     public announcement = false;
     private nextTrackResource: AudioResource<Track> | undefined;
+    private nextVoiceResource: AudioResource | undefined;
     private connectionTimeoutObj: NodeJS.Timeout | undefined;
 
     public constructor(voiceConnection: VoiceConnection, queue: Queue, autoplay: boolean = true) {
@@ -127,6 +128,10 @@ export class MusicSubscription {
                 clearTimeout(this.connectionTimeoutObj!);
             } else if (newState.status === AudioPlayerStatus.Paused) {
                 // If the Playing state has been entered, then the player was paused.
+                if (this.pausedForVoice) {
+                    this.voiceConnection.subscribe(this.voicePlayer);
+                    this.voicePlayer.play(this.nextVoiceResource!);
+                }
             }
         });
 
@@ -193,9 +198,11 @@ export class MusicSubscription {
         if (this.audioPlayer.state.status === AudioPlayerStatus.Playing) {
             this.pausedForVoice = true;
             this.audioPlayer.pause();
+            this.nextVoiceResource = JSON.parse(JSON.stringify(resource));
+        } else {
+            this.voiceConnection.subscribe(this.voicePlayer);
+            this.voicePlayer.play(resource);
         }
-        this.voiceConnection.subscribe(this.voicePlayer);
-        this.voicePlayer.play(resource);
     }
 
     /**

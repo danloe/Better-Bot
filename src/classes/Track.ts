@@ -92,6 +92,7 @@ export class Track {
 export enum TrackType {
     DirectFile,
     YouTube,
+    YouTubePlaylist,
     SoundCloud,
     Newgrounds
 }

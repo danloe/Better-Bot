@@ -1,4 +1,4 @@
-import { Command } from '../../interfaces';
+import { Command, Playlist } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
@@ -11,6 +11,7 @@ import {
     safeReply,
     secondsToDurationString
 } from '../../helpers';
+import { Track, TrackType } from '../../classes';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -19,7 +20,7 @@ export const command: Command = {
         .addStringOption((option) =>
             option
                 .setName('input')
-                .setDescription('URL to a File or Search Text')
+                .setDescription('URL to a File, Search Text or YouTube Playlist')
                 .setRequired(true)
                 .setAutocomplete(true)
         )
@@ -55,49 +56,107 @@ export const command: Command = {
                         if (mode === 'next') next = true;
                     }
                     if (!announce) announce = false;
-                    const track = await client.musicManager.play(interaction, input!, announce, skip, next);
-                    let addedText = '';
-                    if (skip) {
-                        addedText =
-                            '`➕ Track is playing now [' +
-                            (client.musicManager.queues.get(interaction.guildId!)!.length - 1) +
-                            ' in queue]`';
-                    } else if (next) {
-                        addedText =
-                            '`➕ Track is next in queue [' +
-                            client.musicManager.queues.get(interaction.guildId!)!.length +
-                            ' in queue]`';
-                    } else {
-                        addedText =
-                            '`➕ Track was added [' +
-                            client.musicManager.queues.get(interaction.guildId!)!.length +
-                            ' in queue]`';
-                    }
-                    await safeReply(
+
+                    const result: Track | Playlist = await client.musicManager.play(
                         interaction,
-                        createEmbed(
-                            track.name,
-                            addedText,
-                            false,
-                            getTrackTypeColor(track.type),
-                            [
-                                { name: 'Description', value: getPrettyEmbedString(track.description) },
-                                { name: 'Source', value: getTrackSourceString(track), inline: true },
-                                { name: 'Duration', value: secondsToDurationString(track.duration), inline: true },
-                                { name: 'Uploaded', value: getPrettyEmbedString(track.uploaded), inline: true }
-                            ],
-                            track.artworkUrl,
-                            track.displayUrl,
-                            {
-                                text: `Requested by ${interaction.user.username}` + (track.announce ? ' 📣' : ''),
-                                iconURL: interaction.user.avatarURL() || undefined
-                            }
-                        )
+                        input!,
+                        announce,
+                        skip,
+                        next
                     );
+
+                    let addedText = '';
+                    if (result instanceof Track) {
+                        if (skip) {
+                            addedText =
+                                '`➕ Track is playing now [' +
+                                (client.musicManager.queues.get(interaction.guildId!)!.length - 1) +
+                                ' in queue]`';
+                        } else if (next) {
+                            addedText =
+                                '`➕ Track is next in queue [' +
+                                client.musicManager.queues.get(interaction.guildId!)!.length +
+                                ' in queue]`';
+                        } else {
+                            addedText =
+                                '`➕ Track was added [' +
+                                client.musicManager.queues.get(interaction.guildId!)!.length +
+                                ' in queue]`';
+                        }
+                        await safeReply(
+                            interaction,
+                            createEmbed(
+                                result.name,
+                                addedText,
+                                false,
+                                getTrackTypeColor(result.type),
+                                [
+                                    { name: 'Description', value: getPrettyEmbedString(result.description) },
+                                    { name: 'Source', value: getTrackSourceString(result), inline: true },
+                                    { name: 'Duration', value: secondsToDurationString(result.duration), inline: true },
+                                    { name: 'Uploaded', value: getPrettyEmbedString(result.uploaded), inline: true }
+                                ],
+                                result.artworkUrl,
+                                result.displayUrl,
+                                {
+                                    text: `Requested by ${interaction.user.username}` + (result.announce ? ' 📣' : ''),
+                                    iconURL: interaction.user.avatarURL() || undefined
+                                }
+                            )
+                        );
+                    } else {
+                        // Playlist
+                        if (skip) {
+                            addedText =
+                                '`➕ Playlist added and is playing now [' +
+                                (client.musicManager.queues.get(interaction.guildId!)!.length - 1) +
+                                ' in queue]`';
+                        } else if (next) {
+                            addedText =
+                                '`➕ Playlist is next in queue [' +
+                                client.musicManager.queues.get(interaction.guildId!)!.length +
+                                ' in queue]`';
+                        } else {
+                            addedText =
+                                '`➕ Playlist was added [' +
+                                client.musicManager.queues.get(interaction.guildId!)!.length +
+                                ' in queue]`';
+                        }
+                        await safeReply(
+                            interaction,
+                            createEmbed(
+                                result.name,
+                                addedText,
+                                false,
+                                getTrackTypeColor(TrackType.YouTube),
+                                [
+                                    { name: 'Description', value: getPrettyEmbedString(result.description) },
+                                    { name: 'Channel', value: getPrettyEmbedString(result.channelTitle), inline: true },
+                                    {
+                                        name: 'Videos',
+                                        value: getPrettyEmbedString(String(result.itemCount)),
+                                        inline: true
+                                    },
+                                    {
+                                        name: 'Published At',
+                                        value: getPrettyEmbedString(String(result.publishedAt).split('T')[0]),
+                                        inline: true
+                                    }
+                                ],
+                                result.thumbnailUrl,
+                                result.url,
+                                {
+                                    text: `Requested by ${interaction.user.username}` + (result.announce ? ' 📣' : ''),
+                                    iconURL: interaction.user.avatarURL() || undefined
+                                }
+                            )
+                        );
+                    }
+
                     done();
                 } catch (err) {
                     try {
-                        await safeReply(interaction, createErrorEmbed('🚩 Error adding track: `' + err + '`'));
+                        await safeReply(interaction, createErrorEmbed('🚩 Error adding track(s): `' + err + '`'));
                     } catch (err2) {
                         console.log(err2);
                     }
