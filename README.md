@@ -7,7 +7,7 @@ A discord bot, better than my first one. This time in Typescript.
 
 <br />
 <div align="center">
-  <a href="https://unsplash.com/photos/N2zxMUDwT4I">
+  <a href="https://unsplash.com/photos/N2zxMUDwT4I" target="_blank">
     <img src="https://unsplash.com/photos/N2zxMUDwT4I/download?ixid=MnwxMjA3fDB8MXxhbGx8N3x8fHx8fDJ8fDE2NTMyNzQzOTk&force=true&w=640" alt="Logo" width="300" height="300">
   </a>
 </div>
