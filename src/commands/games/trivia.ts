@@ -128,8 +128,10 @@ export const command: Command = {
                                         let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
                                         client.gameManager.destroyLobby(interaction.user);
                                         await safeReply(interaction, { embeds: [embedmsg], components: [] });
-                                        collector.stop();
+                                    } else {
+                                        game.join(button.user);
                                     }
+                                    collector.stop();
                                 } else {
                                     if (button.customId === 'join_join') {
                                         await button.deferUpdate();
@@ -188,6 +190,8 @@ export const command: Command = {
                                         let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
                                         client.gameManager.destroyLobby(interaction.user);
                                         await safeReply(interaction, { embeds: [embedmsg], components: [] });
+                                    } else {
+                                        game.join(button.user);
                                     }
                                     collector.stop();
                                 } else {
@@ -228,7 +232,6 @@ export const command: Command = {
                                 console.log(err);
                             }
                         });
-
                         await safeReply(interaction, { embeds: [embedmsg], components: [row] });
                     });
 

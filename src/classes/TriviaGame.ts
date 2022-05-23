@@ -20,7 +20,7 @@ import { Category, CategoryData, getQuestions, Question, QuestionDifficulty, Que
 
 */
 
-export const answerDisplayTime: number = 5_000;
+export const answerDisplayTime: number = 7_000;
 
 export class TriviaGame extends GameLobby {
     amount: number = 10;
