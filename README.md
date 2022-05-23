@@ -127,5 +127,5 @@ Pull requests are also welcome. For major changes, please open an issue first to
 [issues-shield]: https://img.shields.io/github/issues/danloe/Botterino.svg?style=for-the-badge
 [issues-url]: https://github.com/danloe/Botterino/issues
 [license-shield]: https://img.shields.io/github/license/danloe/Botterino.svg?style=for-the-badge
-[license-url]: https://github.com/danloe/Botterino/blob/master/LICENSE
+[license-url]: https://github.com/danloe/Botterino/blob/master/LICENSE.md
 [product-screenshot]: https://unsplash.com/photos/N2zxMUDwT4I
