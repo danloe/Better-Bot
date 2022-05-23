@@ -44,7 +44,6 @@ Follow these steps to get the bot up and running.
 
 ### Prerequisites
 
-You must have node.js installed with the latest node package manager.
 * [nodejs](https://nodejs.org/) *v16.15 or higher*
 * npm
   ```sh
@@ -54,21 +53,21 @@ You must have node.js installed with the latest node package manager.
 ### Installation
 
 1. Clone or download this repo
-2. Open a terminal in the repo folder
 3. Install the required node_modules:
-
+>Run the following command in a terminal in the repo folder:
 ```sh
 npm install
 ```
-
 4. Create a file named `.env` in the root directory
 5. Add the following line and replace `YOURTOKEN` with your [Discord Bot Token](https://discord.com/developers/applications):
-
 ```sh
 BOT_TOKEN="YOURTOKEN"
 ```
-
-
+6. Add the bot to your server via the `OAuth2` - `URL Generator`. Select `bot` as scope and insert the permissions integer in the `GENERATED URL`.
+>Minimum required permissions integer:
+```
+294242221120
+```
 
 ## Usage
 
@@ -78,11 +77,11 @@ Run the `start.bat` file to start the bot in a terminal
 
 **or**
 
-run the following command in a terminal:
+>run the following command in a terminal:
 ```sh
 npm run start
 ```
-For development:
+>For development:
 ```sh
 npm run dev
 ```
@@ -93,11 +92,11 @@ Guild slash commands are only available in the guild in which they were deployed
 
 Send the following messages in a guild text channel.
 
-Deploy slash commands to guild:
+>Deploy slash commands to guild:
 ```
 >deploy
 ```
-Delete slash commands from guild:
+>Delete slash commands from guild:
 ```
 >clearcommands
 ```
@@ -106,7 +105,7 @@ Delete slash commands from guild:
 
 Application slash commands are available in all guilds. It may take some time until the commands are available.
 
-Run the following command in a terminal:
+>Run the following command in a terminal:
 ```sh
 npm run deploy
 ```
