@@ -54,8 +54,8 @@ You must have node.js installed with the latest node package manager.
 ### Installation
 
 1. Clone or download this repo
-2. Open the `.env` file in the root directory
-3. Replace `YOURTOKEN` with your [Discord Bot Token](https://discord.com/developers/applications):
+2. Create a `.env` file in the root directory
+3. Add the following line and replace `YOURTOKEN` with your [Discord Application Public Key](https://discord.com/developers/applications):
 
 ```sh
 BOT_TOKEN="YOURTOKEN"
