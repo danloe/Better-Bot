@@ -116,7 +116,7 @@ npm run deploy
 
 ## TODOs
 
-See all TODOs in the [Project](https://github.com/users/danloe/projects/1)
+See all TODOs in the [Project](https://github.com/users/danloe/projects/1).
 
 ## Contributing
 Suggestions for extensions or improvements are welcome.
