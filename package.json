@@ -5,7 +5,8 @@
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "start": "tsc && ts-node-dev ./src/index.ts",
+    "start": "tsc && ts-node ./src/index.ts",
+    "dev": "tsc && ts-node-dev ./src/index.ts",
     "deploy": "ts-node-dev --respawn --transpile-only --poll ./src/deploy/global.ts",
     "build": "tsc"
   },
