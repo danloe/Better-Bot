@@ -89,7 +89,7 @@ npm run dev
 
 ### Deploy guild slash commands
 
-Guild slash commands are only available in the guild where they were deployed, but instantly available.
+Guild slash commands are only available in the guild in which they were deployed, but are available immediately.
 
 Send the following messages in a guild text channel.
 
