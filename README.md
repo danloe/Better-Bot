@@ -89,7 +89,9 @@ npm run dev
 
 ### Deploy guild slash commands
 
-Guild slash commands are only available in the guild where they were deployed, but instantly available. Send the messages in a guild text channel.
+Guild slash commands are only available in the guild in which they were deployed, but are available immediately.
+
+Send the following messages in a guild text channel.
 
 Deploy slash commands to guild:
 ```
@@ -114,23 +116,29 @@ npm run deploy
 - [x] Add Readme
 - [x] Add autocomplete functionality
 - [ ] **Add music player controls as embed message**
-- [ ] Add mongoDB database support
+- [ ] *Add mongoDB database support*
+- [ ] Use `config.json`
 - [ ] Add more games
     - [x] Trivia
+    - [ ] **Find the Emoji**
+    - [ ] Guess...?
+    - [ ] Hangman
+    - [ ] Fast Typer
+    - [ ] Akinator
     - [ ] ...
 - [ ] Add more music functionalities
+    - [ ] **YouTube playlists**
+    - [ ] **Add Spotify songs/playlists as YouTube video(s)**
+    - [ ] **Play random songs from YouTube**
     - [ ] Seek tracks
     - [ ] Change volume
-    - [ ] YouTube playlists
-    - [ ] Add Spotify playlists as YouTube videos
-    - [ ] Play random songs from YouTube
     - [ ] ...
 - [ ] Add platform support for music playback
     - [x] YouTube
     - [x] SoundCloud
     - [x] Newgrounds
     - [ ] TikTok
-    - [ ] Instagram?
+    - [ ] *Instagram*
     - [ ] ...
 
 ## Contributing
