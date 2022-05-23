@@ -127,7 +127,7 @@ export const command: Command = {
                                     if (button.customId === 'join_cancel') {
                                         let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
                                         client.gameManager.destroyLobby(interaction.user);
-                                        await interaction.editReply({ embeds: [embedmsg], components: [] });
+                                        await safeReply(interaction, { embeds: [embedmsg], components: [] });
                                         collector.stop();
                                     }
                                 } else {
@@ -136,7 +136,8 @@ export const command: Command = {
                                         game.join(button.user);
                                         collector.stop();
                                     } else if (button.customId === 'join_cancel') {
-                                        await button.reply(
+                                        await safeReply(
+                                            button,
                                             createErrorEmbed('`⛔ Only the host can cancel the game.`', true)
                                         );
                                     }
@@ -154,14 +155,14 @@ export const command: Command = {
                                 ) {
                                     let embedmsg = game.getLobbyMessageEmbed('`The game lobby timed out.`');
                                     client.gameManager.destroyLobby(interaction.user);
-                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
+                                    await safeReply(interaction, { embeds: [embedmsg], components: [] });
                                 }
                             } catch (err) {
                                 console.log(err);
                             }
                         });
 
-                        await interaction.editReply({ embeds: [embedmsg], components: [row] });
+                        await safeReply(interaction, { embeds: [embedmsg], components: [row] });
                     });
 
                     // GAME READY TO START
@@ -186,7 +187,7 @@ export const command: Command = {
                                     } else if (button.customId === 'ready_cancel') {
                                         let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
                                         client.gameManager.destroyLobby(interaction.user);
-                                        await interaction.editReply({ embeds: [embedmsg], components: [] });
+                                        await safeReply(interaction, { embeds: [embedmsg], components: [] });
                                     }
                                     collector.stop();
                                 } else {
@@ -196,7 +197,8 @@ export const command: Command = {
                                             game.join(button.user);
                                             collector.stop();
                                         } else {
-                                            await button.reply(
+                                            await safeReply(
+                                                button,
                                                 createErrorEmbed(
                                                     '`⛔ Only the host can cancel or start the game.`',
                                                     true
@@ -220,14 +222,14 @@ export const command: Command = {
                                 ) {
                                     let embedmsg = game.getLobbyMessageEmbed('`The game lobby timed out.`');
                                     client.gameManager.destroyLobby(interaction.user);
-                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
+                                    await safeReply(interaction, { embeds: [embedmsg], components: [] });
                                 }
                             } catch (err) {
                                 console.log(err);
                             }
                         });
 
-                        await interaction.editReply({ embeds: [embedmsg], components: [row] });
+                        await safeReply(interaction, { embeds: [embedmsg], components: [row] });
                     });
 
                     // GAME START
@@ -239,7 +241,7 @@ export const command: Command = {
                     // GAME QUESTION
                     lobby.on('question', async (game: TriviaGame) => {
                         const gameMessage = game.getQuestionMessage();
-                        await interaction.editReply(gameMessage);
+                        await safeReply(interaction, gameMessage);
 
                         if (game.readQuestions && !game.questionRead) {
                             client.musicManager.say(interaction, game.question!.value, 'en');
@@ -260,14 +262,16 @@ export const command: Command = {
                                 } else {
                                     try {
                                         if (game.answerGiven.includes(button.user)) {
-                                            await button.reply(
+                                            await safeReply(
+                                                button,
                                                 createErrorEmbed(
                                                     "`💤 You've already answered. Wait for your opponents.`",
                                                     true
                                                 )
                                             );
                                         } else {
-                                            await button.reply(
+                                            await safeReply(
+                                                button,
                                                 createErrorEmbed("`⛔ These buttons aren't for you.`", true)
                                             );
                                         }
@@ -294,7 +298,7 @@ export const command: Command = {
                     // GAME ANSWER
                     lobby.on('answer', async (game: TriviaGame) => {
                         const gameMessage = game.getAnswerMessage();
-                        await interaction.editReply(gameMessage);
+                        await safeReply(interaction, gameMessage);
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
@@ -307,12 +311,13 @@ export const command: Command = {
                                     await button.deferUpdate();
                                     let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
                                     client.gameManager.destroyLobby(interaction.user);
-                                    await interaction.editReply({ embeds: [embedmsg], components: [] });
+                                    await safeReply(interaction, { embeds: [embedmsg], components: [] });
 
                                     collector.stop();
                                 } else {
                                     try {
-                                        await button.reply(
+                                        await safeReply(
+                                            button,
                                             createErrorEmbed('`⛔ Only the host can cancel the game.`', true)
                                         );
                                     } catch (err) {
@@ -339,7 +344,7 @@ export const command: Command = {
                     lobby.on('end', async (game: TriviaGame) => {
                         const gameMessage = game.getGameOverMessage();
                         client.gameManager.destroyLobby(interaction.user);
-                        await interaction.editReply(gameMessage);
+                        await safeReply(interaction, gameMessage);
                     });
 
                     // open game lobby
