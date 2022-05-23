@@ -113,6 +113,8 @@ npm run deploy
 
 ## TODOs
 
+See all TODOs in the [Project](https://github.com/users/danloe/projects/1)
+
 - [x] Add Readme
 - [x] Add autocomplete functionality
 - [ ] **Add music player controls as embed message**
