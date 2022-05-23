@@ -21,6 +21,7 @@
 * Slash commands
 * Music
   * YouTube
+  * YouTube playlists
   * SoundCloud
   * Newgrounds
   * Direct Link To File
