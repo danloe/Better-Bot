@@ -119,6 +119,8 @@ npm run deploy
     - [x] Trivia
     - [ ] ...
 - [ ] Add more music functionalities
+    - [ ] Seek tracks
+    - [ ] Change volume
     - [ ] YouTube playlists
     - [ ] Add Spotify playlists as YouTube videos
     - [ ] Play random songs from YouTube
