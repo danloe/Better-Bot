@@ -68,7 +68,7 @@ npm install
 BOT_TOKEN="YOURTOKEN"
 ```
 6. Add the bot to your server via the `OAuth2` - `URL Generator`. Select `bot` as scope and insert the permissions integer in the `GENERATED URL`.
->Minimum required permissions integer:
+>Minimum required [permissions integer](https://discordapi.com/permissions.html#294242221120):
 ```
 294242221120
 ```
