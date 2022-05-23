@@ -117,6 +117,10 @@ npm run deploy
 - [ ] Add mongoDB database support
 - [ ] Add more games
     - [x] Trivia
+    - [ ] Find the Emoji
+    - [ ] Guess...?
+    - [ ] Hangman
+    - [ ] Fast Typer
     - [ ] ...
 - [ ] Add more music functionalities
     - [ ] Seek tracks
