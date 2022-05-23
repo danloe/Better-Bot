@@ -114,27 +114,27 @@ npm run deploy
 - [x] Add Readme
 - [x] Add autocomplete functionality
 - [ ] **Add music player controls as embed message**
-- [ ] Add mongoDB database support
+- [ ] *Add mongoDB database support*
 - [ ] Add more games
     - [x] Trivia
-    - [ ] Find the Emoji
+    - [ ] **Find the Emoji**
     - [ ] Guess...?
     - [ ] Hangman
     - [ ] Fast Typer
     - [ ] ...
 - [ ] Add more music functionalities
+    - [ ] **YouTube playlists**
+    - [ ] **Add Spotify songs/playlists as YouTube video(s)**
+    - [ ] **Play random songs from YouTube**
     - [ ] Seek tracks
     - [ ] Change volume
-    - [ ] YouTube playlists
-    - [ ] Add Spotify playlists as YouTube videos
-    - [ ] Play random songs from YouTube
     - [ ] ...
 - [ ] Add platform support for music playback
     - [x] YouTube
     - [x] SoundCloud
     - [x] Newgrounds
     - [ ] TikTok
-    - [ ] Instagram?
+    - [ ] *Instagram*
     - [ ] ...
 
 ## Contributing
