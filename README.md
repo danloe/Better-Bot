@@ -23,7 +23,7 @@ A discord bot, better than my first one. This time in Typescript.
 * Autocomplete
   * YouTube search suggestions
 * TTS over voice connection
-  * Says any text given in multiple languages
+  * Says any text, multiple languages supported
   * Announces music tracks
   * Reads questions in Trivia games
 * Multiplayer Games
