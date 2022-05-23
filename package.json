@@ -6,8 +6,6 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "tsc && ts-node-dev ./src/index.ts",
-    "startdev": "nodemon",
-    "startauto": "ts-node-dev --respawn --transpile-only --poll ./src/index.ts",
     "deploy": "ts-node-dev --respawn --transpile-only --poll ./src/deploy/global.ts",
     "build": "tsc"
   },
@@ -49,7 +47,6 @@
   "devDependencies": {
     "@types/node": "^17.0.27",
     "eslint": "^8.14.0",
-    "nodemon": "^2.0.16",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3"
   }
