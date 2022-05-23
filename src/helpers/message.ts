@@ -44,6 +44,8 @@ export function getTrackTypeColor(trackType: TrackType): ColorResolvable {
             return '#ff5500';
         case TrackType.Newgrounds:
             return '#fda238';
+        default:
+            return '#ffffff';
     }
 }
 
@@ -57,6 +59,8 @@ export function getTrackTypeString(track: Track): string {
             return 'SoundCloud';
         case TrackType.Newgrounds:
             return 'Newgrounds';
+        default:
+            return 'Unknown';
     }
 }
 

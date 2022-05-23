@@ -1,13 +1,15 @@
 import {
     createErrorEmbed,
-    safeDeferReply as deferReply,
-    determineTrackType,
+    safeDeferReply,
+    determineInputType,
     getNewgroundsTrack,
     getSoundCloudTrack,
     getYouTubeTrack,
-    safeReply
+    safeReply,
+    getYoutubePlaylistTracks,
+    getYoutubePlaylist
 } from '../helpers';
-import { ButtonInteraction, CommandInteraction, GuildMember, Snowflake, VoiceChannel } from 'discord.js';
+import { ButtonInteraction, CommandInteraction, GuildMember, Snowflake } from 'discord.js';
 import BetterClient from '../client';
 import { MusicSubscription } from './MusicSubscription';
 import { Queue } from './Queue';
@@ -21,6 +23,7 @@ import {
     VoiceConnectionStatus
 } from '@discordjs/voice';
 import google from 'googlethis';
+import { Playlist } from '../interfaces';
 const discordTTS = require('discord-tts');
 //import discordTTS from 'discord-tts';
 
@@ -35,44 +38,51 @@ export class MusicManager {
 
     play(
         interaction: CommandInteraction | ButtonInteraction,
-        args: string,
+        input: string,
         announce: boolean,
         skip: boolean,
         next: boolean
     ) {
-        return new Promise<Track>(async (done, error) => {
+        return new Promise<Track | Playlist>(async (done, error) => {
             try {
-                await deferReply(interaction);
+                await safeDeferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
-                let type = determineTrackType(args);
+                let type = determineInputType(input);
                 let track: Track;
+                let tracks: Track[] = [];
+                let playlist: Playlist;
 
                 switch (type) {
                     case TrackType.YouTube:
-                        track = await getYouTubeTrack(args, interaction.user.username, announce);
+                        track = await getYouTubeTrack(input, interaction.user.username, announce);
+                        break;
+
+                    case TrackType.YouTubePlaylist:
+                        playlist = await getYoutubePlaylist(input, announce);
+                        tracks = await getYoutubePlaylistTracks(input, 50, interaction.user.username, announce);
                         break;
 
                     case TrackType.SoundCloud:
-                        track = await getSoundCloudTrack(args, interaction.user.username, announce);
+                        track = await getSoundCloudTrack(input, interaction.user.username, announce);
                         break;
 
                     case TrackType.Newgrounds:
-                        track = await getNewgroundsTrack(args, interaction.user.username, announce);
+                        track = await getNewgroundsTrack(input, interaction.user.username, announce);
                         break;
 
                     case TrackType.DirectFile:
-                        let domainName = args.match(/\w+(?=\.\w+\/)/gi)![0];
+                        let domainName = input.match(/\w+(?=\.\w+\/)/gi)![0];
                         let images = await google.image(domainName + ' logo | icon', { safe: false });
                         const imageUrl = images[0].url;
 
                         track = new Track(
                             TrackType.DirectFile,
-                            args,
+                            input,
                             'Unknown File',
                             interaction.user.username,
                             announce,
-                            args,
+                            input,
                             0,
                             imageUrl,
                             'The requestor provided a direct file link. No information available.',
@@ -84,10 +94,21 @@ export class MusicManager {
 
                 if (!queue) this.queues.set(interaction.guildId!, new Queue());
                 queue = this.queues.get(interaction.guildId!);
-                if (skip || next) {
-                    queue!.next(track);
-                } else {
-                    queue!.queue(track);
+
+                if (tracks.length > 0) {
+                    tracks.forEach((track) => {
+                        if (skip || next) {
+                            queue!.next(track);
+                        } else {
+                            queue!.queue(track);
+                        }
+                    });
+                } else if (track!) {
+                    if (skip || next) {
+                        queue!.next(track);
+                    } else {
+                        queue!.queue(track);
+                    }
                 }
 
                 if (!subscription || !subscription.isVoiceConnectionReady()) {
@@ -114,7 +135,11 @@ export class MusicManager {
                             '🚩 Could not join a voice channel: `You must first join a voice channel for me to follow you. ➡️ Then try the resume command.`'
                         )
                     );
-                    done(track);
+                    if (type === TrackType.YouTube) {
+                        done(track!);
+                    } else {
+                        done(playlist!);
+                    }
                     return;
                 }
 
@@ -131,7 +156,12 @@ export class MusicManager {
                 } else {
                     subscription.play();
                 }
-                done(track);
+
+                if (type === TrackType.YouTube) {
+                    done(track!);
+                } else {
+                    done(playlist!);
+                }
             } catch (err) {
                 console.log(err);
                 error(err);
@@ -142,7 +172,7 @@ export class MusicManager {
     say(interaction: CommandInteraction | ButtonInteraction, phrase: string, lang: string = 'en') {
         return new Promise<void>(async (done, error) => {
             try {
-                await deferReply(interaction, true);
+                await safeDeferReply(interaction, true);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
                 if (!queue) this.queues.set(interaction.guildId!, new Queue());
@@ -202,7 +232,7 @@ export class MusicManager {
     stop(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                await deferReply(interaction);
+                await safeDeferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
                 if (!subscription) {
@@ -222,7 +252,7 @@ export class MusicManager {
     pause(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                await deferReply(interaction);
+                await safeDeferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
                 if (!subscription) {
@@ -242,7 +272,7 @@ export class MusicManager {
     resume(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                await deferReply(interaction);
+                await safeDeferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
                 if (!subscription || !subscription.isVoiceConnectionReady()) {
@@ -291,7 +321,7 @@ export class MusicManager {
     skip(interaction: CommandInteraction | ButtonInteraction, amount: number) {
         return new Promise<Queue>(async (done, error) => {
             try {
-                await deferReply(interaction);
+                await safeDeferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
                 if (!subscription) {
@@ -322,7 +352,7 @@ export class MusicManager {
     remove(interaction: CommandInteraction | ButtonInteraction, positions: number[]) {
         return new Promise<void>(async (done, error) => {
             try {
-                await deferReply(interaction);
+                await safeDeferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
                 if (!queue || queue.length <= 1) {
@@ -349,7 +379,7 @@ export class MusicManager {
     getQueue(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<Queue>(async (done, error) => {
             try {
-                await deferReply(interaction);
+                await safeDeferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
                 if (!queue || queue.length < 1) {
@@ -368,7 +398,7 @@ export class MusicManager {
     clear(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                await deferReply(interaction);
+                await safeDeferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
                 if (!queue || queue.length < 1) {
@@ -388,7 +418,7 @@ export class MusicManager {
     shuffle(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                await deferReply(interaction);
+                await safeDeferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
                 if (!queue) {
@@ -412,7 +442,7 @@ export class MusicManager {
     move(interaction: CommandInteraction | ButtonInteraction, currentPos: number, targetPos: number) {
         return new Promise<void>(async (done, error) => {
             try {
-                await deferReply(interaction);
+                await safeDeferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
                 if (!queue || queue.length <= 1) {

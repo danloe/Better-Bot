@@ -66,11 +66,15 @@ export const command: Command = {
                             }
                         }
 
-                        for (let i = 0; i < queue.length; i++) {
+                        for (let i = 0; i < Math.min(queue.length, 10); i++) {
                             embedmsg.addField(
                                 i + 1 + ': `' + queue[i].name + '`',
                                 queue[i].requestor + (queue[i].announce ? ' 📣' : '') + ' | ' + queue[i].displayUrl
                             );
+                        }
+
+                        if (queue.length > 10) {
+                            embedmsg.addField('\u200B', '`' + String(queue.length - 10) + ' more Tracks in queue.`');
                         }
 
                         const collector = interaction.channel!.createMessageComponentCollector({
@@ -131,10 +135,7 @@ export const command: Command = {
                     }
                 } catch (err) {
                     try {
-                        await safeReply(
-                            interaction,
-                            createErrorEmbed('🚩 Error showing the queue: `' + err + '`')
-                        );
+                        await safeReply(interaction, createErrorEmbed('🚩 Error showing the queue: `' + err + '`'));
                     } catch (err2) {
                         console.log(err2);
                     }

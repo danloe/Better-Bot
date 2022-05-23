@@ -4,11 +4,20 @@ import ytsr from 'ytsr';
 import { Track, TrackType } from '../classes';
 import https from 'node:https';
 import { timeStringToDurationString as timeStringToSecondsNumber } from './message';
+import { Playlist } from '../interfaces';
 
-export function determineTrackType(args: string): TrackType {
+export function determineInputType(args: string): TrackType {
     if (args.startsWith('http://') || args.startsWith('https://')) {
         // URL, get type
-        if (isYouTubeURL(args)) return TrackType.YouTube;
+        if (isYouTubeURL(args)) {
+            if (args.includes('playlist?list=')) {
+                // YouTube Playlist
+                return TrackType.YouTubePlaylist;
+            } else {
+                // YouTube video
+                return TrackType.YouTube;
+            }
+        }
         if (isSoundCloudURL(args)) return TrackType.SoundCloud;
         if (isNewgroundsURL(args)) return TrackType.Newgrounds;
         return TrackType.DirectFile;
@@ -25,7 +34,6 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
                 const filters1 = await ytsr.getFilters(query);
                 const filter1 = filters1.get('Type')!.get('Video');
                 const options = {
-
                     safeSearch: false,
                     limit: 1
                 };
@@ -56,6 +64,103 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
     });
 }
 
+export function getYoutubePlaylist(url: string, announce: boolean) {
+    return new Promise<Playlist>(async (resolve, reject) => {
+        try {
+            const apiUrl =
+                'https://youtube.googleapis.com/youtube/v3/playlists?part=snippet&part=contentDetails&maxResults=1';
+            const playlistId = '&id=' + url.match(/(?<=list=)([a-zA-Z0-9-_]+)?/)![0];
+            const apiKey = '&key=' + process.env.GOOGLE_API_TOKEN;
+            const requestUrl = apiUrl + playlistId + apiKey;
+
+            https.get(requestUrl, (res: any) => {
+                let rawData: any = '';
+
+                res.on('data', (chunk: any) => {
+                    rawData += chunk;
+                });
+
+                res.on('end', () => {
+                    try {
+                        let playlistItem = JSON.parse(rawData).items![0];
+                        let playlist: Playlist;
+
+                        let snippet = playlistItem.snippet;
+
+                        playlist = {
+                            name: snippet.title,
+                            itemCount: playlistItem.contentDetails.itemCount,
+                            url: 'https://youtube.com/playlist?list=' + playlistItem.id,
+                            description: snippet.description,
+                            publishedAt: snippet.publishedAt,
+                            channelTitle: snippet.channelTitle,
+                            thumbnailUrl: snippet.thumbnails.default.url,
+                            announce: announce
+                        };
+                        resolve(playlist);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            });
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+export function getYoutubePlaylistTracks(url: string, maxResults: number = 50, requestor: string, announce: boolean) {
+    return new Promise<Track[]>(async (resolve, reject) => {
+        try {
+            const apiUrl = 'https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet';
+            const apiMaxResults = '&maxResults=' + String(maxResults);
+            const playlistId = '&playlistId=' + url.match(/(?<=list=)([a-zA-Z0-9-_]+)?/)![0];
+            const apiKey = '&key=' + process.env.GOOGLE_API_TOKEN;
+            const requestUrl = apiUrl + apiMaxResults + playlistId + apiKey;
+
+            https.get(requestUrl, (res: any) => {
+                let rawData: any = '';
+
+                res.on('data', (chunk: any) => {
+                    rawData += chunk;
+                });
+
+                res.on('end', () => {
+                    try {
+                        let videos = JSON.parse(rawData).items;
+                        let tracks: Track[] = [];
+
+                        videos.forEach((video: any) => {
+                            let snippet = video.snippet;
+                            tracks.push(
+                                new Track(
+                                    TrackType.YouTube,
+                                    'https://youtu.be/' + snippet.resourceId.videoId,
+                                    snippet.title,
+                                    requestor,
+                                    announce,
+                                    'https://youtu.be/' + snippet.resourceId.videoId,
+                                    0,
+                                    snippet.thumbnails.default.url,
+                                    snippet.description,
+                                    '',
+                                    snippet.publishedAt
+                                )
+                            );
+                        });
+
+                        resolve(tracks);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            });
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
 export function getSoundCloudTrack(url: string, requestor: string, announce: boolean) {
     return new Promise<Track>(async (resolve, reject) => {
         try {
@@ -71,7 +176,7 @@ export function getSoundCloudTrack(url: string, requestor: string, announce: boo
                 info.artwork_url,
                 info.description,
                 info.genre,
-                String(info.created_at).split("T")[0]
+                String(info.created_at).split('T')[0]
             );
 
             resolve(track);
