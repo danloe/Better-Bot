@@ -117,6 +117,7 @@ npm run deploy
 - [x] Add autocomplete functionality
 - [ ] **Add music player controls as embed message**
 - [ ] *Add mongoDB database support*
+- [ ] Use `config.json`
 - [ ] Add more games
     - [x] Trivia
     - [ ] **Find the Emoji**
