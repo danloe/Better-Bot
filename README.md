@@ -2,6 +2,8 @@
   
   <a href="">[![Issues][issues-shield]][issues-url]
   <a href="">[![MIT License][license-shield]][license-url]
+  <a href="">[![Typescript][typescript-shield]][typescript-url]
+  <a href="">[![DiscordJS][discordjs-shield]][discordjs-url]
     
 </div>
 
@@ -126,4 +128,8 @@ Pull requests are also welcome. For major changes, please open an issue first to
 [issues-url]: https://github.com/danloe/Botterino/issues
 [license-shield]: https://img.shields.io/github/license/danloe/Botterino.svg?style=for-the-badge
 [license-url]: https://github.com/danloe/Botterino/blob/master/LICENSE.md
+[typescript-shield]: https://img.shields.io/github/package-json/dependency-version/danloe/botterino/dev/typescript?style=for-the-badge
+[typescript-url]: https://www.npmjs.com/package/typescript
+[discordjs-shield]: https://img.shields.io/github/package-json/dependency-version/danloe/botterino/discord.js?style=for-the-badge
+[discordjs-url]: https://github.com/discordjs/discord.js
 [product-screenshot]: https://unsplash.com/photos/N2zxMUDwT4I
