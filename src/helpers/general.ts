@@ -7,13 +7,19 @@ export async function safeReply(
 ) {
     try {
         if (followup) {
-            await interaction.followUp(options);
-            return;
-        }
-        if (interaction.replied || interaction.deferred) {
-            await interaction.editReply(options);
+            if (interaction.replied) {
+                await interaction.followUp(options);
+                return;
+            } else {
+                await interaction.reply(options);
+                return;
+            }
         } else {
-            await interaction.reply(options);
+            if (interaction.replied || interaction.deferred) {
+                await interaction.editReply(options);
+            } else {
+                await interaction.reply(options);
+            }
         }
     } catch (err) {
         console.log(err);
