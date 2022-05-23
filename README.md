@@ -12,7 +12,7 @@
 <div align="center">
   <br />
   <a href="https://unsplash.com/photos/N2zxMUDwT4I">
-    <img src="https://images.weserv.nl/?url=https://unsplash.com/photos/N2zxMUDwT4I/download?ixid=MnwxMjA3fDB8MXxhbGx8N3x8fHx8fDJ8fDE2NTMyNzQzOTk&force=true&w=640?v=4&fit=cover&mask=circle&maxage=7d" alt="Botterino Photo" width="250" height="250">
+    <img src="https://images.weserv.nl/?url=https://unsplash.com/photos/N2zxMUDwT4I/download?ixid=MnwxMjA3fDB8MXxhbGx8N3x8fHx8fDJ8fDE2NTMyNzQzOTk&force=true&w=640?v=4&fit=cover&mask=circle&maxage=7d&con=-15&mod=1.2" alt="Botterino Photo" width="250" height="250">
   </a>
 </div>
     
@@ -48,8 +48,8 @@ Follow these steps to get the bot up and running.
 
 ### Prerequisites
 
-* [nodejs](https://nodejs.org/) (v16.15 or higher)
-* npm
+* [![NodeJS][node-shield]][node-url]
+* [![npm][npm-shield]][npm-url]
   ```sh
   npm install npm@latest -g
   ```
@@ -131,3 +131,7 @@ Pull requests are also welcome. For major changes, please open an issue first to
 [discordjs-url]: https://github.com/discordjs/discord.js
 [license-shield]: https://img.shields.io/github/license/danloe/Botterino.svg?style=for-the-badge
 [license-url]: https://github.com/danloe/Botterino/blob/master/LICENSE.md
+[node-shield]: https://img.shields.io/node/v/discord.js?style=flat-square
+[node-url]: https://nodejs.org/
+[npm-shield]: https://img.shields.io/npm/v/npm?style=flat-square
+[npm-url]: https://github.com/npm
