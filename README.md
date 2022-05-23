@@ -3,7 +3,7 @@
 
 # Botterino
 
-A discord bot, better than my last one. This time in Typescript.
+A discord bot, better than my first one. This time in Typescript.
 
 <br />
 <div align="center">
