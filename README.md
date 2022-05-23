@@ -124,6 +124,7 @@ npm run deploy
     - [ ] YouTube playlists
     - [ ] Add Spotify playlists as YouTube videos
     - [ ] Play random songs from YouTube
+    - [ ] ...
 - [ ] Add platform support for music playback
     - [x] YouTube
     - [x] SoundCloud
