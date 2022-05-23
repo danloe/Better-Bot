@@ -9,11 +9,10 @@
 
 # Botterino
 
-A discord bot, better than my first one. This time in Typescript.
 <div align="center">
   <br />
   <a href="https://unsplash.com/photos/N2zxMUDwT4I">
-    <img src="https://unsplash.com/photos/N2zxMUDwT4I/download?ixid=MnwxMjA3fDB8MXxhbGx8N3x8fHx8fDJ8fDE2NTMyNzQzOTk&force=true&w=640" alt="Logo" width="200" height="200">
+    <img src="https://images.weserv.nl/?url=https://unsplash.com/photos/N2zxMUDwT4I/download?ixid=MnwxMjA3fDB8MXxhbGx8N3x8fHx8fDJ8fDE2NTMyNzQzOTk&force=true&w=640?v=4&fit=cover&mask=circle&maxage=7d" alt="Botterino Photo" width="250" height="250">
   </a>
 </div>
     
@@ -126,10 +125,9 @@ Pull requests are also welcome. For major changes, please open an issue first to
 
 [issues-shield]: https://img.shields.io/github/issues/danloe/Botterino.svg?style=for-the-badge
 [issues-url]: https://github.com/danloe/Botterino/issues
-[license-shield]: https://img.shields.io/github/license/danloe/Botterino.svg?style=for-the-badge
-[license-url]: https://github.com/danloe/Botterino/blob/master/LICENSE.md
 [typescript-shield]: https://img.shields.io/github/package-json/dependency-version/danloe/botterino/dev/typescript?style=for-the-badge
 [typescript-url]: https://www.npmjs.com/package/typescript
 [discordjs-shield]: https://img.shields.io/github/package-json/dependency-version/danloe/botterino/discord.js?style=for-the-badge
 [discordjs-url]: https://github.com/discordjs/discord.js
-[product-screenshot]: https://unsplash.com/photos/N2zxMUDwT4I
+[license-shield]: https://img.shields.io/github/license/danloe/Botterino.svg?style=for-the-badge
+[license-url]: https://github.com/danloe/Botterino/blob/master/LICENSE.md
