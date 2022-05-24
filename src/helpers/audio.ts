@@ -70,7 +70,7 @@ export function getYoutubePlaylist(url: string, announce: boolean) {
             const apiUrl =
                 'https://youtube.googleapis.com/youtube/v3/playlists?part=snippet&part=contentDetails&maxResults=1';
             const playlistId = '&id=' + url.match(/(?<=list=)([a-zA-Z0-9-_]+)?/)![0];
-            const apiKey = '&key=' + process.env.GOOGLE_API_TOKEN;
+            const apiKey = '&key=' + process.env.GOOGLE_API_KEY;
             const requestUrl = apiUrl + playlistId + apiKey;
 
             https.get(requestUrl, (res: any) => {
@@ -115,7 +115,7 @@ export function getYoutubePlaylistTracks(url: string, maxResults: number = 50, r
             const apiUrl = 'https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet';
             const apiMaxResults = '&maxResults=' + String(maxResults);
             const playlistId = '&playlistId=' + url.match(/(?<=list=)([a-zA-Z0-9-_]+)?/)![0];
-            const apiKey = '&key=' + process.env.GOOGLE_API_TOKEN;
+            const apiKey = '&key=' + process.env.GOOGLE_API_KEY;
             const requestUrl = apiUrl + apiMaxResults + playlistId + apiKey;
 
             https.get(requestUrl, (res: any) => {
