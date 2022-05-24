@@ -3,7 +3,7 @@ import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import { Track, TrackType } from '../classes';
 import https from 'node:https';
-import { timeStringToDurationString as timeStringToSecondsNumber } from './message';
+import { getLogoUrlfromUrl, timeStringToDurationString as timeStringToSecondsNumber } from './message';
 import { Playlist } from '../interfaces';
 
 export function determineInputType(args: string): TrackType {
@@ -80,7 +80,7 @@ export function getYoutubePlaylist(url: string, announce: boolean) {
                     rawData += chunk;
                 });
 
-                res.on('end', () => {
+                res.on('end', async () => {
                     try {
                         let playlistItem = JSON.parse(rawData).items![0];
                         let playlist: Playlist;
@@ -94,11 +94,14 @@ export function getYoutubePlaylist(url: string, announce: boolean) {
                             description: snippet.description,
                             publishedAt: snippet.publishedAt,
                             channelTitle: snippet.channelTitle,
-                            thumbnailUrl: snippet.thumbnails.default.url,
+                            thumbnailUrl: snippet.thumbnails?.default?.url
+                                ? snippet.thumbnails.default.url
+                                : await getLogoUrlfromUrl('https://youtube.com/'),
                             announce: announce
                         };
                         resolve(playlist);
                     } catch (error) {
+                        console.log(error);
                         reject('Could not load playlist. Check URL and privacy status or try again later.');
                     }
                 });
