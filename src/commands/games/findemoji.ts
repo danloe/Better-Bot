@@ -3,26 +3,19 @@ import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Messa
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
 import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
-import { Category, CategoryNamesPretty, CategoryResolvable, QuestionDifficulty, QuestionType } from 'open-trivia-db';
-import { answerDisplayTime, TriviaGame, GameType, GameState } from '../../classes';
-import { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
+import { GameType, GameState, GameDifficulty, FindTheEmojiGame } from '../../classes';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
-        .setName('trivia')
-        .setDescription('Start a game of Trivia.')
+        .setName('findtheemoji')
+        .setDescription('Start a game of Find The Emoji.')
         .addIntegerOption((option) =>
-            option
-                .setName('amount')
-                .setDescription('How many questions?')
-                .setMinValue(1)
-                .setMaxValue(50)
-                .setRequired(true)
+            option.setName('rounds').setDescription('How many rounds?').setMinValue(1).setMaxValue(50).setRequired(true)
         )
         .addStringOption((option) =>
             option
                 .setName('difficulty')
-                .setDescription('Which question difficulty?')
+                .setDescription('Which difficulty?')
                 .addChoices(
                     { name: 'easy', value: 'easy' },
                     { name: 'medium', value: 'medium' },
@@ -30,18 +23,20 @@ export const command: Command = {
                 )
                 .setRequired(false)
         )
-        .addStringOption((option) =>
+        .addIntegerOption((option) =>
             option
-                .setName('type')
-                .setDescription('What question answers type?')
-                .addChoices({ name: 'yes / no', value: 'boolean' }, { name: 'multiple choice', value: 'multiple' })
+                .setName('tries')
+                .setDescription('How many tries per player?')
+                .setMinValue(1)
+                .setMaxValue(5)
                 .setRequired(false)
         )
-        .addStringOption((option) =>
+        .addIntegerOption((option) =>
             option
-                .setName('category')
-                .setDescription('Which question category?')
-                .addChoices(...getCategoryOptions())
+                .setName('time')
+                .setDescription('How many seconds to search?')
+                .setMinValue(3)
+                .setMaxValue(60)
                 .setRequired(false)
         )
         .addIntegerOption((option) =>
@@ -50,20 +45,6 @@ export const command: Command = {
                 .setDescription('How many players can join?')
                 .setMinValue(1)
                 .setMaxValue(10)
-                .setRequired(false)
-        )
-        .addBooleanOption((option) =>
-            option
-                .setName('voice')
-                .setDescription('Activate TTS over voice to read the questions? Host must be in voice channel!')
-                .setRequired(false)
-        )
-        .addIntegerOption((option) =>
-            option
-                .setName('time')
-                .setDescription('How many seconds for each question?')
-                .setMinValue(5)
-                .setMaxValue(60)
                 .setRequired(false)
         ),
     run: (
@@ -77,39 +58,30 @@ export const command: Command = {
                 try {
                     await safeDeferReply(interaction);
 
-                    let amount = interaction.options.getInteger('amount');
-                    let difficultyOption = interaction.options.getString('difficulty');
-                    if (!difficultyOption) difficultyOption = null;
-                    let typeOption = interaction.options.getString('type');
-                    if (!typeOption) typeOption = null;
-                    let categoryOption = interaction.options.getString('category');
-                    if (!categoryOption) categoryOption = null;
-                    let maxPlayersOption = interaction.options.getInteger('players');
-                    if (!maxPlayersOption) maxPlayersOption = 10;
-                    let voiceOption = interaction.options.getBoolean('voice');
-                    if (!voiceOption) voiceOption = false;
+                    let rounds = interaction.options.getInteger('rounds');
+                    let difficultyOption = <GameDifficulty>interaction.options.getString('difficulty');
+                    if (!difficultyOption) difficultyOption = GameDifficulty.Easy;
+                    let triesOption = interaction.options.getInteger('tries');
+                    if (!triesOption) triesOption = 1;
                     let timeOption = interaction.options.getInteger('time');
                     if (!timeOption) timeOption = 20;
+                    let maxPlayersOption = interaction.options.getInteger('players');
+                    if (!maxPlayersOption) maxPlayersOption = 5;
 
                     const lobby = (await client.gameManager.createLobby(
-                        GameType.Trivia,
+                        GameType.FindTheEmoji,
                         interaction,
                         interaction.user,
                         1,
                         maxPlayersOption
-                    )) as TriviaGame;
-                    lobby.amount = amount!;
-                    lobby.difficulty = <QuestionDifficulty>difficultyOption!;
-                    lobby.type = <QuestionType>typeOption!;
-                    lobby.readQuestions = voiceOption;
-                    lobby.questionAnswerTime = timeOption! * 1000;
-                    if (categoryOption) {
-                        lobby.category = new Category(<CategoryResolvable>categoryOption);
-                        await lobby.getCategoryInfo();
-                    }
+                    )) as FindTheEmojiGame;
+                    lobby.rounds = rounds!;
+                    lobby.difficulty = difficultyOption!;
+                    lobby.tries = triesOption!;
+                    lobby.emojiSearchTime = timeOption! * 1000;
 
                     // A PLAYER JOINED
-                    lobby.on('join', async (game: TriviaGame) => {
+                    lobby.on('join', async (game: FindTheEmojiGame) => {
                         let embedmsg = game.getLobbyMessageEmbed('`Waiting for more players...`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('join_join').setLabel('Join').setStyle('PRIMARY'),
@@ -168,7 +140,7 @@ export const command: Command = {
                     });
 
                     // GAME READY TO START
-                    lobby.on('ready', async (game: TriviaGame) => {
+                    lobby.on('ready', async (game: FindTheEmojiGame) => {
                         let embedmsg = game.getLobbyMessageEmbed('`Minimum player count reached. The game is ready.`');
                         const row = new MessageActionRow().addComponents([
                             new MessageButton().setCustomId('ready_join').setLabel('Join').setStyle('PRIMARY'),
@@ -236,31 +208,25 @@ export const command: Command = {
                     });
 
                     // GAME START
-                    lobby.on('start', async (game: TriviaGame) => {
-                        await lobby.getQuestions();
-                        lobby.nextRound();
+                    lobby.on('start', async (game: FindTheEmojiGame) => {
+                        game.nextRound();
                     });
 
-                    // GAME QUESTION
-                    lobby.on('question', async (game: TriviaGame) => {
-                        const gameMessage = game.getQuestionMessage();
+                    // GAME SEARCH
+                    lobby.on('search', async (game: FindTheEmojiGame) => {
+                        const gameMessage = game.getSearchMessage();
                         await safeReply(interaction, gameMessage);
-
-                        if (game.readQuestions && !game.questionRead) {
-                            client.musicManager.say(interaction, game.question!.value, 'en');
-                            game.questionRead = true;
-                        }
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: game.questionAnswerTime
+                            time: game.emojiSearchTime
                         });
 
                         collector.on('collect', async (button) => {
                             try {
-                                if (game.answerRequired.includes(button.user)) {
+                                if (game.answerTries.has(button.user)) {
                                     await button.deferUpdate();
-                                    game.answerQuestion(button.user, parseInt(button.customId.replace('trivia_', '')));
+                                    game.selectEmoji(button.user, parseInt(button.customId.replace('emoji_', '')));
                                     collector.stop();
                                 } else {
                                     try {
@@ -268,7 +234,7 @@ export const command: Command = {
                                             await safeReply(
                                                 button,
                                                 createErrorEmbed(
-                                                    "`💤 You've already answered. Wait for your opponents.`",
+                                                    "`💤 You're out of tries. Wait for your opponents.`",
                                                     true
                                                 )
                                             );
@@ -299,38 +265,38 @@ export const command: Command = {
                     });
 
                     // GAME ANSWER
-                    lobby.on('answer', async (game: TriviaGame) => {
+                    lobby.on('answer', async (game: FindTheEmojiGame) => {
                         const gameMessage = game.getAnswerMessage();
                         await safeReply(interaction, gameMessage);
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
-                            time: answerDisplayTime
+                            time: game.answerDisplayTime
                         });
 
-                        collector.on('collect', async (button) => {
-                            try {
-                                if (button.user.id === interaction.user.id) {
-                                    await button.deferUpdate();
-                                    let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
-                                    client.gameManager.destroyLobby(interaction.user);
-                                    await safeReply(interaction, { embeds: [embedmsg], components: [] });
+                        // collector.on('collect', async (button) => {
+                        //     try {
+                        //         if (button.user.id === interaction.user.id) {
+                        //             await button.deferUpdate();
+                        //             let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
+                        //             client.gameManager.destroyLobby(interaction.user);
+                        //             await safeReply(interaction, { embeds: [embedmsg], components: [] });
 
-                                    collector.stop();
-                                } else {
-                                    try {
-                                        await safeReply(
-                                            button,
-                                            createErrorEmbed('`⛔ Only the host can cancel the game.`', true)
-                                        );
-                                    } catch (err) {
-                                        console.log(err);
-                                    }
-                                }
-                            } catch (err) {
-                                console.log(err);
-                            }
-                        });
+                        //             collector.stop();
+                        //         } else {
+                        //             try {
+                        //                 await safeReply(
+                        //                     button,
+                        //                     createErrorEmbed('`⛔ Only the host can cancel the game.`', true)
+                        //                 );
+                        //             } catch (err) {
+                        //                 console.log(err);
+                        //             }
+                        //         }
+                        //     } catch (err) {
+                        //         console.log(err);
+                        //     }
+                        // });
 
                         collector.on('end', async (_: any, reason: string) => {
                             try {
@@ -344,7 +310,7 @@ export const command: Command = {
                     });
 
                     // GAME OVER
-                    lobby.on('end', async (game: TriviaGame) => {
+                    lobby.on('end', async (game: FindTheEmojiGame) => {
                         const gameMessage = game.getGameOverMessage();
                         client.gameManager.destroyLobby(interaction.user);
                         await safeReply(interaction, gameMessage);
@@ -357,7 +323,7 @@ export const command: Command = {
                     try {
                         await safeReply(
                             interaction,
-                            createErrorEmbed('🚩 Error creating a Trivia game: `' + err + '`')
+                            createErrorEmbed('🚩 Error creating a Find The Emoji game: `' + err + '`')
                         );
                     } catch (err2) {
                         console.log(err2);
@@ -368,13 +334,3 @@ export const command: Command = {
             }
         })
 };
-
-function getCategoryOptions(): APIApplicationCommandOptionChoice<string>[] {
-    let options = [];
-    for (let item in CategoryNamesPretty) {
-        if (isNaN(Number(item))) {
-            options.push({ name: item, value: item });
-        }
-    }
-    return options;
-}

@@ -122,7 +122,7 @@ export class MusicSubscription {
                         this.voiceConnection.destroy();
                     }
                 }, 60_000);
-                this.processQueue();
+                if (this.autoplay) this.processQueue();
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
                 // Stop connection timeout check
@@ -178,6 +178,7 @@ export class MusicSubscription {
      * Stops audio playback.
      */
     public stop() {
+        this.autoplay = false;
         this.audioPlayer.stop(true);
     }
 

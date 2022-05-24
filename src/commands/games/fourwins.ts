@@ -17,7 +17,7 @@ import { FourWinsGame, GameType, GameState } from '../../classes';
 export const command: Command = {
     data: new SlashCommandBuilder()
         .setName('fourwins')
-        .setDescription('Start a game of four wins.')
+        .setDescription('Start a game of Four Wins.')
         .addUserOption((option) =>
             option.setName('opponent').setDescription('Do you want to challenge a specific user?').setRequired(false)
         ),

@@ -4,6 +4,7 @@ import { GameLobby } from './GameLobby';
 import { TTTGame } from './TTTGame';
 import { FourWinsGame } from './FourWinsGame';
 import { TriviaGame } from './TriviaGame';
+import { FindTheEmojiGame } from './FindTheEmojiGame';
 
 export class GameManager {
     client: BetterClient;
@@ -29,7 +30,10 @@ export class GameManager {
                         lobby = new FourWinsGame(host, interaction.channel!);
                         break;
                     case GameType.Trivia:
-                        lobby = new TriviaGame(host, interaction.channel!, minPlayers, maxPlayers);
+                        lobby = new TriviaGame(host, interaction.channel!, maxPlayers);
+                        break;
+                    case GameType.FindTheEmoji:
+                        lobby = new FindTheEmojiGame(host, interaction.channel!, maxPlayers);
                         break;
                 }
                 this.games.set(host.id, lobby!);
@@ -48,5 +52,6 @@ export class GameManager {
 export enum GameType {
     TicTacToe,
     FourWins,
-    Trivia
+    Trivia,
+    FindTheEmoji
 }
