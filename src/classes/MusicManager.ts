@@ -135,10 +135,10 @@ export class MusicManager {
                             '🚩 Could not join a voice channel: `You must first join a voice channel for me to follow you. ➡️ Then try the resume command.`'
                         )
                     );
-                    if (type === TrackType.YouTube) {
-                        done(track!);
-                    } else {
+                    if (type === TrackType.YouTubePlaylist) {
                         done(playlist!);
+                    } else {
+                        done(track!);
                     }
                     return;
                 }
