@@ -27,5 +27,6 @@ export const youTubeGeneratedLists = [
     { name: 'Pop Fresh', id: 'RDCLAK5uy_nOwL35BM_GUTEbdbw_9FmvQhPWWdd3sAg' },
     { name: 'SAY NO MORE.', id: 'RDCLAK5uy_lMXERBY0Uw6-9ZW1DVmMu8cicbwkkg15Q' },
     { name: 'Alt-Frequencies', id: 'RDCLAK5uy_k0KkqT3D_36qFNHE9rq_Iz8VT-ZV7Jt0o' },
-    { name: 'Hits Remixed', id: 'RDCLAK5uy_l2zLaMIWOqWSePvTSmt49GcuR8460ZR10' }
+    { name: 'Hits Remixed', id: 'RDCLAK5uy_l2zLaMIWOqWSePvTSmt49GcuR8460ZR10' },
+    { name: 'Luxe Life', id: 'RDCLAK5uy_kumKEaPpcfaAOpnEdpjtp4jyLoiqZdRnU' }
 ];
