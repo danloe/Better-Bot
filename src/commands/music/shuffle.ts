@@ -11,27 +11,29 @@ export const command: Command = {
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
-    ) => new Promise<void>(async (done, error) => {
-        if (interaction) {
-            try {
-                await client.musicManager.shuffle(interaction);
-                await safeReply(
-                    interaction,
-                    createEmbed('Shuffled', '`✅ The Queue is no longer in OOOORDER.`', false)
-                );
-                done();
-            } catch (err) {
+    ) =>
+        new Promise<void>(async (done, error) => {
+            if (interaction) {
                 try {
-                    await safeReply(
-                        interaction,
-                        createErrorEmbed('🚩 Error shuffling the queue: `' + err + '`')
-                    );
-                } catch (err2) {
-                    console.log(err2);
+                    await client.musicManager.shuffle(interaction);
+
+                    if (interaction instanceof CommandInteraction) {
+                        await safeReply(
+                            interaction,
+                            createEmbed('Shuffled', '`✅ The Queue is no longer in OOOORDER.`', false)
+                        );
+                    }
+
+                    done();
+                } catch (err) {
+                    try {
+                        await safeReply(interaction, createErrorEmbed('🚩 Error shuffling the queue: `' + err + '`'));
+                    } catch (err2) {
+                        console.log(err2);
+                    }
+                    console.log(err);
+                    error(err);
                 }
-                console.log(err);
-                error(err);
             }
-        }
-    })
+        })
 };

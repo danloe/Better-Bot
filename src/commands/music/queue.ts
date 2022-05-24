@@ -13,6 +13,7 @@ import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 import { command as skip } from './skip';
 import { command as clear } from './clear';
 import { command as shuffle } from './shuffle';
+import { MusicSubscription, Queue } from '../../classes';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('queue').setDescription('Show the Queue.'),
@@ -29,71 +30,8 @@ export const command: Command = {
 
                     if (queue) {
                         let subscription = client.musicManager.subscriptions.get(interaction.guildId!);
-                        const message = queue.getQueueMessageEmbed(subscription);
 
-                        const collector = interaction.channel!.createMessageComponentCollector({
-                            componentType: 'BUTTON',
-                            time: 60000
-                        });
-
-                        collector.on('collect', async (button) => {
-                            try {
-                                await button.deferUpdate();
-                                if (button.user.id === interaction.user.id) {
-                                    switch (button.customId) {
-                                        case 'queue_previous':
-                                            if (queue.currentPage > 1) {
-                                                queue.currentPage--;
-                                                await safeReply(interaction, {
-                                                    embeds: [queue.getQueueMessageEmbed(subscription)],
-                                                    components: [queue.getQueueMessageRow()]
-                                                });
-                                            }
-                                            break;
-                                        case 'queue_skip':
-                                            await skip.run(client, button);
-                                            break;
-                                        case 'queue_clear':
-                                            await clear.run(client, button);
-                                            break;
-                                        case 'queue_shuffle':
-                                            await shuffle.run(client, button);
-                                            break;
-                                        case 'queue_next':
-                                            if (queue.currentPage < queue.totalPages) {
-                                                queue.currentPage++;
-                                                await safeReply(interaction, {
-                                                    embeds: [queue.getQueueMessageEmbed(subscription)],
-                                                    components: [queue.getQueueMessageRow()]
-                                                });
-                                            }
-                                            break;
-                                    }
-                                } else {
-                                    try {
-                                        await safeReply(
-                                            button,
-                                            createErrorEmbed("`⛔ These buttons aren't for you.`", true)
-                                        );
-                                    } catch (err) {
-                                        console.log(err);
-                                    }
-                                }
-                            } catch (err) {
-                                console.log(err);
-                            }
-                        });
-
-                        collector.on('end', async (_) => {
-                            try {
-                                await safeReply(interaction, {
-                                    embeds: [queue.getQueueMessageEmbed(subscription)],
-                                    components: []
-                                });
-                            } catch (err) {
-                                console.log(err);
-                            }
-                        });
+                        startCollector(client, interaction, subscription, queue);
 
                         await safeReply(interaction, {
                             embeds: [queue.getQueueMessageEmbed(subscription)],
@@ -113,3 +51,71 @@ export const command: Command = {
             }
         })
 };
+
+function startCollector(
+    client: BetterClient,
+    interaction: CommandInteraction | ButtonInteraction,
+    subscription: MusicSubscription,
+    queue: Queue
+) {
+    const collector = interaction.channel!.createMessageComponentCollector({
+        componentType: 'BUTTON',
+        time: 60000
+    });
+
+    collector.on('collect', async (button) => {
+        try {
+            await button.deferUpdate();
+            if (button.user.id === interaction.user.id) {
+                switch (button.customId) {
+                    case 'queue_previous':
+                        if (queue.currentPage > 1) {
+                            queue.currentPage--;
+                        }
+                        break;
+                    case 'queue_skip':
+                        await skip.run(client, button);
+                        break;
+                    case 'queue_clear':
+                        await clear.run(client, button);
+                        break;
+                    case 'queue_shuffle':
+                        await shuffle.run(client, button);
+                        break;
+                    case 'queue_next':
+                        if (queue.currentPage < queue.totalPages) {
+                            queue.currentPage++;
+                        }
+                        break;
+                }
+                await safeReply(interaction, {
+                    embeds: [queue.getQueueMessageEmbed(subscription)],
+                    components: [queue.getQueueMessageRow()]
+                });
+                collector.stop();
+                startCollector(client, interaction, subscription, queue);
+            } else {
+                try {
+                    await safeReply(button, createErrorEmbed("`⛔ These buttons aren't for you.`", true));
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    });
+
+    collector.on('end', async (_, reason) => {
+        if (reason === 'time') {
+            try {
+                await safeReply(interaction, {
+                    embeds: [queue.getQueueMessageEmbed(subscription)],
+                    components: []
+                });
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    });
+}
