@@ -157,10 +157,10 @@ export class MusicManager {
                     subscription.play();
                 }
 
-                if (type === TrackType.YouTube) {
-                    done(track!);
-                } else {
+                if (type === TrackType.YouTubePlaylist) {
                     done(playlist!);
+                } else {
+                    done(track!);
                 }
             } catch (err) {
                 error(err);
