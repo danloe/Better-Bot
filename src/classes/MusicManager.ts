@@ -7,7 +7,8 @@ import {
     getYouTubeTrack,
     safeReply,
     getYoutubePlaylistTracks,
-    getYoutubePlaylist
+    getYoutubePlaylist,
+    getLogoUrlfromUrl
 } from '../helpers';
 import { ButtonInteraction, CommandInteraction, GuildMember, Snowflake } from 'discord.js';
 import BetterClient from '../client';
@@ -22,7 +23,6 @@ import {
     StreamType,
     VoiceConnectionStatus
 } from '@discordjs/voice';
-import google from 'googlethis';
 import { Playlist } from '../interfaces';
 const discordTTS = require('discord-tts');
 //import discordTTS from 'discord-tts';
@@ -72,9 +72,7 @@ export class MusicManager {
                         break;
 
                     case TrackType.DirectFile:
-                        let domainName = input.match(/\w+(?=\.\w+\/)/gi)![0];
-                        let images = await google.image(domainName + ' logo | icon', { safe: false });
-                        const imageUrl = images[0].url;
+                        const imageUrl = await getLogoUrlfromUrl(input);
 
                         track = new Track(
                             TrackType.DirectFile,

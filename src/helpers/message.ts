@@ -1,6 +1,7 @@
 import { EmbedFooterData } from '@discordjs/builders';
 import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
 import { Track, TrackType } from '../classes';
+import google from 'googlethis';
 
 export function createEmbed(
     title: string,
@@ -159,5 +160,16 @@ export function getAnnouncementString(trackName: string): string {
     } else {
         i = Math.floor(Math.random() * postAnnouncements.length);
         return trackName + postAnnouncements[i];
+    }
+}
+
+export async function getLogoUrlfromUrl(url: string): Promise<string> {
+    try {
+        let domainName = url.match(/\w+(?=\.\w+\/)/gi)![0];
+        let images = await google.image(domainName + ' logo | icon', { safe: false });
+        return images[0].url;
+    } catch (error) {
+        console.log(error);
+        return '';
     }
 }
