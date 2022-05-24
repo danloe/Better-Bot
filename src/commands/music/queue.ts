@@ -31,10 +31,10 @@ export const command: Command = {
                     if (queue) {
                         let subscription = client.musicManager.subscriptions.get(interaction.guildId!);
 
-                        startCollector(client, interaction, subscription, queue);
+                        startCollector(client, interaction, subscription!, queue);
 
                         await safeReply(interaction, {
-                            embeds: [queue.getQueueMessageEmbed(subscription)],
+                            embeds: [queue.getQueueMessageEmbed(subscription!)],
                             components: [queue.getQueueMessageRow()]
                         });
                         done();
