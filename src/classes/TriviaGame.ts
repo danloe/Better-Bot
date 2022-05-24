@@ -39,8 +39,8 @@ export class TriviaGame extends GameLobby {
     readQuestions = false;
     questionRead = true;
 
-    public constructor(host: User, channel: TextBasedChannel, minPlayers: number, maxPlayers: number) {
-        super(GameType.Trivia, host, channel, minPlayers, maxPlayers);
+    public constructor(host: User, channel: TextBasedChannel, maxPlayers: number) {
+        super(GameType.Trivia, host, channel, 1, maxPlayers);
         this.name = 'Trivia';
         this.thumbnail = 'https://opentdb.com/images/logo-banner.png';
     }
@@ -147,7 +147,7 @@ export class TriviaGame extends GameLobby {
 
         let embedmsg = new MessageEmbed()
             .setColor('#403075')
-            .setTitle('Trivia')
+            .setTitle(this.name)
             .setDescription('Question: `' + this.question!.value + '`')
             .addField('Category:', this.question!.category, true)
             .addField('Difficulty:', this.question!.difficulty, true)
@@ -175,7 +175,7 @@ export class TriviaGame extends GameLobby {
     getAnswerMessage(): string | MessagePayload | WebhookEditMessageOptions {
         let embedmsg = new MessageEmbed()
             .setColor('#403075')
-            .setTitle('Trivia')
+            .setTitle(this.name)
             .setDescription(
                 'Question: `' + this.question!.value + '`\n' + 'Answer: `' + this.question!.correctAnswer + '`'
             );
@@ -225,7 +225,7 @@ export class TriviaGame extends GameLobby {
 
         let embedmsg = new MessageEmbed()
             .setColor('#403075')
-            .setTitle('Trivia')
+            .setTitle(this.name)
             .setDescription(winners)
             .setThumbnail(this.thumbnail);
 

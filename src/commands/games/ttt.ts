@@ -15,7 +15,7 @@ import { TTTGame, GameType, GameState } from '../../classes';
 export const command: Command = {
     data: new SlashCommandBuilder()
         .setName('tictactoe')
-        .setDescription('Start a game of tic tac toe.')
+        .setDescription('Start a game of Tic Tac Toe.')
         .addUserOption((option) =>
             option.setName('opponent').setDescription('Do you want to challenge a specific user?').setRequired(false)
         ),
@@ -376,7 +376,7 @@ export const command: Command = {
                     try {
                         await safeReply(
                             interaction,
-                            createErrorEmbed('🚩 Error creating a tic tac toe game: `' + err + '`')
+                            createErrorEmbed('🚩 Error creating a Tic Tac Toe game: `' + err + '`')
                         );
                     } catch (err2) {
                         console.log(err2);
