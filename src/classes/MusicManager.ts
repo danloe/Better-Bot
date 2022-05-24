@@ -24,8 +24,7 @@ import {
     VoiceConnectionStatus
 } from '@discordjs/voice';
 import { Playlist } from '../interfaces';
-const discordTTS = require('discord-tts');
-//import discordTTS from 'discord-tts';
+import discordTTS from 'discord-tts';
 
 export class MusicManager {
     client: BetterClient;

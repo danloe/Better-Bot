@@ -19,8 +19,7 @@ import { Track } from './Track';
 import { Queue } from './Queue';
 import { TextBasedChannel } from 'discord.js';
 import { getAnnouncementString } from '../helpers';
-const discordTTS = require('discord-tts');
-//import discordTTS from 'discord-tts';
+import discordTTS from 'discord-tts';
 
 const wait = promisify(setTimeout);
 
