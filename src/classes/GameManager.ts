@@ -35,7 +35,6 @@ export class GameManager {
                 this.games.set(host.id, lobby!);
                 done(lobby!);
             } catch (err) {
-                console.log(err);
                 error(err);
             }
         });

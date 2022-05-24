@@ -163,7 +163,6 @@ export class MusicManager {
                     done(playlist!);
                 }
             } catch (err) {
-                console.log(err);
                 error(err);
             }
         });
@@ -223,7 +222,6 @@ export class MusicManager {
                 subscription!.playVoice(audioResource);
                 done();
             } catch (err) {
-                console.log(err);
                 error(err);
             }
         });
@@ -243,7 +241,6 @@ export class MusicManager {
                 subscription!.audioPlayer.stop();
                 done();
             } catch (err) {
-                console.log(err);
                 error(err);
             }
         });
@@ -263,7 +260,6 @@ export class MusicManager {
                 subscription!.audioPlayer.pause();
                 done();
             } catch (err) {
-                console.log(err);
                 error(err);
             }
         });
@@ -312,7 +308,6 @@ export class MusicManager {
                 subscription.audioPlayer.unpause();
                 done();
             } catch (err) {
-                console.log(err);
                 error(err);
             }
         });
@@ -343,7 +338,6 @@ export class MusicManager {
                 subscription.audioPlayer.stop();
                 done(queue);
             } catch (err) {
-                console.log(err);
                 error(err);
             }
         });
@@ -370,7 +364,6 @@ export class MusicManager {
 
                 done();
             } catch (err) {
-                console.log(err);
                 error(err);
             }
         });
@@ -389,7 +382,6 @@ export class MusicManager {
 
                 done(queue);
             } catch (err) {
-                console.log(err);
                 error(err);
             }
         });
@@ -409,7 +401,6 @@ export class MusicManager {
                 queue.clear();
                 done();
             } catch (err) {
-                console.log(err);
                 error(err);
             }
         });
@@ -433,7 +424,6 @@ export class MusicManager {
                 queue.shuffle();
                 done();
             } catch (err) {
-                console.log(err);
                 error(err);
             }
         });
@@ -463,7 +453,6 @@ export class MusicManager {
                 queue.move(currentPos, targetPos);
                 done();
             } catch (err) {
-                console.log(err);
                 error(err);
             }
         });

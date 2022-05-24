@@ -59,7 +59,7 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
 
             resolve(track);
         } catch (error) {
-            reject(error);
+            reject('Could not load video. Check URL and privacy status or try again later.');
         }
     });
 }
@@ -99,12 +99,12 @@ export function getYoutubePlaylist(url: string, announce: boolean) {
                         };
                         resolve(playlist);
                     } catch (error) {
-                        reject(error);
+                        reject('Could not load playlist. Check URL and privacy status or try again later.');
                     }
                 });
             });
         } catch (error) {
-            reject(error);
+            reject('Could not load playlist. Please try again later.');
         }
     });
 }
