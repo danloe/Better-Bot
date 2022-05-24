@@ -198,8 +198,8 @@ export class MusicSubscription {
     public playVoice(resource: AudioResource) {
         if (this.audioPlayer.state.status === AudioPlayerStatus.Playing) {
             this.pausedForVoice = true;
+            this.nextVoiceResource = resource;
             this.audioPlayer.pause();
-            this.nextVoiceResource = JSON.parse(JSON.stringify(resource));
         } else {
             this.voiceConnection.subscribe(this.voicePlayer);
             this.voicePlayer.play(resource);
