@@ -80,6 +80,31 @@
   * Roast
   * Decide
   * Coin Flip
+    
+<details>
+  <summary>Screenshots</summary>
+      <table style="width: 250px;"  cellpadding="2">
+        <tbody>
+          <tr>
+          <td><img src="http://fayyn.bplaced.net/botterino/youtube.jpg" maxwidth alt="Botterino YouTube"></td>
+          <td><img src="http://fayyn.bplaced.net/botterino/trivia.jpg" maxwidth alt="Botterino Trivia"></td>
+          </tr>
+          <tr>
+          <td><img src="http://fayyn.bplaced.net/botterino/playlist.jpg" maxwidth alt="Botterino Playlist">
+            <img src="http://fayyn.bplaced.net/botterino/soundcloud.jpg" maxwidth alt="Botterino SoundCloud"></td>
+          <td><img src="http://fayyn.bplaced.net/botterino/queue.jpg" maxwidth alt="Botterino Queue"></td>
+          </tr>
+          <tr>
+          <td><img src="http://fayyn.bplaced.net/botterino/challenge.jpg" maxwidth alt="Botterino Challenge"></td>
+          <td><img src="http://fayyn.bplaced.net/botterino/fw.jpg" maxwidth alt="Botterino FourWins"></td>
+          </tr>
+          <tr>
+          <td><img src="http://fayyn.bplaced.net/botterino/about.jpg" maxwidth alt="Botterino About"></td>
+          <td><img src="http://fayyn.bplaced.net/botterino/ttt.jpg" maxwidth alt="Botterino TicTacToe"></td>
+          </tr>
+        </tbody>
+      </table>
+</details>
 
 <p align="right"><a href="#top">&uarr;</a></p>
 
