@@ -56,12 +56,12 @@ export class FindTheEmojiGame extends GameLobby {
             this.displayAnswer();
             return;
         }
-        tries--;
+        tries!--;
         if (tries == 0) {
             this.answerTries.delete(player);
             this.answerGiven.push(player);
         } else {
-            this.answerTries.set(player, tries);
+            this.answerTries.set(player, tries!);
         }
 
         if (this.answerTries.size == 0) {
