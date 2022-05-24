@@ -458,25 +458,6 @@ export class MusicManager {
         });
     }
 
-    /*
-    setVolume(interaction: CommandInteraction, volume: number) {
-        return new Promise(async (done, error) => {
-        volume = Math.min(Math.max(volume / 100 + 0.5, 0.5), 2);
-        this.config.stream.volume = volume;
-        if (this.dispatcher) {
-            this.dispatcher.setVolume(volume);
-        }
-    });
-    }
-
-    getVolume(interaction: CommandInteraction) {
-        return (this.config.stream.volume - 0.5) * 100 + '%';
-    }
-    */
-
-    /**
-     * Returns for subscription and queue if available
-     */
     getSubscriptionAndQueue(
         interaction: CommandInteraction | ButtonInteraction
     ): [MusicSubscription | undefined, Queue | undefined] {
