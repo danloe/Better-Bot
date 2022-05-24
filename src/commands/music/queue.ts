@@ -28,54 +28,8 @@ export const command: Command = {
                     const queue = await client.musicManager.getQueue(interaction);
 
                     if (queue) {
-                        let embedmsg = new MessageEmbed().setColor('#403075').setTitle('Queue');
-                        const row = new MessageActionRow().addComponents([
-                            new MessageButton()
-                                .setCustomId('queue_previous')
-                                .setLabel('⬅️')
-                                .setStyle('SECONDARY')
-                                .setDisabled(true),
-                            new MessageButton().setCustomId('queue_skip').setLabel('⏭️ Skip').setStyle('SECONDARY'),
-                            new MessageButton().setCustomId('queue_clear').setLabel('🚮 Clear').setStyle('DANGER'),
-                            new MessageButton()
-                                .setCustomId('queue_shuffle')
-                                .setLabel('🔀 Shuffle')
-                                .setStyle('SECONDARY'),
-                            new MessageButton()
-                                .setCustomId('queue_next')
-                                .setLabel('➡️')
-                                .setStyle('SECONDARY')
-                                .setDisabled(true)
-                        ]);
-
                         let subscription = client.musicManager.subscriptions.get(interaction.guildId!);
-                        if (subscription) {
-                            if (subscription.currentTrack) {
-                                embedmsg
-                                    .addField(
-                                        'Now playing:',
-                                        '`' +
-                                            subscription.currentTrack.name +
-                                            '`\n' +
-                                            subscription.currentTrack.requestor +
-                                            ' | ' +
-                                            subscription.currentTrack.displayUrl
-                                    )
-                                    .addField('\u200B', '**Tracks in queue:**')
-                                    .setThumbnail(subscription.currentTrack.artworkUrl);
-                            }
-                        }
-
-                        for (let i = 0; i < Math.min(queue.length, 10); i++) {
-                            embedmsg.addField(
-                                i + 1 + ': `' + queue[i].name + '`',
-                                queue[i].requestor + (queue[i].announce ? ' 📣' : '') + ' | ' + queue[i].displayUrl
-                            );
-                        }
-
-                        if (queue.length > 10) {
-                            embedmsg.addField('\u200B', '`' + String(queue.length - 10) + ' more Tracks in queue.`');
-                        }
+                        const message = queue.getQueueMessageEmbed(subscription);
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
@@ -84,10 +38,17 @@ export const command: Command = {
 
                         collector.on('collect', async (button) => {
                             try {
-                                await safeDeferReply(button);
+                                await button.deferUpdate();
                                 if (button.user.id === interaction.user.id) {
                                     switch (button.customId) {
                                         case 'queue_previous':
+                                            if (queue.currentPage > 1) {
+                                                queue.currentPage--;
+                                                await safeReply(interaction, {
+                                                    embeds: [queue.getQueueMessageEmbed(subscription)],
+                                                    components: [queue.getQueueMessageRow()]
+                                                });
+                                            }
                                             break;
                                         case 'queue_skip':
                                             await skip.run(client, button);
@@ -96,9 +57,16 @@ export const command: Command = {
                                             await clear.run(client, button);
                                             break;
                                         case 'queue_shuffle':
-                                            shuffle.run(client, button);
+                                            await shuffle.run(client, button);
                                             break;
                                         case 'queue_next':
+                                            if (queue.currentPage < queue.totalPages) {
+                                                queue.currentPage++;
+                                                await safeReply(interaction, {
+                                                    embeds: [queue.getQueueMessageEmbed(subscription)],
+                                                    components: [queue.getQueueMessageRow()]
+                                                });
+                                            }
                                             break;
                                     }
                                 } else {
@@ -116,10 +84,10 @@ export const command: Command = {
                             }
                         });
 
-                        collector.on('end', async (collection) => {
+                        collector.on('end', async (_) => {
                             try {
-                                await interaction.editReply({
-                                    embeds: [embedmsg],
+                                await safeReply(interaction, {
+                                    embeds: [queue.getQueueMessageEmbed(subscription)],
                                     components: []
                                 });
                             } catch (err) {
@@ -128,8 +96,8 @@ export const command: Command = {
                         });
 
                         await safeReply(interaction, {
-                            embeds: [embedmsg],
-                            components: [row]
+                            embeds: [queue.getQueueMessageEmbed(subscription)],
+                            components: [queue.getQueueMessageRow()]
                         });
                         done();
                     }

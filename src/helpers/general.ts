@@ -6,6 +6,11 @@ export async function safeReply(
     followup = false
 ) {
     try {
+        if (interaction instanceof ButtonInteraction) {
+            interaction.followUp(options);
+            return;
+        }
+
         if (followup) {
             if (interaction.replied) {
                 await interaction.followUp(options);

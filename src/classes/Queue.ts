@@ -1,6 +1,11 @@
+import { MessageActionRow, MessageButton, MessageEmbed, MessagePayload } from 'discord.js';
+import { MusicSubscription } from './MusicSubscription';
 import { Track } from './Track';
 
 export class Queue extends Array<Track> {
+    public currentPage: number = 1;
+    public totalPages: number = 1;
+
     get first(): Track {
         return this[0];
     }
@@ -11,11 +16,13 @@ export class Queue extends Array<Track> {
 
     queue(item: Track): void {
         this.push(item);
+        this.updateQueuePages();
     }
 
     next(item: Track): void {
         this.push(item);
         this.move(this.length - 1, 0);
+        this.updateQueuePages();
     }
 
     dequeue(item?: Track): Track {
@@ -24,9 +31,12 @@ export class Queue extends Array<Track> {
             if (idx > -1) {
                 this.splice(idx, 1);
             }
+            this.updateQueuePages();
             return item;
         } else {
-            return this.shift()!;
+            let i = this.shift()!;
+            this.updateQueuePages();
+            return i;
         }
     }
 
@@ -34,10 +44,12 @@ export class Queue extends Array<Track> {
         if (position > 0 && this.queue.length >= position) {
             this.splice(position - 1, amount);
         }
+        this.updateQueuePages();
     }
 
     clear() {
         this.length = 0;
+        this.updateQueuePages();
     }
 
     shuffle() {
@@ -59,5 +71,62 @@ export class Queue extends Array<Track> {
         if (key1 != key2) {
             this.splice(key2, 0, this.splice(key1, 1)[0]);
         }
+    }
+
+    getQueueMessageEmbed(subscription: MusicSubscription): MessageEmbed {
+        let embedmsg = new MessageEmbed().setColor('#403075').setTitle('Queue');
+
+        if (subscription) {
+            if (subscription.currentTrack) {
+                embedmsg
+                    .addField(
+                        'Now playing:',
+                        '`' +
+                            subscription.currentTrack.name +
+                            '`\n' +
+                            subscription.currentTrack.requestor +
+                            ' | ' +
+                            subscription.currentTrack.displayUrl
+                    )
+                    .addField('\u200B', '**Tracks in queue:**')
+                    .setThumbnail(subscription.currentTrack.artworkUrl);
+            }
+        }
+
+        for (let i = this.currentPage * 10 - 10; i < this.currentPage * 10; i++) {
+            if (i == this.length) break;
+            embedmsg.addField(
+                i + 1 + ': `' + this[i].name + '`',
+                this[i].requestor + (this[i].announce ? ' 📣' : '') + ' | ' + this[i].displayUrl
+            );
+        }
+
+        if (this.length > 10) {
+            embedmsg.addField('\u200B', '`' + String(this.length) + ' Tracks in total.`');
+        }
+        return embedmsg;
+    }
+
+    getQueueMessageRow(): MessageActionRow {
+        const row = new MessageActionRow().addComponents([
+            new MessageButton()
+                .setCustomId('queue_previous')
+                .setLabel('⬅️')
+                .setStyle('SECONDARY')
+                .setDisabled(this.currentPage <= 1),
+            new MessageButton().setCustomId('queue_skip').setLabel('⏭️ Skip').setStyle('SECONDARY'),
+            new MessageButton().setCustomId('queue_clear').setLabel('🚮 Clear').setStyle('DANGER'),
+            new MessageButton().setCustomId('queue_shuffle').setLabel('🔀 Shuffle').setStyle('SECONDARY'),
+            new MessageButton()
+                .setCustomId('queue_next')
+                .setLabel('➡️')
+                .setStyle('SECONDARY')
+                .setDisabled(this.currentPage >= this.totalPages)
+        ]);
+        return row;
+    }
+
+    private updateQueuePages() {
+        this.totalPages = Math.ceil(this.length / 10);
     }
 }
