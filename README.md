@@ -48,7 +48,7 @@
         <li><a href="#deploy-guild-slash-commands">Deploy guild slash commands</a></li>
         <li><a href="#deploy-application-slash-commands">Deploy application slash commands</a></li>
       </ul>
-    <li><a href="#todos">TODOs</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
   </ol>
 </details>
@@ -177,9 +177,9 @@ npm run deploy
 
 <p align="right"><a href="#top">&uarr;</a></p>
 
-## TODOs
+## Roadmap
 
-See all TODOs in the [Project](https://github.com/users/danloe/projects/1).
+Have a look at the [Project](https://github.com/users/danloe/projects/1).
 
 <p align="right"><a href="#top">&uarr;</a></p>
 
