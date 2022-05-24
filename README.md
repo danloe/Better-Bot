@@ -106,7 +106,7 @@ Follow these steps to get the bot up and running.
 ### Installation
 
 1. Clone or download this repo
-3. Install the required npm packages:
+3. Install the required npm packages
 >Run the following command in a terminal in the repo folder:
 ```sh
 npm install
@@ -120,7 +120,7 @@ GOOGLE_API_KEY="YOURKEY"
 6. Replace `YOURKEY` with your [Google API Key for YouTube Data API v3](https://console.cloud.google.com/marketplace/product/google/youtube.googleapis.com)[^googleapi] 
 [^googleapi]:required for playlist search; free for up to 10,000 searches per day
 
-6. Add the bot to your server via the [OAuth2 > URL Generator](https://discord.com/developers/applications). Select `bot` as scope and insert the permissions integer in the `GENERATED URL`.
+6. Add the bot to your server via the [OAuth2 > URL Generator](https://discord.com/developers/applications). Select `bot` as scope and insert the permissions integer in the `GENERATED URL`
 >Minimum [permissions integer](https://discordapi.com/permissions.html#294242221120):[^permissions]
 ```
 294242221120
