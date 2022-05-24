@@ -66,7 +66,7 @@
 * Autocomplete
   * YouTube search suggestions
 * TTS over voice connection
-  * Says any text, multiple languages supported
+  * Says any text :gb: :de: :netherlands: :fr: :es:
   * Announces music tracks
   * Reads questions in Trivia games
 * Multiplayer Games
