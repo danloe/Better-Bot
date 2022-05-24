@@ -18,6 +18,7 @@ import { promisify } from 'node:util';
 import { Track } from './Track';
 import { Queue } from './Queue';
 import { TextBasedChannel } from 'discord.js';
+import { getAnnouncementString } from '../helpers';
 const discordTTS = require('discord-tts');
 //import discordTTS from 'discord-tts';
 
@@ -254,45 +255,5 @@ export class MusicSubscription {
         } catch (err) {
             console.log(err);
         }
-    }
-}
-
-const announcements = [
-    'Next track is ',
-    'Next up, ',
-    'Now playing, ',
-    'Coming up next is ',
-    'Listen closely to ',
-    'Now coming, ',
-    'Shut up, here is ',
-    'Stop talking, this is ',
-    'Hey Listen',
-    "Rythm's not up, let me give you a hug. ",
-    "Rythm's gone, my time has come. ",
-    'Alright, Rythms lazy, listen to me baby. ',
-    "Rythm's not doing shit, let me play this hit. ",
-    'Hey Listen',
-    "Rhytm who? Nothing that I can't do! ",
-    "I don't wanna anounce this, I do it anyways. "
-];
-
-const postAnnouncements = [
-    ', listen closely.',
-    ", don't laugh.",
-    ', I love that.',
-    ', oh god not again.',
-    ', groovy!',
-    ', why do you do this?',
-    ", that's my jam!"
-];
-
-function getAnnouncementString(trackName: string): string {
-    let i = 0;
-    if (Math.random() > 0.4) {
-        i = Math.floor(Math.random() * announcements.length);
-        return announcements[i] + trackName;
-    } else {
-        i = Math.floor(Math.random() * postAnnouncements.length);
-        return trackName + postAnnouncements[i];
     }
 }
