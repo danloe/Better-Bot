@@ -116,7 +116,7 @@ npm install
 BOT_TOKEN="YOURTOKEN"
 GOOGLE_API_KEY="YOURKEY"
 ```
-5. Replace `YOURTOKEN` with your [Discord Bot Token](https://discord.com/developers/applications):
+5. Replace `YOURTOKEN` with your [Discord Bot Token](https://discord.com/developers/applications)
 6. Replace `YOURKEY` with your [Google API Key for YouTube Data API v3](https://console.cloud.google.com/marketplace/product/google/youtube.googleapis.com)[^googleapi] 
 [^googleapi]:required for playlist search; free for up to 10,000 searches per day
 
