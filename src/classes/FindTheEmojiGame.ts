@@ -107,6 +107,28 @@ export class FindTheEmojiGame extends GameLobby {
         }
     }
 
+    restartRound() {
+        if (this.round < this.rounds) {
+            this.emojiWanted = emoji.random();
+
+            this.emojiField = [];
+            for (let i = 0; i < 25; i++) {
+                this.emojiField.push(emoji.random().emoji);
+            }
+            this.emojiField[Math.floor(Math.random() * 25)] = this.emojiWanted.emoji;
+
+            this.players.forEach((player) => {
+                this.answerTries.set(player, this.tries);
+            });
+            this.answerGiven = [];
+            this.correctAnswer = null;
+            this.displaySearch();
+        } else {
+            this.state = GameState.Finished;
+            this.displayGameOver();
+        }
+    }
+
     getLobbyMessageEmbed(message: string) {
         let players = '';
         this.players.forEach((player) => {
@@ -157,6 +179,7 @@ export class FindTheEmojiGame extends GameLobby {
             .setColor('#DDD620')
             .setTitle(this.name)
             .setDescription('Search: ' + emojiString)
+            .addField('Round:', String(this.round) + ' of ' + String(this.rounds), true)
             .addField('Difficulty:', this.difficulty, true)
             .addField('Time:', String(this.emojiSearchTime / 1000) + ' seconds', true)
             .addField('Answer awaited:', requiredPlayers, false)
@@ -192,15 +215,16 @@ export class FindTheEmojiGame extends GameLobby {
     getAnswerMessage(): string | MessagePayload | WebhookEditMessageOptions {
         let correctUserString = '';
         if (this.correctAnswer) {
-            correctUserString = '<@' + this.correctAnswer.id + '>';
+            correctUserString = '<@' + this.correctAnswer.id + '> ➕1️⃣';
         } else {
-            correctUserString = '`No one found the emoji!`';
+            correctUserString = '`No one has found the emoji!`';
         }
 
         let embedmsg = new MessageEmbed()
             .setColor('#403075')
             .setTitle(this.name)
-            .setDescription('Emoji: ' + this.emojiWanted.emoji)
+            .setDescription('Emoji: ' + this.emojiWanted.emoji + ' `(' + this.emojiWanted.key + ')`')
+            .addField('Round:', String(this.round) + ' of ' + String(this.rounds), true)
             .addField('Fastest User', correctUserString, false);
 
         let row = new MessageActionRow();
@@ -254,7 +278,7 @@ export class FindTheEmojiGame extends GameLobby {
                 winners = winners + 'have won the game!';
             }
         } else {
-            winners = 'No one has scored. Everyone is a loser!';
+            winners = 'Nobody scored. Everyone is a loser!';
         }
 
         let embedmsg = new MessageEmbed()
