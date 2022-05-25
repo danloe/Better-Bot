@@ -60,6 +60,7 @@
   * YouTube
       * Search
       * Video & Playlist URL
+      * YouTube auto generated playlists
   * SoundCloud
   * Newgrounds
   * Spotify Playlists
