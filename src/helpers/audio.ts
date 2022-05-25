@@ -2,10 +2,17 @@ import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import { Track, InputType } from '../classes';
-import { getLogoUrlfromUrl, timeStringToDurationString as timeStringToSecondsNumber } from './message';
+import {
+    createEmbed,
+    getLoadingMessage,
+    getLogoUrlfromUrl,
+    timeStringToDurationString as timeStringToSecondsNumber
+} from './message';
 import { Playlist, PlaylistType } from '../interfaces';
 import BetterClient from '../client';
 import fetch from 'node-fetch';
+import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { safeDeferReply, safeReply } from './general';
 
 export function determineInputType(args: string): InputType {
     if (args.startsWith('http://') || args.startsWith('https://')) {
@@ -273,7 +280,7 @@ export function getSpotifyTrack(url: string, client: BetterClient, requestor: st
 export function getSpotifyPlaylistTracks(
     url: string,
     client: BetterClient,
-    requestor: string,
+    interaction: CommandInteraction | ButtonInteraction,
     announce: boolean,
     reverse: boolean,
     shuffle: boolean
@@ -300,7 +307,7 @@ export function getSpotifyPlaylistTracks(
             if (response!.error) reject('Playlist not found. Is it private?');
 
             let playlistTracks = response.tracks.items;
-
+            console.log(response);
             let playlist: Playlist = {
                 type: PlaylistType.Spotify,
                 name: response.name || 'Unknown',
@@ -310,24 +317,110 @@ export function getSpotifyPlaylistTracks(
                 announce: announce,
                 owner: response.owner.display_name || 'Unknown',
                 publishedAt: 'Unknown',
-                thumbnailUrl: response.images?.url || (await getLogoUrlfromUrl(response.external_urls.spotify))
+                thumbnailUrl: response.images[0]?.url || (await getLogoUrlfromUrl(response.external_urls.spotify))
             };
 
             let tracks: Track[] = [];
+            let stopLoop = false;
+            let abortLoop = false;
+            let embedmsg = new MessageEmbed()
+                .setColor('#1DB954')
+                .setTitle(playlist.name)
+                .setDescription(
+                    '`' +
+                        getLoadingMessage(tracks.length, playlistTracks.length) +
+                        ' ' +
+                        String(Math.floor((tracks.length / playlistTracks.length) * 100)) +
+                        '%`'
+                )
+                .setThumbnail(
+                    playlist.thumbnailUrl ||
+                        'https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg'
+                )
+                .addField('Description', playlist.description, false)
+                .addField('Owner', playlist.owner, true)
+                .addField('Videos', String(playlist.itemCount), true)
+                .addField('Published At', playlist.publishedAt, true);
+            embedmsg.footer = {
+                text: `Requested by ${interaction.user.username}` + (playlist.announce ? ' 📣' : ''),
+                iconURL: interaction.user.avatarURL() || undefined
+            };
+            const row = new MessageActionRow().addComponents([
+                new MessageButton().setCustomId('loading_stop').setLabel('Stop & Accept').setStyle('SECONDARY'),
+                new MessageButton().setCustomId('loading_abort').setLabel('Abort').setStyle('DANGER')
+            ]);
+
+            await safeReply(interaction, { embeds: [embedmsg], components: [row] });
+
+            let messageTrigger = setInterval(async () => {
+                embedmsg = new MessageEmbed()
+                    .setColor('#1DB954')
+                    .setTitle(playlist.name)
+                    .setDescription(
+                        '`' +
+                            getLoadingMessage(tracks.length, playlistTracks.length) +
+                            ' ' +
+                            String(Math.floor((tracks.length / playlistTracks.length) * 100)) +
+                            '%`'
+                    )
+                    .setThumbnail(
+                        playlist.thumbnailUrl ||
+                            'https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg'
+                    )
+                    .addField('Description', playlist.description, false)
+                    .addField('Owner', playlist.owner, true)
+                    .addField('Videos', String(playlist.itemCount), true)
+                    .addField('Published At', playlist.publishedAt, true);
+                embedmsg.footer = {
+                    text: `Requested by ${interaction.user.username}` + (playlist.announce ? ' 📣' : ''),
+                    iconURL: interaction.user.avatarURL() || undefined
+                };
+
+                const collector = interaction.channel!.createMessageComponentCollector({
+                    componentType: 'BUTTON',
+                    time: 3_000
+                });
+
+                collector.on('collect', async (button) => {
+                    try {
+                        clearInterval(messageTrigger);
+                        await safeDeferReply(button);
+                        if (button.customId === 'loading_stop') {
+                            stopLoop = true;
+                        } else if (button.customId === 'loading_abort') {
+                            abortLoop = true;
+                        }
+                        await safeReply(interaction, { embeds: [embedmsg], components: [] });
+                    } catch (err) {
+                        console.log(err);
+                    }
+                });
+
+                await safeReply(interaction, { embeds: [embedmsg], components: [row] });
+            }, 3_000);
+
             for (const track of playlistTracks) {
                 try {
                     tracks.push(
                         await getYouTubeTrack(
                             track.track.artists[0].name + ' ' + track.track.name,
-                            requestor,
+                            interaction.user.id,
                             announce,
                             InputType.SpotifyPlaylist
                         )
                     );
+                    if (stopLoop) break;
+                    if (abortLoop) {
+                        reject('Loading Spotify Playlist was aborted.');
+                        return;
+                    }
                 } catch (error) {
                     continue;
                 }
             }
+
+            clearInterval(messageTrigger);
+            await safeReply(interaction, { embeds: [embedmsg], components: [] });
 
             if (shuffle) {
                 let currentIndex = tracks.length;
