@@ -197,7 +197,7 @@ export class MusicSubscription {
      */
     public stop() {
         this.autoplay = false;
-        this.audioPlayer.stop(true);
+        this.voiceConnection.destroy();
     }
 
     /**
