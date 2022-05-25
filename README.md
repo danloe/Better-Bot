@@ -62,6 +62,7 @@
       * Video & Playlist URL
   * SoundCloud
   * Newgrounds
+  * Spotify Playlists
   * Direct Link To File
 * Autocomplete
   * YouTube search suggestions
@@ -73,6 +74,7 @@
   * Tic Tac Toe
   * Four Wins
   * Trivia
+  * Find The Emoji
 * Administrator Role Commands
   * Delete Messages
 * General & Fun Commands
@@ -131,21 +133,30 @@ Follow these steps to get the bot up and running.
 ### Installation
 
 1. Clone or download this repo
-3. Install the required npm packages
+
+2. Install the required npm packages
 >Run the following command in a terminal in the repo folder:
 ```sh
 npm install
 ```
-4. Create a file named `.env` in the root directory and add the following lines
+
+3. Create a file named `.env` in the root directory and add the following lines
 ```sh
 BOT_TOKEN="YOURTOKEN"
 GOOGLE_API_KEY="YOURKEY"
+SPOTIFY_CLIENT_ID="YOURCLIENTID"
+SPOTIFY_CLIENT_SECRET="YOURCLIENTSECRET"
 ```
-5. Replace `YOURTOKEN` with your [Discord Bot Token](https://discord.com/developers/applications)
-6. Replace `YOURKEY` with your [Google API Key for YouTube Data API v3](https://console.cloud.google.com/marketplace/product/google/youtube.googleapis.com)[^googleapi] 
+
+4. Replace `YOURTOKEN` with your [Discord Bot Token](https://discord.com/developers/applications)
+
+5. *(optional)* Replace `YOURKEY` with your [Google API Key for YouTube Data API v3](https://console.cloud.google.com/marketplace/product/google/youtube.googleapis.com)[^googleapi] 
 [^googleapi]:required for playlist search; free for up to 10,000 searches per day
 
-6. Add the bot to your server via the [OAuth2 > URL Generator](https://discord.com/developers/applications). Select `bot` as scope and insert the permissions integer in the `GENERATED URL`
+6. *(optional)* Replace `YOURCLIENTID` and `YOURCLIENTSECRET` with your [Spotify API Credentials](https://developer.spotify.com/dashboard/)[^spotifyapi]
+[^spotifyapi]:required to search spotify playlists; free of charge for appropriate use    
+
+7. Add the bot to your server via the [OAuth2 > URL Generator](https://discord.com/developers/applications). Select `bot` as scope and insert the permissions integer in the `GENERATED URL`
 >Minimum [permissions integer](https://discordapi.com/permissions.html#294242221120):[^permissions]
 ```
 294242221120
