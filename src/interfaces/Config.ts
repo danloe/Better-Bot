@@ -1,6 +1,8 @@
 export interface Config {
     prefix: string;
-    activity: string;
+    activityName: string;
+    activityType: string;
+    status: string;
     bitrate: string;
     volume: number;
 }

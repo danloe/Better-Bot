@@ -1,6 +1,8 @@
 {
     "prefix": ">",
-    "activity": "",
+    "activityName": "🦄",
+    "activityType": "WATCHING",
+    "status": "dnd",
     "bitrate": "auto",
     "volume": 1
 }
