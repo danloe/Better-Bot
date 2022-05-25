@@ -206,3 +206,33 @@ export async function getLogoUrlfromUrl(url: string): Promise<string> {
         return '';
     }
 }
+
+export function getLoadingMessage(actual: number, total: number, size = 16): string {
+    let p = Math.floor((actual / total) * 100);
+    let style = '⣀⣄⣤⣦⣶⣷⣿'; // '⣀⣄⣤⣦⣶⣷⣿' '▁▂▃▄▅▆▇█'
+    var full: number,
+        m: string,
+        middle: number,
+        rest: number,
+        x: number,
+        full_symbol = style[style.length - 1],
+        barStyleIndex = style.length - 1,
+        bar: string = '';
+    if (p == 100) return repeatString(full_symbol, size);
+    p = p / 100;
+    x = p * size;
+    full = Math.floor(x);
+
+    rest = x - full;
+    middle = Math.floor(rest * barStyleIndex);
+    m = style[middle];
+
+    bar = repeatString(full_symbol, full) + m + repeatString(style[0], size - full - 1);
+    return bar;
+}
+
+function repeatString(string: string, amount: number) {
+    var s = '';
+    for (var j = 0; j < amount; j++) s += string;
+    return s;
+}

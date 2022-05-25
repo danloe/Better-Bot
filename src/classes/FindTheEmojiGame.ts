@@ -47,7 +47,7 @@ export class FindTheEmojiGame extends GameLobby {
             return;
         }
         let tries = this.answerTries.get(player);
-        if (tries > 0) {
+        if (tries && tries > 0) {
             if (this.emojiField[index] === this.emojiWanted.emoji) {
                 this.answeredCorrectly = player;
                 let playerScore = this.score.get(player);
