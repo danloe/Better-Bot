@@ -2,7 +2,6 @@ import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import { Track, InputType } from '../classes';
-import https from 'node:https';
 import { getLogoUrlfromUrl, timeStringToDurationString as timeStringToSecondsNumber } from './message';
 import { Playlist, PlaylistType } from '../interfaces';
 import BetterClient from '../client';
@@ -13,10 +12,8 @@ export function determineInputType(args: string): InputType {
         // URL, get type
         if (isYouTubeURL(args)) {
             if (args.includes('playlist?list=')) {
-                // YouTube Playlist
                 return InputType.YouTubePlaylist;
             } else {
-                // YouTube video
                 return InputType.YouTube;
             }
         }
@@ -31,7 +28,12 @@ export function determineInputType(args: string): InputType {
     }
 }
 
-export function getYouTubeTrack(query: string, requestor: string, announce: boolean, inputType: InputType = InputType.YouTube) {
+export function getYouTubeTrack(
+    query: string,
+    requestor: string,
+    announce: boolean,
+    inputType: InputType = InputType.YouTube
+) {
     return new Promise<Track>(async (resolve, reject) => {
         try {
             if (!query.startsWith('http://') && !query.startsWith('https://')) {
@@ -78,42 +80,33 @@ export function getYoutubePlaylist(url: string, announce: boolean) {
             const apiKey = '&key=' + process.env.GOOGLE_API_KEY;
             const requestUrl = apiUrl + playlistId + apiKey;
 
-            https.get(requestUrl, (res: any) => {
-                let rawData: any = '';
-
-                res.on('data', (chunk: any) => {
-                    rawData += chunk;
-                });
-
-                res.on('end', async () => {
-                    try {
-                        let playlistItem = JSON.parse(rawData).items![0];
-                        let playlist: Playlist;
-
-                        let snippet = playlistItem.snippet;
-
-                        playlist = {
-                            type: PlaylistType.YouTube,
-                            name: snippet.title,
-                            itemCount: playlistItem.contentDetails.itemCount,
-                            url: 'https://youtube.com/playlist?list=' + playlistItem.id,
-                            description: snippet.description,
-                            publishedAt: snippet.publishedAt,
-                            owner: snippet.channelTitle,
-                            thumbnailUrl: snippet.thumbnails?.default?.url
-                                ? snippet.thumbnails.default.url
-                                : await getLogoUrlfromUrl('https://youtube.com/'),
-                            announce: announce
-                        };
-                        resolve(playlist);
-                    } catch (error) {
-                        console.log(error);
-                        reject('Could not load playlist. Check URL and privacy status or try again later.');
-                    }
-                });
+            let response: any = await fetch(requestUrl, {
+                method: 'GET'
             });
+            response = await response.json();
+            if (response!.error) reject('Playlist not found. Is it private?');
+
+            let playlistItem = response.items![0];
+            let playlist: Playlist;
+            let snippet = playlistItem.snippet;
+
+            playlist = {
+                type: PlaylistType.YouTube,
+                name: snippet.title,
+                itemCount: playlistItem.contentDetails.itemCount,
+                url: 'https://youtube.com/playlist?list=' + playlistItem.id,
+                description: snippet.description,
+                publishedAt: snippet.publishedAt,
+                owner: snippet.channelTitle,
+                thumbnailUrl: snippet.thumbnails?.default?.url
+                    ? snippet.thumbnails.default.url
+                    : await getLogoUrlfromUrl('https://youtube.com/'),
+                announce: announce
+            };
+            resolve(playlist);
         } catch (error) {
-            reject('Could not load playlist. Please try again later.');
+            console.log(error);
+            reject('Could not load playlist. Check URL and privacy status or try again later.');
         }
     });
 }
@@ -134,59 +127,48 @@ export function getYoutubePlaylistTracks(
             const apiKey = '&key=' + process.env.GOOGLE_API_KEY;
             const requestUrl = apiUrl + apiMaxResults + playlistId + apiKey;
 
-            https.get(requestUrl, (res: any) => {
-                let rawData: any = '';
+            let response: any = await fetch(requestUrl, {
+                method: 'GET'
+            });
+            response = await response.json();
+            if (response!.error) reject('Playlist Tracks not found. Are they private?');
 
-                res.on('data', (chunk: any) => {
-                    rawData += chunk;
-                });
+            let videos = response.items;
+            let tracks: Track[] = [];
 
-                res.on('end', () => {
-                    try {
-                        let videos = JSON.parse(rawData).items;
-                        let tracks: Track[] = [];
+            videos.forEach((video: any) => {
+                let snippet = video.snippet;
+                tracks.push(
+                    new Track(
+                        InputType.YouTubePlaylist,
+                        InputType.YouTube,
+                        'https://youtu.be/' + snippet.resourceId.videoId,
+                        snippet.title,
+                        requestor,
+                        announce,
+                        'https://youtu.be/' + snippet.resourceId.videoId,
+                        0,
+                        snippet.thumbnails.default.url,
+                        snippet.description,
+                        '',
+                        snippet.publishedAt
+                    )
+                );
 
-                        videos.forEach((video: any) => {
-                            let snippet = video.snippet;
-                            tracks.push(
-                                new Track(
-                                    InputType.YouTubePlaylist,
-                                    InputType.YouTube,
-                                    'https://youtu.be/' + snippet.resourceId.videoId,
-                                    snippet.title,
-                                    requestor,
-                                    announce,
-                                    'https://youtu.be/' + snippet.resourceId.videoId,
-                                    0,
-                                    snippet.thumbnails.default.url,
-                                    snippet.description,
-                                    '',
-                                    snippet.publishedAt
-                                )
-                            );
-                        });
+                if (shuffle) {
+                    let currentIndex = tracks.length;
+                    let randomIndex = 0;
 
-                        if (shuffle) {
-                            let currentIndex = tracks.length;
-                            let randomIndex = 0;
-
-                            while (currentIndex != 0) {
-                                randomIndex = Math.floor(Math.random() * currentIndex);
-                                currentIndex--;
-                                [tracks[currentIndex], tracks[randomIndex]] = [
-                                    tracks[randomIndex],
-                                    tracks[currentIndex]
-                                ];
-                            }
-                        } else if (reverse) {
-                            tracks = tracks.reverse();
-                        }
-
-                        resolve(tracks);
-                    } catch (error) {
-                        reject(error);
+                    while (currentIndex != 0) {
+                        randomIndex = Math.floor(Math.random() * currentIndex);
+                        currentIndex--;
+                        [tracks[currentIndex], tracks[randomIndex]] = [tracks[randomIndex], tracks[currentIndex]];
                     }
-                });
+                } else if (reverse) {
+                    tracks = tracks.reverse();
+                }
+
+                resolve(tracks);
             });
         } catch (error) {
             reject(error);
@@ -221,42 +203,37 @@ export function getSoundCloudTrack(url: string, requestor: string, announce: boo
 }
 
 export function getNewgroundsTrack(url: string, requestor: string, announce: boolean) {
-    return new Promise<Track>((resolve, reject) => {
-        //send http request
-        https.get(url, (res: any) => {
-            let body: any;
-
-            res.on('data', (chunk: any) => {
-                body += chunk;
-            });
-
-            res.on('end', () => {
-                try {
-                    //regex pattern for the https result
-                    const pattern = /(?:"params":)(.*)(?:,"portal_item_requirements":)/;
-                    let m;
-                    m = pattern.exec(body);
-                    //regex matching group 1 to json
-                    let info = JSON.parse(m![1]);
-
-                    const track = new Track(
-                        InputType.Newgrounds,
-                        InputType.Newgrounds,
-                        info.filename,
-                        `${info.artist} - ${decodeURIComponent(info.name)}`,
-                        requestor,
-                        announce,
-                        url,
-                        info.duration,
-                        info.icon
-                    );
-
-                    resolve(track);
-                } catch (error) {
-                    reject(error);
-                }
-            });
+    return new Promise<Track>(async (resolve, reject) => {
+        let response: any = await fetch(url, {
+            method: 'GET'
         });
+        response = await response.json();
+        if (response!.error) reject('Track not found. Is it private?');
+
+        try {
+            //regex pattern for the https result
+            const pattern = /(?:"params":)(.*)(?:,"portal_item_requirements":)/;
+            let m;
+            m = pattern.exec(response);
+            //regex matching group 1 to json
+            let info = JSON.parse(m![1]);
+
+            const track = new Track(
+                InputType.Newgrounds,
+                InputType.Newgrounds,
+                info.filename,
+                `${info.artist} - ${decodeURIComponent(info.name)}`,
+                requestor,
+                announce,
+                url,
+                info.duration,
+                info.icon
+            );
+
+            resolve(track);
+        } catch (error) {
+            reject(error);
+        }
     });
 }
 
@@ -279,7 +256,12 @@ export function getSpotifyTrack(url: string, client: BetterClient, requestor: st
             });
             response = await response.json();
             if (response!.error) reject('Track not found. Is it available in our market?');
-            const track = await getYouTubeTrack(response.artists[0].name + ' ' + response.name, requestor, announce, InputType.SpotifyTrack);
+            const track = await getYouTubeTrack(
+                response.artists[0].name + ' ' + response.name,
+                requestor,
+                announce,
+                InputType.SpotifyTrack
+            );
             resolve(track);
         } catch (error) {
             reject(error);
@@ -334,7 +316,12 @@ export function getSpotifyPlaylistTracks(
             let tracks: Track[] = [];
             for (const track of playlistTracks) {
                 tracks.push(
-                    await getYouTubeTrack(track.track.artists[0].name + ' ' + track.track.name, requestor, announce, InputType.SpotifyPlaylist)
+                    await getYouTubeTrack(
+                        track.track.artists[0].name + ' ' + track.track.name,
+                        requestor,
+                        announce,
+                        InputType.SpotifyPlaylist
+                    )
                 );
             }
 

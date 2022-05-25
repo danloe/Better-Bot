@@ -17,32 +17,28 @@ class BetterClient extends Client {
     public SpotifyAuthorizationTimeout: Date = new Date();
 
     public async init() {
-        try {
-            discordModals(this);
-            this.login(process.env.BOT_TOKEN);
-            //connect(process.env.MONGO_URI);
+        discordModals(this);
+        this.login(process.env.BOT_TOKEN);
+        //connect(process.env.MONGO_URI);
 
-            // Commands
-            const commandPath = path.join(__dirname, '..', 'commands');
-            readdirSync(commandPath).forEach((dir) => {
-                const commands = readdirSync(`${commandPath}\\${dir}`).filter((file) => file.endsWith('.ts'));
+        // Commands
+        const commandPath = path.join(__dirname, '..', 'commands');
+        readdirSync(commandPath).forEach((dir) => {
+            const commands = readdirSync(`${commandPath}\\${dir}`).filter((file) => file.endsWith('.ts'));
 
-                for (const file of commands) {
-                    const { command } = require(`${commandPath}\\${dir}\\${file}`);
-                    this.commands.set(command.data.name, command);
-                }
-            });
+            for (const file of commands) {
+                const { command } = require(`${commandPath}\\${dir}\\${file}`);
+                this.commands.set(command.data.name, command);
+            }
+        });
 
-            // Events
-            const eventPath = path.join(__dirname, '..', 'events');
-            readdirSync(eventPath).forEach(async (file) => {
-                const { event } = await import(`${eventPath}/${file}`);
-                this.events.set(event.name, event);
-                this.on(event.name, event.run.bind(null, this));
-            });
-        } catch (err) {
-            console.log(err);
-        }
+        // Events
+        const eventPath = path.join(__dirname, '..', 'events');
+        readdirSync(eventPath).forEach(async (file) => {
+            const { event } = await import(`${eventPath}/${file}`);
+            this.events.set(event.name, event);
+            this.on(event.name, event.run.bind(null, this));
+        });
     }
 }
 
