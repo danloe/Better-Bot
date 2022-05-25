@@ -8,13 +8,14 @@ import {
     safeReply,
     getYoutubePlaylistTracks,
     getYoutubePlaylist,
-    getLogoUrlfromUrl
+    getLogoUrlfromUrl,
+    getSpotifyPlaylistTracks
 } from '../helpers';
 import { ButtonInteraction, CommandInteraction, GuildMember, Snowflake } from 'discord.js';
 import BetterClient from '../client';
 import { MusicSubscription } from './MusicSubscription';
 import { Queue } from './Queue';
-import { Track, TrackType } from './Track';
+import { Track, InputType } from './Track';
 import {
     createAudioResource,
     DiscordGatewayAdapterCreator,
@@ -24,7 +25,8 @@ import {
     VoiceConnectionStatus
 } from '@discordjs/voice';
 import { Playlist } from '../interfaces';
-import discordTTS from 'discord-tts';
+//import discordTTS from 'discord-tts';
+const discordTTS = require('discord-tts');
 
 export class MusicManager {
     client: BetterClient;
@@ -40,41 +42,61 @@ export class MusicManager {
         input: string,
         announce: boolean,
         skip: boolean,
-        next: boolean
+        next: boolean,
+        reverse: boolean,
+        shuffle: boolean
     ) {
         return new Promise<Track | Playlist>(async (done, error) => {
             try {
                 await safeDeferReply(interaction);
                 let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
 
-                let type = determineInputType(input);
+                let inputType = determineInputType(input);
                 let track: Track;
                 let tracks: Track[] = [];
-                let playlist: Playlist;
+                let playlist: Playlist | null = null;
 
-                switch (type) {
-                    case TrackType.YouTube:
+                switch (inputType) {
+                    case InputType.YouTube:
                         track = await getYouTubeTrack(input, interaction.user.username, announce);
                         break;
 
-                    case TrackType.YouTubePlaylist:
+                    case InputType.YouTubePlaylist:
                         playlist = await getYoutubePlaylist(input, announce);
-                        tracks = await getYoutubePlaylistTracks(input, 50, interaction.user.username, announce);
+                        tracks = await getYoutubePlaylistTracks(
+                            input,
+                            50,
+                            interaction.user.username,
+                            announce,
+                            reverse,
+                            shuffle
+                        );
                         break;
 
-                    case TrackType.SoundCloud:
+                    case InputType.SoundCloud:
                         track = await getSoundCloudTrack(input, interaction.user.username, announce);
                         break;
 
-                    case TrackType.Newgrounds:
+                    case InputType.Newgrounds:
                         track = await getNewgroundsTrack(input, interaction.user.username, announce);
                         break;
 
-                    case TrackType.DirectFile:
+                    case InputType.SpotifyPlaylist:
+                        [playlist, tracks] = await getSpotifyPlaylistTracks(
+                            input,
+                            this.client,
+                            interaction.user.username,
+                            announce,
+                            reverse,
+                            shuffle
+                        );
+                        break;
+
+                    case InputType.DirectFile:
                         const imageUrl = await getLogoUrlfromUrl(input);
 
                         track = new Track(
-                            TrackType.DirectFile,
+                            InputType.DirectFile,
                             input,
                             'Unknown File',
                             interaction.user.username,
@@ -132,7 +154,7 @@ export class MusicManager {
                             '🚩 Could not join a voice channel: `You must first join a voice channel for me to follow you. ➡️ Then try the resume command.`'
                         )
                     );
-                    if (type === TrackType.YouTubePlaylist) {
+                    if (playlist) {
                         done(playlist!);
                     } else {
                         done(track!);
@@ -154,7 +176,7 @@ export class MusicManager {
                     subscription.play();
                 }
 
-                if (type === TrackType.YouTubePlaylist) {
+                if (playlist) {
                     done(playlist!);
                 } else {
                     done(track!);

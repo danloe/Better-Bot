@@ -1,6 +1,6 @@
 import { EmbedFooterData } from '@discordjs/builders';
 import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
-import { Track, TrackType } from '../classes';
+import { Track, InputType } from '../classes';
 import google from 'googlethis';
 
 export function createEmbed(
@@ -35,15 +35,15 @@ export function createErrorEmbed(message: string, ephemeral: boolean = true) {
     };
 }
 
-export function getTrackTypeColor(trackType: TrackType): ColorResolvable {
+export function getTrackTypeColor(trackType: InputType): ColorResolvable {
     switch (trackType) {
-        case TrackType.DirectFile:
+        case InputType.DirectFile:
             return '#999999';
-        case TrackType.YouTube:
+        case InputType.YouTube:
             return '#ff0000';
-        case TrackType.SoundCloud:
+        case InputType.SoundCloud:
             return '#ff5500';
-        case TrackType.Newgrounds:
+        case InputType.Newgrounds:
             return '#fda238';
         default:
             return '#ffffff';
@@ -52,13 +52,13 @@ export function getTrackTypeColor(trackType: TrackType): ColorResolvable {
 
 export function getTrackTypeString(track: Track): string {
     switch (track.type) {
-        case TrackType.DirectFile:
+        case InputType.DirectFile:
             return track.url.match(/\w+(?=\.\w+\/)\.\w+/gi)![0];
-        case TrackType.YouTube:
+        case InputType.YouTube:
             return 'YouTube';
-        case TrackType.SoundCloud:
+        case InputType.SoundCloud:
             return 'SoundCloud';
-        case TrackType.Newgrounds:
+        case InputType.Newgrounds:
             return 'Newgrounds';
         default:
             return 'Unknown';

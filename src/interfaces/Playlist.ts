@@ -4,7 +4,7 @@ export interface Playlist {
     announce: boolean;
     description: string;
     thumbnailUrl: string;
-    channelTitle: string;
+    owner: string;
     publishedAt: string;
     itemCount: number;
 }

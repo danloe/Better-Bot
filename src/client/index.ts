@@ -13,6 +13,8 @@ class BetterClient extends Client {
     public config: Config = ConfigJson;
     public musicManager: MusicManager = new MusicManager(this);
     public gameManager: GameManager = new GameManager(this);
+    public SpotifyAuthorization: string = '';
+    public SpotifyAuthorizationTimeout: Date = new Date();
 
     public async init() {
         try {
