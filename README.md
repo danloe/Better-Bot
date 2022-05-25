@@ -140,7 +140,8 @@ Follow these steps to get the bot up and running.
 npm install
 ```
 
-3. Create a file named `.env` in the root directory and add the following lines
+3. Create a file named `.env` in the root directory
+>Add the following lines:
 ```sh
 BOT_TOKEN="YOURTOKEN"
 GOOGLE_API_KEY="YOURKEY"
