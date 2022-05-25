@@ -88,7 +88,7 @@ export class MusicManager {
                         [playlist, tracks] = await getSpotifyPlaylistTracks(
                             input,
                             this.client,
-                            interaction.user.username,
+                            interaction,
                             announce,
                             reverse,
                             shuffle
