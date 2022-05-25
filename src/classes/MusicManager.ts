@@ -9,7 +9,8 @@ import {
     getYoutubePlaylistTracks,
     getYoutubePlaylist,
     getLogoUrlfromUrl,
-    getSpotifyPlaylistTracks
+    getSpotifyPlaylistTracks,
+    getSpotifyTrack
 } from '../helpers';
 import { ButtonInteraction, CommandInteraction, GuildMember, Snowflake } from 'discord.js';
 import BetterClient from '../client';
@@ -81,6 +82,10 @@ export class MusicManager {
                         track = await getNewgroundsTrack(input, interaction.user.username, announce);
                         break;
 
+                    case InputType.SpotifyTrack:
+                        track = await getSpotifyTrack(input, this.client, interaction.user.username, announce);
+                        break;
+
                     case InputType.SpotifyPlaylist:
                         [playlist, tracks] = await getSpotifyPlaylistTracks(
                             input,
@@ -96,6 +101,7 @@ export class MusicManager {
                         const imageUrl = await getLogoUrlfromUrl(input);
 
                         track = new Track(
+                            InputType.DirectFile,
                             InputType.DirectFile,
                             input,
                             'Unknown File',

@@ -7,9 +7,10 @@ import {
     createEmbed,
     createErrorEmbed,
     getTrackTypeColor,
-    getTrackTypeString as getTrackSourceString,
+    getTrackSourceString as getTrackSourceString,
     safeReply,
-    secondsToDurationString
+    secondsToDurationString,
+    getTrackTypeString
 } from '../../helpers';
 import { Track, InputType } from '../../classes';
 
@@ -103,10 +104,11 @@ export const command: Command = {
                                 result.name,
                                 addedText,
                                 false,
-                                getTrackTypeColor(result.type),
+                                getTrackTypeColor(result.inputType),
                                 [
                                     { name: 'Description', value: getPrettyEmbedString(result.description) },
-                                    { name: 'Source', value: getTrackSourceString(result), inline: true },
+                                    { name: 'Track Source', value: getTrackTypeString(result), inline: true },
+                                    { name: 'Audio Source', value: getTrackSourceString(result), inline: true },
                                     { name: 'Duration', value: secondsToDurationString(result.duration), inline: true },
                                     { name: 'Uploaded', value: getPrettyEmbedString(result.uploaded), inline: true }
                                 ],
@@ -142,7 +144,11 @@ export const command: Command = {
                                 result.name,
                                 addedText,
                                 false,
-                                getTrackTypeColor(result.type === PlaylistType.YouTube ? InputType.YouTubePlaylist : InputType.SpotifyPlaylist),
+                                getTrackTypeColor(
+                                    result.type === PlaylistType.YouTube
+                                        ? InputType.YouTubePlaylist
+                                        : InputType.SpotifyPlaylist
+                                ),
                                 [
                                     { name: 'Description', value: getPrettyEmbedString(result.description) },
                                     { name: 'Owner', value: getPrettyEmbedString(result.owner), inline: true },

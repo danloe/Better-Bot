@@ -22,6 +22,7 @@ export function determineInputType(args: string): InputType {
         }
         if (isSoundCloudURL(args)) return InputType.SoundCloud;
         if (isNewgroundsURL(args)) return InputType.Newgrounds;
+        if (isSpotifyTrackURL(args)) return InputType.SpotifyTrack;
         if (isSpotifyPlaylistURL(args)) return InputType.SpotifyPlaylist;
         return InputType.DirectFile;
     } else {
@@ -30,7 +31,7 @@ export function determineInputType(args: string): InputType {
     }
 }
 
-export function getYouTubeTrack(query: string, requestor: string, announce: boolean) {
+export function getYouTubeTrack(query: string, requestor: string, announce: boolean, inputType: InputType = InputType.YouTube) {
     return new Promise<Track>(async (resolve, reject) => {
         try {
             if (!query.startsWith('http://') && !query.startsWith('https://')) {
@@ -47,6 +48,7 @@ export function getYouTubeTrack(query: string, requestor: string, announce: bool
             let info = await ytdl.getInfo(query);
 
             const track = new Track(
+                inputType,
                 InputType.YouTube,
                 info.videoDetails.video_url,
                 info.videoDetails.title,
@@ -148,6 +150,7 @@ export function getYoutubePlaylistTracks(
                             let snippet = video.snippet;
                             tracks.push(
                                 new Track(
+                                    InputType.YouTubePlaylist,
                                     InputType.YouTube,
                                     'https://youtu.be/' + snippet.resourceId.videoId,
                                     snippet.title,
@@ -197,6 +200,7 @@ export function getSoundCloudTrack(url: string, requestor: string, announce: boo
             let info: any = await scdl.getInfo(url);
             const track = new Track(
                 InputType.SoundCloud,
+                InputType.SoundCloud,
                 info.uri,
                 info.title,
                 requestor,
@@ -237,6 +241,7 @@ export function getNewgroundsTrack(url: string, requestor: string, announce: boo
 
                     const track = new Track(
                         InputType.Newgrounds,
+                        InputType.Newgrounds,
                         info.filename,
                         `${info.artist} - ${decodeURIComponent(info.name)}`,
                         requestor,
@@ -252,6 +257,33 @@ export function getNewgroundsTrack(url: string, requestor: string, announce: boo
                 }
             });
         });
+    });
+}
+
+export function getSpotifyTrack(url: string, client: BetterClient, requestor: string, announce: boolean) {
+    return new Promise<Track>(async (resolve, reject) => {
+        try {
+            if (client.SpotifyAuthorization == '' || client.SpotifyAuthorizationTimeout < new Date()) {
+                await getSpotifyAuthorizationToken(client, reject);
+            }
+
+            const apiUrl = 'https://api.spotify.com/v1/tracks/';
+            const playlistId = url.match(/(?<=track\/)([a-zA-Z0-9-_]+)?/)![0];
+            const requestUrl = apiUrl + playlistId;
+
+            let response: any = await fetch(requestUrl, {
+                method: 'GET',
+                headers: {
+                    Authorization: client.SpotifyAuthorization
+                }
+            });
+            response = await response.json();
+            if (response!.error) reject('Track not found. Is it available in our market?');
+            const track = await getYouTubeTrack(response.artists[0].name + ' ' + response.name, requestor, announce, InputType.SpotifyTrack);
+            resolve(track);
+        } catch (error) {
+            reject(error);
+        }
     });
 }
 
@@ -302,7 +334,7 @@ export function getSpotifyPlaylistTracks(
             let tracks: Track[] = [];
             for (const track of playlistTracks) {
                 tracks.push(
-                    await getYouTubeTrack(track.track.artists[0].name + ' ' + track.track.name, requestor, announce)
+                    await getYouTubeTrack(track.track.artists[0].name + ' ' + track.track.name, requestor, announce, InputType.SpotifyPlaylist)
                 );
             }
 
@@ -376,6 +408,15 @@ function isSoundCloudURL(url: string): boolean {
 
 function isNewgroundsURL(url: string): boolean {
     const urls = ['https://www.newgrounds.com/audio/listen/'];
+
+    for (let u of urls) {
+        if (url.startsWith(u)) return true;
+    }
+    return false;
+}
+
+function isSpotifyTrackURL(url: string): boolean {
+    const urls = ['https://open.spotify.com/track/'];
 
     for (let u of urls) {
         if (url.startsWith(u)) return true;

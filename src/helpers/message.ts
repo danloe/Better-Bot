@@ -42,11 +42,13 @@ export function getTrackTypeColor(trackType: InputType): ColorResolvable {
         case InputType.YouTube:
             return '#ff0000';
         case InputType.YouTubePlaylist:
-            return '#282828';
+            return '#ff0000';
         case InputType.SoundCloud:
             return '#ff5500';
         case InputType.Newgrounds:
             return '#fda238';
+        case InputType.SpotifyTrack:
+            return '#1DB954';
         case InputType.SpotifyPlaylist:
             return '#1DB954';
         default:
@@ -54,16 +56,43 @@ export function getTrackTypeColor(trackType: InputType): ColorResolvable {
     }
 }
 
-export function getTrackTypeString(track: Track): string {
-    switch (track.type) {
+export function getTrackSourceString(track: Track): string {
+    switch (track.inputType) {
         case InputType.DirectFile:
             return track.url.match(/\w+(?=\.\w+\/)\.\w+/gi)![0];
         case InputType.YouTube:
+            return 'YouTube';
+        case InputType.YouTubePlaylist:
             return 'YouTube';
         case InputType.SoundCloud:
             return 'SoundCloud';
         case InputType.Newgrounds:
             return 'Newgrounds';
+        case InputType.SpotifyTrack:
+            return 'YouTube';
+        case InputType.SpotifyPlaylist:
+            return 'YouTube';
+        default:
+            return 'Unknown';
+    }
+}
+
+export function getTrackTypeString(track: Track): string {
+    switch (track.inputType) {
+        case InputType.DirectFile:
+            return track.url.match(/\w+(?=\.\w+\/)\.\w+/gi)![0];
+        case InputType.YouTube:
+            return 'YouTube';
+        case InputType.YouTubePlaylist:
+            return 'YouTube';
+        case InputType.SoundCloud:
+            return 'SoundCloud';
+        case InputType.Newgrounds:
+            return 'Newgrounds';
+        case InputType.SpotifyTrack:
+            return 'Spotify';
+        case InputType.SpotifyPlaylist:
+            return 'Spotify';
         default:
             return 'Unknown';
     }
@@ -113,12 +142,12 @@ export function secondsToDurationString(seconds: number): string {
     return 'live or unknown';
 }
 
-export function checkEmbedString(string: string): string {
+export function checkEmbedString(string: string, limit: number = 300): string {
     try {
         if (string == null || string == undefined || string == '') return 'Unknown';
         if (string == 'null') return 'No description.';
-        if (string.length > 220) {
-            let substr = string.substring(0, 219);
+        if (string.length > limit) {
+            let substr = string.substring(0, limit - 1);
             return substr.substring(0, substr.lastIndexOf(' ')) + ' [...]';
         }
         return string;
