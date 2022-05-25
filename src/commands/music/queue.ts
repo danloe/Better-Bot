@@ -57,41 +57,33 @@ function startCollector(
     collector.on('collect', async (button) => {
         try {
             await button.deferUpdate();
-            if (button.user.id === interaction.user.id) {
-                switch (button.customId) {
-                    case 'queue_previous':
-                        if (queue.currentPage > 1) {
-                            queue.currentPage--;
-                        }
-                        break;
-                    case 'queue_skip':
-                        await skip.run(client, button);
-                        break;
-                    case 'queue_clear':
-                        await clear.run(client, button);
-                        break;
-                    case 'queue_shuffle':
-                        await shuffle.run(client, button);
-                        break;
-                    case 'queue_next':
-                        if (queue.currentPage < queue.totalPages) {
-                            queue.currentPage++;
-                        }
-                        break;
-                }
-                await safeReply(interaction, {
-                    embeds: [queue.getQueueMessageEmbed(subscription)],
-                    components: [queue.getQueueMessageRow()]
-                });
-                collector.stop();
-                startCollector(client, interaction, subscription, queue);
-            } else {
-                try {
-                    await safeReply(button, createErrorEmbed("`⛔ These buttons aren't for you.`", true));
-                } catch (err) {
-                    console.log(err);
-                }
+            switch (button.customId) {
+                case 'queue_previous':
+                    if (queue.currentPage > 1) {
+                        queue.currentPage--;
+                    }
+                    break;
+                case 'queue_skip':
+                    await skip.run(client, button);
+                    break;
+                case 'queue_clear':
+                    await clear.run(client, button);
+                    break;
+                case 'queue_shuffle':
+                    await shuffle.run(client, button);
+                    break;
+                case 'queue_next':
+                    if (queue.currentPage < queue.totalPages) {
+                        queue.currentPage++;
+                    }
+                    break;
             }
+            await safeReply(interaction, {
+                embeds: [queue.getQueueMessageEmbed(subscription)],
+                components: [queue.getQueueMessageRow()]
+            });
+            collector.stop();
+            startCollector(client, interaction, subscription, queue);
         } catch (err) {
             console.log(err);
         }

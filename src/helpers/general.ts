@@ -7,8 +7,13 @@ export async function safeReply(
 ) {
     try {
         if (interaction instanceof ButtonInteraction) {
-            interaction.followUp(options);
-            return;
+            if (interaction.replied || interaction.deferred) {
+                await interaction.followUp(options);
+                return;
+            } else {
+                await interaction.reply(options);
+                return;
+            }
         }
 
         if (followup) {
@@ -22,8 +27,10 @@ export async function safeReply(
         } else {
             if (interaction.replied || interaction.deferred) {
                 await interaction.editReply(options);
+                return;
             } else {
                 await interaction.reply(options);
+                return;
             }
         }
     } catch (err) {
@@ -33,8 +40,14 @@ export async function safeReply(
 
 export async function safeDeferReply(interaction: CommandInteraction | ButtonInteraction, ephemeral: boolean = false) {
     try {
-        if (!interaction.deferred) {
-            await interaction.deferReply({ ephemeral: ephemeral });
+        if (interaction instanceof ButtonInteraction) {
+            if (!interaction.deferred) {
+                await interaction.deferUpdate();
+            }
+        } else {
+            if (!interaction.deferred) {
+                await interaction.deferReply({ ephemeral: ephemeral });
+            }
         }
     } catch (err) {
         console.log(err);

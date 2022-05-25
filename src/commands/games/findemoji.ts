@@ -215,14 +215,7 @@ export const command: Command = {
                     // GAME SEARCH
                     lobby.on('search', async (game: FindTheEmojiGame) => {
                         const gameMessage = game.getSearchMessage();
-
-                        await safeReply(interaction, gameMessage).catch((reason) => {
-                            // Invalid emoji error might occur, try with new emoji set
-                            if (reason === 'DiscordAPIError: Invalid Form Body') {
-                                game.restartRound();
-                                return;
-                            }
-                        });
+                        await safeReply(interaction, gameMessage);
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',

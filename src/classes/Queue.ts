@@ -104,7 +104,7 @@ export class Queue extends Array<Track> {
             }
 
             if (this.length > 10) {
-                embedmsg.addField('\u200B', '`' + String(this.length) + ' Tracks in total.`');
+                embedmsg.addField('\u200B', '`∑ ' + String(this.length) + ' Tracks`');
             }
         } else {
             embedmsg.addField('\u200B', '`The queue is empty.`');

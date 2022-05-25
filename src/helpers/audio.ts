@@ -66,6 +66,7 @@ export function getYouTubeTrack(
 
             resolve(track);
         } catch (error) {
+            console.log(error);
             reject('Could not load video. Check URL and privacy status or try again later.');
         }
     });
@@ -302,27 +303,30 @@ export function getSpotifyPlaylistTracks(
 
             let playlist: Playlist = {
                 type: PlaylistType.Spotify,
-                name: decodeURIComponent(response.name.replace(/(..)/g, '%$1')) || 'Unknown',
-                description:
-                    decodeURIComponent(response.description.replace(/(..)/g, '%$1')) || 'No desciption available.',
+                name: response.name || 'Unknown',
+                description: response.description || 'No desciption available.',
                 url: response.external_urls.spotify,
                 itemCount: playlistTracks.length,
                 announce: announce,
-                owner: decodeURIComponent(response.owner.display_name.replace(/(..)/g, '%$1')) || 'Unknown',
+                owner: response.owner.display_name || 'Unknown',
                 publishedAt: 'Unknown',
                 thumbnailUrl: response.images?.url || (await getLogoUrlfromUrl(response.external_urls.spotify))
             };
 
             let tracks: Track[] = [];
             for (const track of playlistTracks) {
-                tracks.push(
-                    await getYouTubeTrack(
-                        track.track.artists[0].name + ' ' + track.track.name,
-                        requestor,
-                        announce,
-                        InputType.SpotifyPlaylist
-                    )
-                );
+                try {
+                    tracks.push(
+                        await getYouTubeTrack(
+                            track.track.artists[0].name + ' ' + track.track.name,
+                            requestor,
+                            announce,
+                            InputType.SpotifyPlaylist
+                        )
+                    );
+                } catch (error) {
+                    continue;
+                }
             }
 
             if (shuffle) {

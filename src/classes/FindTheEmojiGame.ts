@@ -34,7 +34,7 @@ export class FindTheEmojiGame extends GameLobby {
     score: Map<User, number> = new Map<User, number>();
     answerTries: Map<User, number> = new Map<User, number>();
     answerGiven: User[] = [];
-    correctAnswer: User | null = null;
+    answeredCorrectly: User | null = null;
 
     public constructor(host: User, channel: TextBasedChannel, maxPlayers: number) {
         super(GameType.FindTheEmoji, host, channel, 1, maxPlayers);
@@ -43,31 +43,37 @@ export class FindTheEmojiGame extends GameLobby {
     }
 
     selectEmoji(player: User, index: number) {
-        let tries = this.answerTries.get(player);
-        if (this.emojiField[index] === this.emojiWanted.emoji) {
-            this.correctAnswer = player;
-            let playerScore = this.score.get(player);
-            if (playerScore) {
-                playerScore++;
-            } else {
-                playerScore = 1;
-            }
-            this.score.set(player, playerScore);
-            this.displayAnswer();
+        if (this.answeredCorrectly) {
             return;
         }
-        tries!--;
-        if (tries == 0) {
-            this.answerTries.delete(player);
-            this.answerGiven.push(player);
-        } else {
-            this.answerTries.set(player, tries!);
-        }
+        let tries = this.answerTries.get(player);
+        if (tries > 0) {
+            if (this.emojiField[index] === this.emojiWanted.emoji) {
+                this.answeredCorrectly = player;
+                let playerScore = this.score.get(player);
+                if (playerScore) {
+                    playerScore++;
+                } else {
+                    playerScore = 1;
+                }
+                this.score.set(player, playerScore);
+                this.displayAnswer();
+                return;
+            } else {
+                tries!--;
+                if (tries <= 0) {
+                    this.answerTries.delete(player);
+                    this.answerGiven.push(player);
+                } else {
+                    this.answerTries.set(player, tries!);
+                }
 
-        if (this.answerTries.size == 0) {
-            this.displayAnswer();
-        } else {
-            this.displaySearch();
+                if (this.answerTries.size == 0) {
+                    this.displayAnswer();
+                } else {
+                    this.displaySearch();
+                }
+            }
         }
     }
 
@@ -99,7 +105,7 @@ export class FindTheEmojiGame extends GameLobby {
                 this.answerTries.set(player, this.tries);
             });
             this.answerGiven = [];
-            this.correctAnswer = null;
+            this.answeredCorrectly = null;
             this.displaySearch();
         } else {
             this.state = GameState.Finished;
@@ -121,7 +127,7 @@ export class FindTheEmojiGame extends GameLobby {
                 this.answerTries.set(player, this.tries);
             });
             this.answerGiven = [];
-            this.correctAnswer = null;
+            this.answeredCorrectly = null;
             this.displaySearch();
         } else {
             this.state = GameState.Finished;
@@ -140,7 +146,7 @@ export class FindTheEmojiGame extends GameLobby {
             .setDescription(message)
             .setThumbnail(this.thumbnail);
 
-        embedmsg.addField('Questions:', String(this.rounds), true);
+        embedmsg.addField('Rounds:', String(this.rounds), true);
         if (this.difficulty) embedmsg.addField('Difficulty:', this.difficulty, true);
         if (this.tries) embedmsg.addField('Tries:', String(this.tries), true);
         if (this.emojiSearchTime) embedmsg.addField('Time:', String(this.emojiSearchTime / 1000) + ' seconds', true);
@@ -214,8 +220,8 @@ export class FindTheEmojiGame extends GameLobby {
 
     getAnswerMessage(): string | MessagePayload | WebhookEditMessageOptions {
         let correctUserString = '';
-        if (this.correctAnswer) {
-            correctUserString = '<@' + this.correctAnswer.id + '> ➕1️⃣';
+        if (this.answeredCorrectly) {
+            correctUserString = '<@' + this.answeredCorrectly.id + '> 1️⃣🆙';
         } else {
             correctUserString = '`No one has found the emoji!`';
         }
