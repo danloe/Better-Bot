@@ -123,7 +123,7 @@ export class MusicSubscription {
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
                 // Stop connection timeout check
-                clearTimeout(this.connectionTimeoutObj!);
+                this.stopConnectionTimeout();
             } else if (newState.status === AudioPlayerStatus.Paused) {
                 // If the Playing state has been entered, then the player was paused.
                 if (this.pausedForVoice) {
@@ -153,7 +153,8 @@ export class MusicSubscription {
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
                 // Stop connection timeout check
-                clearTimeout(this.connectionTimeoutObj!);
+                this.stopConnectionTimeout();
+
                 this.autoplay = true;
             }
         });
@@ -177,6 +178,10 @@ export class MusicSubscription {
                 this.voiceConnection.destroy();
             }
         }, 60000);
+    }
+
+    private stopConnectionTimeout() {
+        clearTimeout(this.connectionTimeoutObj!);
     }
 
     /**
