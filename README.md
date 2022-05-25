@@ -1,7 +1,8 @@
 <div id="top"></div>
 
 <div align="center">
-  
+    
+  <a href="">[![Release][release-shield]][release-url]
   <a href="">[![Issues][issues-shield]][issues-url]
   <a href="">[![Typescript][typescript-shield]][typescript-url]
   <a href="">[![DiscordJS][discordjs-shield]][discordjs-url]
@@ -228,6 +229,8 @@ Pull requests are also welcome. For major changes, please open an issue first to
 
 <p align="right"><a href="#top">&uarr;</a></p>
 
+[release-shield]: https://img.shields.io/github/v/release/danloe/botterino?style=for-the-badge
+[release-url]: https://github.com/danloe/Botterino/releases
 [issues-shield]: https://img.shields.io/github/issues/danloe/Botterino.svg?style=for-the-badge
 [issues-url]: https://github.com/danloe/Botterino/issues
 [typescript-shield]: https://img.shields.io/github/package-json/dependency-version/danloe/botterino/dev/typescript?style=for-the-badge
