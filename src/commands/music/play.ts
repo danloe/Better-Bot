@@ -11,7 +11,7 @@ import {
     safeReply,
     secondsToDurationString
 } from '../../helpers';
-import { Track, TrackType } from '../../classes';
+import { Track, InputType } from '../../classes';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -33,6 +33,12 @@ export const command: Command = {
         )
         .addBooleanOption((option) =>
             option.setName('announce').setDescription('Announce the track with TTS voice.').setRequired(false)
+        )
+        .addBooleanOption((option) =>
+            option.setName('reverse').setDescription('Playlists only: Reverse items?').setRequired(false)
+        )
+        .addBooleanOption((option) =>
+            option.setName('shuffle').setDescription('Playlists only: Shuffle items?').setRequired(false)
         ),
     run: (
         client: BetterClient,
@@ -49,6 +55,10 @@ export const command: Command = {
                         interaction instanceof CommandInteraction ? interaction.options.getString('mode') : undefined;
                     let announce =
                         interaction instanceof CommandInteraction ? interaction.options.getBoolean('announce') : false;
+                    let reverse =
+                        interaction instanceof CommandInteraction ? interaction.options.getBoolean('reverse') : false;
+                    let shuffle =
+                        interaction instanceof CommandInteraction ? interaction.options.getBoolean('shuffle') : false;
                     let skip = false;
                     let next = false;
                     if (mode) {
@@ -56,13 +66,17 @@ export const command: Command = {
                         if (mode === 'next') next = true;
                     }
                     if (!announce) announce = false;
+                    if (!reverse) reverse = false;
+                    if (!shuffle) shuffle = false;
 
                     const result: Track | Playlist = await client.musicManager.play(
                         interaction,
                         input!,
                         announce,
                         skip,
-                        next
+                        next,
+                        reverse,
+                        shuffle
                     );
 
                     let addedText = '';
@@ -128,10 +142,10 @@ export const command: Command = {
                                 result.name,
                                 addedText,
                                 false,
-                                getTrackTypeColor(TrackType.YouTube),
+                                getTrackTypeColor(InputType.YouTube),
                                 [
                                     { name: 'Description', value: getPrettyEmbedString(result.description) },
-                                    { name: 'Channel', value: getPrettyEmbedString(result.channelTitle), inline: true },
+                                    { name: 'Owner', value: getPrettyEmbedString(result.owner), inline: true },
                                     {
                                         name: 'Videos',
                                         value: getPrettyEmbedString(String(result.itemCount)),

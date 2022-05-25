@@ -88,10 +88,11 @@ export class Queue extends Array<Track> {
                             ' | ' +
                             subscription.currentTrack.displayUrl
                     )
-                    .addField('\u200B', '**Tracks in queue:**')
                     .setThumbnail(subscription.currentTrack.artworkUrl);
             }
         }
+
+        if (this.length > 0) embedmsg.addField('\u200B', '**Tracks in queue:**');
 
         for (let i = this.currentPage * 10 - 10; i < this.currentPage * 10; i++) {
             if (i == this.length) break;

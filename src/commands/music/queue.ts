@@ -1,15 +1,8 @@
 import { Command } from '../../interfaces';
-import {
-    ButtonInteraction,
-    CommandInteraction,
-    Message,
-    MessageActionRow,
-    MessageButton,
-    MessageEmbed
-} from 'discord.js';
+import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
+import { createErrorEmbed, safeReply } from '../../helpers';
 import { command as skip } from './skip';
 import { command as clear } from './clear';
 import { command as shuffle } from './shuffle';

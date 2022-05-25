@@ -3,7 +3,7 @@ import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 
 export class Track {
-    type: TrackType;
+    type: InputType;
     url: string;
     name: string;
     requestor: string;
@@ -16,7 +16,7 @@ export class Track {
     uploaded: string;
 
     constructor(
-        type: TrackType,
+        type: InputType,
         url: string,
         name: string,
         requestor: string,
@@ -46,7 +46,7 @@ export class Track {
             try {
                 let stream: any;
                 switch (this.type) {
-                    case TrackType.YouTube:
+                    case InputType.YouTube:
                         stream = ytdl(this.url, {
                             filter: 'audioonly',
                             highWaterMark: 1 << 22
@@ -56,7 +56,7 @@ export class Track {
                         });
                         return;
 
-                    case TrackType.SoundCloud:
+                    case InputType.SoundCloud:
                         stream = await scdl.downloadFormat(
                             this.url,
                             scdl.FORMATS.MP3
@@ -67,11 +67,11 @@ export class Track {
                         });
                         return;
 
-                    case TrackType.Newgrounds:
+                    case InputType.Newgrounds:
                         stream = this.url;
                         break;
 
-                    case TrackType.DirectFile:
+                    case InputType.DirectFile:
                         stream = this.url;
                         break;
                 }
@@ -85,10 +85,11 @@ export class Track {
     }
 }
 
-export enum TrackType {
+export enum InputType {
     DirectFile,
     YouTube,
     YouTubePlaylist,
     SoundCloud,
-    Newgrounds
+    Newgrounds,
+    SpotifyPlaylist
 }
