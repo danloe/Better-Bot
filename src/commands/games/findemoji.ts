@@ -17,9 +17,9 @@ export const command: Command = {
                 .setName('difficulty')
                 .setDescription('Which difficulty?')
                 .addChoices(
-                    { name: 'easy', value: 'easy' },
-                    { name: 'medium', value: 'medium' },
-                    { name: 'hard', value: 'hard' }
+                    { name: 'Easy', value: 'Easy' },
+                    { name: 'Medium', value: 'Medium' },
+                    { name: 'Hard', value: 'Hard' }
                 )
                 .setRequired(false)
         )
@@ -35,7 +35,7 @@ export const command: Command = {
             option
                 .setName('time')
                 .setDescription('How many seconds to search?')
-                .setMinValue(3)
+                .setMinValue(2)
                 .setMaxValue(60)
                 .setRequired(false)
         )
@@ -44,7 +44,7 @@ export const command: Command = {
                 .setName('players')
                 .setDescription('How many players can join?')
                 .setMinValue(1)
-                .setMaxValue(10)
+                .setMaxValue(5)
                 .setRequired(false)
         ),
     run: (

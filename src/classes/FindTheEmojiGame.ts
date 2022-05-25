@@ -149,7 +149,7 @@ export class FindTheEmojiGame extends GameLobby {
                 emojiString = Math.random() >= 0.5 ? this.emojiWanted.emoji : this.emojiWanted.key;
                 break;
             case GameDifficulty.Hard:
-                emojiString = this.emojiWanted.key;
+                emojiString = '`' + this.emojiWanted.key + '`';
                 break;
         }
 
