@@ -201,6 +201,14 @@ export class MusicSubscription {
     }
 
     /**
+     * Skips current audio playback.
+     */
+    public skip() {
+        this.autoplay = true;
+        this.audioPlayer.stop();
+    }
+
+    /**
      * Plays audio.
      */
     public play() {

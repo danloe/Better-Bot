@@ -21,17 +21,15 @@ export const command: Command = {
                 try {
                     const queue = await client.musicManager.getQueue(interaction);
 
-                    if (queue) {
-                        let subscription = client.musicManager.subscriptions.get(interaction.guildId!);
+                    const subscription = client.musicManager.subscriptions.get(interaction.guildId!)!;
 
-                        startCollector(client, interaction, subscription!, queue);
+                    startCollector(client, interaction, subscription, queue);
 
-                        await safeReply(interaction, {
-                            embeds: [queue.getQueueMessageEmbed(subscription!)],
-                            components: [queue.getQueueMessageRow()]
-                        });
-                        done();
-                    }
+                    await safeReply(interaction, {
+                        embeds: [queue.getQueueMessageEmbed(subscription!)],
+                        components: [queue.getQueueMessageRow()]
+                    });
+                    done();
                 } catch (err) {
                     try {
                         await safeReply(interaction, createErrorEmbed('🚩 Error showing the queue: `' + err + '`'));

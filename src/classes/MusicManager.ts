@@ -47,15 +47,13 @@ export class MusicManager {
         reverse: boolean,
         shuffle: boolean
     ) {
-        return new Promise<Track | Playlist>(async (done, error) => {
+        return new Promise<Track | Playlist>(async (resolve, reject) => {
             try {
                 await safeDeferReply(interaction);
-                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
-
-                let inputType = determineInputType(input);
                 let track: Track;
                 let tracks: Track[] = [];
                 let playlist: Playlist | null = null;
+                let inputType = determineInputType(input);
 
                 switch (inputType) {
                     case InputType.YouTube:
@@ -117,8 +115,7 @@ export class MusicManager {
                         break;
                 }
 
-                if (!queue) this.queues.set(interaction.guildId!, new Queue());
-                queue = this.queues.get(interaction.guildId!);
+                const queue = this.getQueue(interaction);
 
                 if (tracks.length > 0) {
                     tracks.forEach((track) => {
@@ -136,22 +133,7 @@ export class MusicManager {
                     }
                 }
 
-                if (!subscription || !subscription.isVoiceConnectionReady()) {
-                    if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                        const channel = interaction.member.voice.channel;
-                        subscription = new MusicSubscription(
-                            joinVoiceChannel({
-                                channelId: channel.id,
-                                guildId: channel.guild.id,
-                                adapterCreator: channel.guild
-                                    .voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator // TODO: remove cast when fixed
-                            }),
-                            queue!
-                        );
-                        subscription.voiceConnection.on('error', console.warn);
-                        this.subscriptions.set(interaction.guildId!, subscription);
-                    }
-                }
+                const subscription = this.createSubscription(interaction);
 
                 if (!subscription) {
                     await safeReply(
@@ -161,34 +143,31 @@ export class MusicManager {
                         )
                     );
                     if (playlist) {
-                        done(playlist!);
+                        resolve(playlist!);
                     } else {
-                        done(track!);
+                        resolve(track!);
                     }
                     return;
                 }
 
-                try {
-                    await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20e3);
-                } catch (err) {
-                    console.warn(err);
-                    error('Failed to join voice channel within 20 seconds, please try again later!');
+                await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20e3).catch((_) => {
+                    reject('Failed to join voice channel within 20 seconds, please try again later!');
                     return;
-                }
+                });
 
                 if (skip) {
-                    subscription.audioPlayer.stop();
+                    subscription.skip();
                 } else {
                     subscription.play();
                 }
 
                 if (playlist) {
-                    done(playlist!);
+                    resolve(playlist!);
                 } else {
-                    done(track!);
+                    resolve(track!);
                 }
             } catch (err) {
-                error(err);
+                reject(err);
             }
         });
     }
@@ -197,28 +176,7 @@ export class MusicManager {
         return new Promise<void>(async (done, error) => {
             try {
                 await safeDeferReply(interaction, true);
-                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
-
-                if (!queue) this.queues.set(interaction.guildId!, new Queue());
-                queue = this.queues.get(interaction.guildId!);
-
-                if (!subscription || !subscription?.isVoiceConnectionReady()) {
-                    if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                        const channel = interaction.member.voice.channel;
-                        subscription = new MusicSubscription(
-                            joinVoiceChannel({
-                                channelId: channel.id,
-                                guildId: channel.guild.id,
-                                adapterCreator: channel.guild
-                                    .voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator // TODO: remove cast when fixed
-                            }),
-                            queue!,
-                            false
-                        );
-                        subscription.voiceConnection.on('error', console.warn);
-                        this.subscriptions.set(interaction.guildId!, subscription);
-                    }
-                }
+                const subscription = this.createSubscription(interaction, true);
 
                 if (!subscription) {
                     error(
@@ -255,8 +213,7 @@ export class MusicManager {
     stop(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                await safeDeferReply(interaction);
-                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
+                const subscription = this.subscriptions.get(interaction.guildId!);
 
                 if (!subscription) {
                     error('Not playing anything.');
@@ -274,8 +231,7 @@ export class MusicManager {
     pause(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                await safeDeferReply(interaction);
-                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
+                const subscription = this.subscriptions.get(interaction.guildId!);
 
                 if (!subscription) {
                     error('Not playing anything.');
@@ -293,29 +249,7 @@ export class MusicManager {
     resume(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                await safeDeferReply(interaction);
-                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
-
-                if (!subscription || !subscription.isVoiceConnectionReady()) {
-                    if (!queue) {
-                        error('No queue.');
-                        return;
-                    }
-                    if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                        const channel = interaction.member.voice.channel;
-                        subscription = new MusicSubscription(
-                            joinVoiceChannel({
-                                channelId: channel.id,
-                                guildId: channel.guild.id,
-                                adapterCreator: channel.guild
-                                    .voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator // TODO: remove cast when fixed
-                            }),
-                            queue
-                        );
-                        subscription.voiceConnection.on('error', console.warn);
-                        this.subscriptions.set(interaction.guildId!, subscription);
-                    }
-                }
+                const subscription = this.subscriptions.get(interaction.guildId!);
 
                 if (!subscription) {
                     error('Not in a voice channel.');
@@ -341,8 +275,8 @@ export class MusicManager {
     skip(interaction: CommandInteraction | ButtonInteraction, amount: number) {
         return new Promise<Queue>(async (done, error) => {
             try {
-                await safeDeferReply(interaction);
-                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
+                const subscription = this.subscriptions.get(interaction.guildId!);
+                const queue = this.getQueue(interaction);
 
                 if (!subscription) {
                     error('Not playing anything.');
@@ -372,9 +306,9 @@ export class MusicManager {
         return new Promise<void>(async (done, error) => {
             try {
                 await safeDeferReply(interaction);
-                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
+                const queue = this.getQueue(interaction);
 
-                if (!queue || queue.length <= 1) {
+                if (queue.length <= 1) {
                     error('Queue not long enough.');
                     return;
                 }
@@ -394,31 +328,13 @@ export class MusicManager {
         });
     }
 
-    getQueue(interaction: CommandInteraction | ButtonInteraction) {
-        return new Promise<Queue>(async (done, error) => {
-            try {
-                await safeDeferReply(interaction);
-                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
-
-                if (!queue || queue.length < 1) {
-                    error('Queue is empty.');
-                    return;
-                }
-
-                done(queue);
-            } catch (err) {
-                error(err);
-            }
-        });
-    }
-
     clear(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
                 await safeDeferReply(interaction);
-                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
+                const queue = this.getQueue(interaction);
 
-                if (!queue || queue.length < 1) {
+                if (queue.length < 1) {
                     error('Queue is empty.');
                     return;
                 }
@@ -434,14 +350,14 @@ export class MusicManager {
     shuffle(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                await safeDeferReply(interaction);
-                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
+                const queue = this.getQueue(interaction);
 
-                if (!queue) {
+                if (queue.length == 0) {
                     error('Queue is empty.');
                     return;
                 }
-                if (queue.length <= 1) {
+
+                if (queue.length == 1) {
                     error('Queue has not enough tracks.');
                     return;
                 }
@@ -457,8 +373,7 @@ export class MusicManager {
     move(interaction: CommandInteraction | ButtonInteraction, currentPos: number, targetPos: number) {
         return new Promise<void>(async (done, error) => {
             try {
-                await safeDeferReply(interaction);
-                let [subscription, queue] = this.getSubscriptionAndQueue(interaction);
+                const queue = this.getQueue(interaction);
 
                 if (!queue || queue.length <= 1) {
                     error('Queue not long enough.');
@@ -483,14 +398,39 @@ export class MusicManager {
         });
     }
 
-    getSubscriptionAndQueue(
-        interaction: CommandInteraction | ButtonInteraction
-    ): [MusicSubscription | undefined, Queue | undefined] {
-        if (!interaction.guildId) return [undefined, undefined];
-        const subscription = this.subscriptions.get(interaction.guildId);
-        const queue = this.queues.get(interaction.guildId);
-        if (subscription) subscription.lastChannel = interaction.channel || undefined;
-        return [subscription, queue];
+    getQueue(interaction: CommandInteraction | ButtonInteraction): Queue {
+        let queue = this.queues.get(interaction.guildId!);
+
+        if (!queue) {
+            queue = new Queue();
+            this.queues.set(interaction.guildId!, queue);
+        }
+        return queue;
+    }
+
+    createSubscription(
+        interaction: CommandInteraction | ButtonInteraction,
+        autoplay: boolean = false
+    ): MusicSubscription {
+        let subscription = this.subscriptions.get(interaction.guildId!);
+
+        if (!subscription || !subscription.isVoiceConnectionReady()) {
+            if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
+                const channel = interaction.member.voice.channel;
+                subscription = new MusicSubscription(
+                    joinVoiceChannel({
+                        channelId: channel.id,
+                        guildId: channel.guild.id,
+                        adapterCreator: channel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator // TODO: remove cast when fixed
+                    }),
+                    this.getQueue(interaction),
+                    autoplay
+                );
+                subscription.voiceConnection.on('error', console.warn);
+                this.subscriptions.set(interaction.guildId!, subscription);
+            }
+        }
+        return subscription!;
     }
 }
 

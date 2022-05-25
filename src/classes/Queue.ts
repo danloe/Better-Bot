@@ -92,18 +92,22 @@ export class Queue extends Array<Track> {
             }
         }
 
-        if (this.length > 0) embedmsg.addField('\u200B', '**Tracks in queue:**');
+        if (this.length > 0) {
+            embedmsg.addField('\u200B', '**Tracks in queue:**');
 
-        for (let i = this.currentPage * 10 - 10; i < this.currentPage * 10; i++) {
-            if (i == this.length) break;
-            embedmsg.addField(
-                i + 1 + ': `' + this[i].name + '`',
-                this[i].requestor + (this[i].announce ? ' 📣' : '') + ' | ' + this[i].displayUrl
-            );
-        }
+            for (let i = this.currentPage * 10 - 10; i < this.currentPage * 10; i++) {
+                if (i == this.length) break;
+                embedmsg.addField(
+                    i + 1 + ': `' + this[i].name + '`',
+                    this[i].requestor + (this[i].announce ? ' 📣' : '') + ' | ' + this[i].displayUrl
+                );
+            }
 
-        if (this.length > 10) {
-            embedmsg.addField('\u200B', '`' + String(this.length) + ' Tracks in total.`');
+            if (this.length > 10) {
+                embedmsg.addField('\u200B', '`' + String(this.length) + ' Tracks in total.`');
+            }
+        } else {
+            embedmsg.addField('\u200B', '`The queue is empty.`');
         }
         return embedmsg;
     }
