@@ -3,7 +3,6 @@ import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import { Track, InputType } from '../classes';
 import {
-    createEmbed,
     getLoadingMessage,
     getLogoUrlfromUrl,
     timeStringToDurationString as timeStringToSecondsNumber
@@ -404,7 +403,7 @@ export function getSpotifyPlaylistTracks(
                     tracks.push(
                         await getYouTubeTrack(
                             track.track.artists[0].name + ' ' + track.track.name,
-                            interaction.user.id,
+                            interaction.user.username,
                             announce,
                             InputType.SpotifyPlaylist
                         )
