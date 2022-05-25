@@ -117,11 +117,8 @@ export class MusicSubscription {
                 // The queue is then processed to start playing the next track, if one is available.
 
                 // Start connection timeout check
-                this.connectionTimeoutObj = setTimeout(() => {
-                    if (this.audioPlayer.state.status !== AudioPlayerStatus.Playing) {
-                        this.voiceConnection.destroy();
-                    }
-                }, 60_000);
+                this.startConnectionTimeout();
+
                 if (this.autoplay) this.processQueue();
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
@@ -144,11 +141,8 @@ export class MusicSubscription {
                 this.voiceConnection.subscribe(this.audioPlayer);
 
                 // Start connection timeout check
-                this.connectionTimeoutObj = setTimeout(() => {
-                    if (this.audioPlayer.state.status !== AudioPlayerStatus.Playing) {
-                        this.voiceConnection.destroy();
-                    }
-                }, 60_000);
+                this.startConnectionTimeout();
+
                 if (this.pausedForVoice) {
                     this.pausedForVoice = false;
                     this.audioPlayer.unpause();
@@ -172,6 +166,17 @@ export class MusicSubscription {
         this.voicePlayer.on('error', (error: { resource: any }) => console.log(error));
 
         voiceConnection.subscribe(this.audioPlayer);
+    }
+
+    private startConnectionTimeout() {
+        this.connectionTimeoutObj = setTimeout(() => {
+            if (
+                this.audioPlayer.state.status !== AudioPlayerStatus.Playing &&
+                this.voicePlayer.state.status !== AudioPlayerStatus.Playing
+            ) {
+                this.voiceConnection.destroy();
+            }
+        }, 60000);
     }
 
     /**
