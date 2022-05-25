@@ -204,7 +204,9 @@ export class MusicSubscription {
      * Plays audio.
      */
     public play() {
-        if (this.audioPlayer.playable) {
+        if (this.autoplay) {
+            this.audioPlayer.unpause();
+        } else {
             this.autoplay = true;
             this.pausedForVoice = false;
             this.processQueue();

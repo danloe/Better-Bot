@@ -330,7 +330,7 @@ export class MusicManager {
                     return;
                 }
 
-                subscription.audioPlayer.unpause();
+                subscription.play();
                 done();
             } catch (err) {
                 error(err);
