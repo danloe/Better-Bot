@@ -1,4 +1,4 @@
-import { Command, Playlist } from '../../interfaces';
+import { Command, Playlist, PlaylistType } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
@@ -142,7 +142,7 @@ export const command: Command = {
                                 result.name,
                                 addedText,
                                 false,
-                                getTrackTypeColor(InputType.YouTube),
+                                getTrackTypeColor(result.type === PlaylistType.YouTube ? InputType.YouTubePlaylist : InputType.SpotifyPlaylist),
                                 [
                                     { name: 'Description', value: getPrettyEmbedString(result.description) },
                                     { name: 'Owner', value: getPrettyEmbedString(result.owner), inline: true },

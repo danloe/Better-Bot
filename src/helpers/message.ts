@@ -41,10 +41,14 @@ export function getTrackTypeColor(trackType: InputType): ColorResolvable {
             return '#999999';
         case InputType.YouTube:
             return '#ff0000';
+        case InputType.YouTubePlaylist:
+            return '#282828';
         case InputType.SoundCloud:
             return '#ff5500';
         case InputType.Newgrounds:
             return '#fda238';
+        case InputType.SpotifyPlaylist:
+            return '#1DB954';
         default:
             return '#ffffff';
     }

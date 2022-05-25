@@ -4,7 +4,7 @@ import ytsr from 'ytsr';
 import { Track, InputType } from '../classes';
 import https from 'node:https';
 import { getLogoUrlfromUrl, timeStringToDurationString as timeStringToSecondsNumber } from './message';
-import { Playlist } from '../interfaces';
+import { Playlist, PlaylistType } from '../interfaces';
 import BetterClient from '../client';
 import fetch from 'node-fetch';
 
@@ -91,6 +91,7 @@ export function getYoutubePlaylist(url: string, announce: boolean) {
                         let snippet = playlistItem.snippet;
 
                         playlist = {
+                            type: PlaylistType.YouTube,
                             name: snippet.title,
                             itemCount: playlistItem.contentDetails.itemCount,
                             url: 'https://youtube.com/playlist?list=' + playlistItem.id,
@@ -286,12 +287,14 @@ export function getSpotifyPlaylistTracks(
             let playlistTracks = response.tracks.items;
 
             let playlist: Playlist = {
-                name: response.name || 'Unknown',
-                description: response.description || 'No desciption available.',
+                type: PlaylistType.Spotify,
+                name: decodeURIComponent(response.name.replace(/(..)/g, '%$1')) || 'Unknown',
+                description:
+                    decodeURIComponent(response.description.replace(/(..)/g, '%$1')) || 'No desciption available.',
                 url: response.external_urls.spotify,
                 itemCount: playlistTracks.length,
                 announce: announce,
-                owner: response.owner.display_name || 'Unknown',
+                owner: decodeURIComponent(response.owner.display_name.replace(/(..)/g, '%$1')) || 'Unknown',
                 publishedAt: 'Unknown',
                 thumbnailUrl: response.images?.url || (await getLogoUrlfromUrl(response.external_urls.spotify))
             };

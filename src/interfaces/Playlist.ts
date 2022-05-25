@@ -1,4 +1,5 @@
 export interface Playlist {
+    type: PlaylistType;
     name: string;
     url: string;
     announce: boolean;
@@ -7,4 +8,9 @@ export interface Playlist {
     owner: string;
     publishedAt: string;
     itemCount: number;
+}
+
+export enum PlaylistType {
+    YouTube,
+    Spotify
 }

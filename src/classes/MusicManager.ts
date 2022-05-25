@@ -257,7 +257,7 @@ export class MusicManager {
                     return;
                 }
 
-                subscription!.audioPlayer.stop();
+                subscription!.stop();
                 done();
             } catch (err) {
                 error(err);
