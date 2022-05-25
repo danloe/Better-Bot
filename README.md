@@ -154,7 +154,7 @@ SPOTIFY_CLIENT_SECRET="YOURCLIENTSECRET"
 [^googleapi]:required for playlist search; free for up to 10,000 searches per day
 
 6. *(optional)* Replace `YOURCLIENTID` and `YOURCLIENTSECRET` with your [Spotify API Credentials](https://developer.spotify.com/dashboard/)[^spotifyapi]
-[^spotifyapi]:required to search spotify playlists; free of charge for appropriate use    
+[^spotifyapi]:required to search spotify playlists; free of charge for appropriate, rate limited use    
 
 7. Add the bot to your server via the [OAuth2 > URL Generator](https://discord.com/developers/applications). Select `bot` as scope and insert the permissions integer in the `GENERATED URL`
 >Minimum [permissions integer](https://discordapi.com/permissions.html#294242221120):[^permissions]
