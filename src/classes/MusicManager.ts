@@ -45,7 +45,9 @@ export class MusicManager {
         skip: boolean,
         next: boolean,
         reverse: boolean,
-        shuffle: boolean
+        shuffle: boolean,
+        offset: number,
+        limit: number
     ) {
         return new Promise<Track | Playlist>(async (resolve, reject) => {
             try {
@@ -91,7 +93,9 @@ export class MusicManager {
                             interaction,
                             announce,
                             reverse,
-                            shuffle
+                            shuffle,
+                            offset,
+                            limit
                         );
                         break;
 
@@ -102,7 +106,9 @@ export class MusicManager {
                             interaction,
                             announce,
                             reverse,
-                            shuffle
+                            shuffle,
+                            offset,
+                            limit
                         );
                         break;
 

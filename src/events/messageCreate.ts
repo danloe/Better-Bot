@@ -38,13 +38,13 @@ async function setCommands(message: Message) {
     let passed = true;
     readdirSync(commandPath).forEach((dir) => {
         const dirs = readdirSync(`${commandPath}\\${dir}`).filter((file) => file.endsWith('.ts'));
-        const regex = RegExp(/^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$/gu);
+        // const regex = RegExp(/^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$/gu);
         for (const file of dirs) {
             const { command } = require(`${commandPath}\\${dir}\\${file}`);
-            if (!regex.test(command.data.name)) {
-                console.log(command.data.name + ' failed the regex check.');
-                passed = false;
-            }
+            // if (!regex.test(command.data.name)) {
+            //     console.log(command.data.name + ' failed the regex check.');
+            //     passed = false;
+            // }
             commands.push(command.data.toJSON());
         }
     });

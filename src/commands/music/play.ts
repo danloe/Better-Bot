@@ -33,13 +33,23 @@ export const command: Command = {
                 .addChoices({ name: 'skip', value: 'skip' }, { name: 'next', value: 'next' })
         )
         .addBooleanOption((option) =>
-            option.setName('announce').setDescription('Announce the track with TTS voice.').setRequired(false)
+            option.setName('announce').setDescription('Announce the track(s) with TTS voice?').setRequired(false)
         )
         .addBooleanOption((option) =>
             option.setName('reverse').setDescription('Playlists only: Reverse items?').setRequired(false)
         )
         .addBooleanOption((option) =>
             option.setName('shuffle').setDescription('Playlists only: Shuffle items?').setRequired(false)
+        )
+        .addIntegerOption((option) =>
+            option
+                .setName('offset')
+                .setDescription('Playlists only: Start track offset?')
+                .setMinValue(1)
+                .setRequired(false)
+        )
+        .addIntegerOption((option) =>
+            option.setName('limit').setDescription('Playlists only: How many tracks?').setMinValue(1).setRequired(false)
         ),
     run: (
         client: BetterClient,
@@ -60,6 +70,12 @@ export const command: Command = {
                         interaction instanceof CommandInteraction ? interaction.options.getBoolean('reverse') : false;
                     let shuffle =
                         interaction instanceof CommandInteraction ? interaction.options.getBoolean('shuffle') : false;
+                    let offset =
+                        interaction instanceof CommandInteraction ? interaction.options.getInteger('offset') : 0;
+                    let limit =
+                        interaction instanceof CommandInteraction
+                            ? interaction.options.getInteger('limit')
+                            : Number.POSITIVE_INFINITY;
                     let skip = false;
                     let next = false;
                     if (mode) {
@@ -69,6 +85,8 @@ export const command: Command = {
                     if (!announce) announce = false;
                     if (!reverse) reverse = false;
                     if (!shuffle) shuffle = false;
+                    if (!offset) offset = 0;
+                    if (!limit) limit = Number.POSITIVE_INFINITY;
 
                     const result: Track | Playlist = await client.musicManager.play(
                         interaction,
@@ -77,7 +95,9 @@ export const command: Command = {
                         skip,
                         next,
                         reverse,
-                        shuffle
+                        shuffle,
+                        offset,
+                        limit
                     );
 
                     let addedText = '';

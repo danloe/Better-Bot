@@ -2,11 +2,7 @@ import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import { Track, InputType } from '../classes';
-import {
-    getLoadingMessage,
-    getLogoUrlfromUrl,
-    timeStringToDurationString as timeStringToSecondsNumber
-} from './message';
+import { getLoadingMessage, timeStringToDurationString as timeStringToSecondsNumber } from './message';
 import { Playlist, PlaylistType } from '../interfaces';
 import BetterClient from '../client';
 import fetch from 'node-fetch';
@@ -278,7 +274,9 @@ export function getSpotifyAlbumOrPlaylistTracks(
     interaction: CommandInteraction | ButtonInteraction,
     announce: boolean,
     reverse: boolean,
-    shuffle: boolean
+    shuffle: boolean,
+    offset: number,
+    limit: number
 ) {
     return new Promise<[Playlist, Track[]]>(async (resolve, reject) => {
         try {
@@ -287,7 +285,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
             let responseTracks: any[];
 
             if (url.includes('/album/')) {
-                response = await getSpotifyAlbumsApiResponse(client, url, reject);
+                response = await getSpotifyAlbumsApiResponse(client, url, offset, limit, reject);
                 responseTracks = response.tracks.items;
                 playlist = {
                     type: PlaylistType.SpotifyAlbum,
@@ -296,7 +294,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
                         'Album Type: ' +
                         JSDOM.fragment(response.album_type).textContent +
                         (response.copyrights
-                            ? ', Copyright: (' + response.copyrights[0]!.type + ') ' + response.copyrights[0]!.text
+                            ? '\nCopyright: (' + response.copyrights[0]!.type + ') ' + response.copyrights[0]!.text
                             : ''),
                     url: response.external_urls.spotify,
                     itemCount: responseTracks.length,
@@ -306,7 +304,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
                     thumbnailUrl: response.images[0]?.url || spotifyThumbnail
                 };
             } else {
-                response = await getSpotifyPlaylistsApiResponse(client, url, reject);
+                response = await getSpotifyPlaylistsApiResponse(client, url, offset, limit, reject);
                 responseTracks = response.tracks.items;
                 playlist = {
                     type: PlaylistType.SpotifyPlaylist,
@@ -359,6 +357,18 @@ export function getSpotifyAlbumOrPlaylistTracks(
 
                 await safeReply(interaction, { embeds: [embedmsg], components: [row] });
             }, 3_000);
+
+            if (offset) {
+                if (responseTracks.length > offset) {
+                    responseTracks.splice(0, offset - 1);
+                }
+            }
+
+            if (limit) {
+                if (responseTracks.length > limit) {
+                    responseTracks.splice(limit, responseTracks.length - limit);
+                }
+            }
 
             if (shuffle) {
                 shuffleArray(responseTracks);
