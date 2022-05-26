@@ -84,17 +84,17 @@ export const command: Command = {
                     if (result instanceof Track) {
                         if (skip) {
                             addedText =
-                                '`➕ Track is playing now [' +
+                                '`🔺 Track is playing now [' +
                                 (client.musicManager.queues.get(interaction.guildId!)!.length - 1) +
                                 ' in queue]`';
                         } else if (next) {
                             addedText =
-                                '`➕ Track is next in queue [' +
+                                '`🔺 Track is next in queue [' +
                                 client.musicManager.queues.get(interaction.guildId!)!.length +
                                 ' in queue]`';
                         } else {
                             addedText =
-                                '`➕ Track was added [' +
+                                '`🔺 Track was added [' +
                                 client.musicManager.queues.get(interaction.guildId!)!.length +
                                 ' in queue]`';
                         }
@@ -124,17 +124,17 @@ export const command: Command = {
                         // Playlist
                         if (skip) {
                             addedText =
-                                '`➕ Playlist added and is playing now [' +
+                                '`🔺 Playlist added and is playing now [' +
                                 (client.musicManager.queues.get(interaction.guildId!)!.length - 1) +
                                 ' in queue]`';
                         } else if (next) {
                             addedText =
-                                '`➕ Playlist is next in queue [' +
+                                '`🔺 Playlist is next in queue [' +
                                 client.musicManager.queues.get(interaction.guildId!)!.length +
                                 ' in queue]`';
                         } else {
                             addedText =
-                                '`➕ Playlist was added [' +
+                                '`🔺 Playlist was added [' +
                                 client.musicManager.queues.get(interaction.guildId!)!.length +
                                 ' in queue]`';
                         }
@@ -172,7 +172,6 @@ export const command: Command = {
                             )
                         );
                     }
-
                     done();
                 } catch (err) {
                     try {

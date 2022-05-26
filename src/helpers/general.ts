@@ -1,4 +1,5 @@
 import { ButtonInteraction, CommandInteraction, MessagePayload, WebhookEditMessageOptions } from 'discord.js';
+import { arrayBuffer } from 'stream/consumers';
 
 export async function safeReply(
     interaction: CommandInteraction | ButtonInteraction,
@@ -52,4 +53,16 @@ export async function safeDeferReply(interaction: CommandInteraction | ButtonInt
     } catch (err) {
         console.log(err);
     }
+}
+
+export function shuffleArray(arr: any[]): any[] {
+    let currentIndex = arr.length;
+    let randomIndex = 0;
+
+    while (currentIndex != 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [arr[currentIndex], arr[randomIndex]] = [arr[randomIndex], arr[currentIndex]];
+    }
+    return arr;
 }

@@ -11,7 +11,11 @@ import { Playlist, PlaylistType } from '../interfaces';
 import BetterClient from '../client';
 import fetch from 'node-fetch';
 import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
-import { safeDeferReply, safeReply } from './general';
+import { safeDeferReply, safeReply, shuffleArray } from './general';
+import { getSpotifyPlaylistsApiResponse, getSpotifyTracksApiResponse } from './spotifyAPI';
+import { JSDOM } from 'jsdom';
+
+const spotifyThumbnail = 'https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg';
 
 export function determineInputType(args: string): InputType {
     if (args.startsWith('http://') || args.startsWith('https://')) {
@@ -247,22 +251,7 @@ export function getNewgroundsTrack(url: string, requestor: string, announce: boo
 export function getSpotifyTrack(url: string, client: BetterClient, requestor: string, announce: boolean) {
     return new Promise<Track>(async (resolve, reject) => {
         try {
-            if (client.SpotifyAuthorization == '' || client.SpotifyAuthorizationTimeout < new Date()) {
-                await getSpotifyAuthorizationToken(client, reject);
-            }
-
-            const apiUrl = 'https://api.spotify.com/v1/tracks/';
-            const playlistId = url.match(/(?<=track\/)([a-zA-Z0-9-_]+)?/)![0];
-            const requestUrl = apiUrl + playlistId;
-
-            let response: any = await fetch(requestUrl, {
-                method: 'GET',
-                headers: {
-                    Authorization: client.SpotifyAuthorization
-                }
-            });
-            response = await response.json();
-            if (response!.error) reject('Track not found. Is it available in our market?');
+            let response = await getSpotifyTracksApiResponse(client, url, reject);
             const track = await getYouTubeTrack(
                 response.artists[0].name + ' ' + response.name,
                 requestor,
@@ -286,64 +275,26 @@ export function getSpotifyPlaylistTracks(
 ) {
     return new Promise<[Playlist, Track[]]>(async (resolve, reject) => {
         try {
-            if (client.SpotifyAuthorization == '' || client.SpotifyAuthorizationTimeout < new Date()) {
-                await getSpotifyAuthorizationToken(client, reject);
-            }
-
-            const apiUrl = 'https://api.spotify.com/v1/playlists/';
-            const playlistId = url.match(/(?<=playlist\/)([a-zA-Z0-9-_]+)?/)![0];
-            const fields =
-                '?fields=name,description,owner,external_urls,id,images,tracks.items(track(album(images),artists,duration_ms,name))';
-            const requestUrl = apiUrl + playlistId + fields;
-
-            let response: any = await fetch(requestUrl, {
-                method: 'GET',
-                headers: {
-                    Authorization: client.SpotifyAuthorization
-                }
-            });
-            response = await response.json();
-            if (response!.error) reject('Playlist not found. Is it private?');
-
+            let response = await getSpotifyPlaylistsApiResponse(client, url, reject);
             let playlistTracks = response.tracks.items;
-            console.log(response);
             let playlist: Playlist = {
                 type: PlaylistType.Spotify,
-                name: response.name || 'Unknown',
-                description: response.description || 'No desciption available.',
+                name: JSDOM.fragment(response.name).textContent || 'Unknown',
+                description: JSDOM.fragment(response.description).textContent || 'No desciption available.',
                 url: response.external_urls.spotify,
                 itemCount: playlistTracks.length,
                 announce: announce,
                 owner: response.owner.display_name || 'Unknown',
                 publishedAt: 'Unknown',
-                thumbnailUrl: response.images[0]?.url || (await getLogoUrlfromUrl(response.external_urls.spotify))
+                thumbnailUrl: response.images[0]?.url || spotifyThumbnail
             };
 
             let tracks: Track[] = [];
             let stopLoop = false;
             let abortLoop = false;
-            let embedmsg = new MessageEmbed()
-                .setColor('#1DB954')
-                .setTitle(playlist.name)
-                .setDescription(
-                    '`' +
-                        getLoadingMessage(tracks.length, playlistTracks.length) +
-                        ' ' +
-                        String(Math.floor((tracks.length / playlistTracks.length) * 100)) +
-                        '%`'
-                )
-                .setThumbnail(
-                    playlist.thumbnailUrl ||
-                        'https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg'
-                )
-                .addField('Description', playlist.description, false)
-                .addField('Owner', playlist.owner, true)
-                .addField('Videos', String(playlist.itemCount), true)
-                .addField('Published At', playlist.publishedAt, true);
-            embedmsg.footer = {
-                text: `Requested by ${interaction.user.username}` + (playlist.announce ? ' 📣' : ''),
-                iconURL: interaction.user.avatarURL() || undefined
-            };
+            let loaded = 0;
+            let failed = 0;
+            let embedmsg = getLoadingMessageEmbed(interaction, playlist, tracks, playlistTracks, loaded, failed);
             const row = new MessageActionRow().addComponents([
                 new MessageButton().setCustomId('loading_stop').setLabel('Stop & Accept').setStyle('SECONDARY'),
                 new MessageButton().setCustomId('loading_abort').setLabel('Abort').setStyle('DANGER')
@@ -352,28 +303,7 @@ export function getSpotifyPlaylistTracks(
             await safeReply(interaction, { embeds: [embedmsg], components: [row] });
 
             let messageTrigger = setInterval(async () => {
-                embedmsg = new MessageEmbed()
-                    .setColor('#1DB954')
-                    .setTitle(playlist.name)
-                    .setDescription(
-                        '`' +
-                            getLoadingMessage(tracks.length, playlistTracks.length) +
-                            ' ' +
-                            String(Math.floor((tracks.length / playlistTracks.length) * 100)) +
-                            '%`'
-                    )
-                    .setThumbnail(
-                        playlist.thumbnailUrl ||
-                            'https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg'
-                    )
-                    .addField('Description', playlist.description, false)
-                    .addField('Owner', playlist.owner, true)
-                    .addField('Videos', String(playlist.itemCount), true)
-                    .addField('Published At', playlist.publishedAt, true);
-                embedmsg.footer = {
-                    text: `Requested by ${interaction.user.username}` + (playlist.announce ? ' 📣' : ''),
-                    iconURL: interaction.user.avatarURL() || undefined
-                };
+                embedmsg = getLoadingMessageEmbed(interaction, playlist, tracks, playlistTracks, loaded, failed);
 
                 const collector = interaction.channel!.createMessageComponentCollector({
                     componentType: 'BUTTON',
@@ -398,6 +328,12 @@ export function getSpotifyPlaylistTracks(
                 await safeReply(interaction, { embeds: [embedmsg], components: [row] });
             }, 3_000);
 
+            if (shuffle) {
+                shuffleArray(playlistTracks);
+            } else if (reverse) {
+                playlistTracks = playlistTracks.reverse();
+            }
+
             for (const track of playlistTracks) {
                 try {
                     tracks.push(
@@ -408,31 +344,19 @@ export function getSpotifyPlaylistTracks(
                             InputType.SpotifyPlaylist
                         )
                     );
+                    loaded += 1;
                     if (stopLoop) break;
                     if (abortLoop) {
                         reject('Loading Spotify Playlist was aborted.');
                         return;
                     }
                 } catch (error) {
+                    failed += 1;
                     continue;
                 }
             }
-
             clearInterval(messageTrigger);
             await safeReply(interaction, { embeds: [embedmsg], components: [] });
-
-            if (shuffle) {
-                let currentIndex = tracks.length;
-                let randomIndex = 0;
-
-                while (currentIndex != 0) {
-                    randomIndex = Math.floor(Math.random() * currentIndex);
-                    currentIndex--;
-                    [tracks[currentIndex], tracks[randomIndex]] = [tracks[randomIndex], tracks[currentIndex]];
-                }
-            } else if (reverse) {
-                tracks = tracks.reverse();
-            }
 
             resolve([playlist, tracks]);
         } catch (error) {
@@ -441,25 +365,37 @@ export function getSpotifyPlaylistTracks(
     });
 }
 
-async function getSpotifyAuthorizationToken(client: BetterClient, reject: (reason?: any) => void) {
-    await fetch('https://accounts.spotify.com/api/token?grant_type=client_credentials', {
-        method: 'POST',
-        headers: {
-            Authorization:
-                'Basic ' +
-                Buffer.from(process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET).toString('base64'),
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    })
-        .then((response) => response.json())
-        .then((data: any) => {
-            if (data?.error) reject('Spotify API Authorization failed.');
-            client.SpotifyAuthorization = data.token_type + ' ' + data.access_token;
-            client.SpotifyAuthorizationTimeout = new Date(new Date().getTime() + data.expires_in * 1000);
-        })
-        .catch((reason) => {
-            reject(reason);
-        });
+function getLoadingMessageEmbed(
+    interaction: CommandInteraction | ButtonInteraction,
+    playlist: Playlist,
+    tracks: any,
+    playlistTracks: any,
+    loaded: number,
+    failed: number
+) {
+    let embedmsg = new MessageEmbed()
+        .setColor('#1DB954')
+        .setTitle(playlist.name)
+        .setDescription(
+            '`' +
+                getLoadingMessage(tracks.length, playlistTracks.length) +
+                ' ' +
+                String(Math.floor((tracks.length / playlistTracks.length) * 100)) +
+                '%`\n' +
+                '`Loaded: ' +
+                String(loaded) +
+                (failed > 0 ? '`\n`Not found: ' + String(failed) : '`')
+        )
+        .setThumbnail(playlist.thumbnailUrl || spotifyThumbnail)
+        .addField('Description', playlist.description, false)
+        .addField('Owner', playlist.owner, true)
+        .addField('Videos', String(playlist.itemCount), true)
+        .addField('Published At', playlist.publishedAt, true);
+    embedmsg.footer = {
+        text: `Requested by ${interaction.user.username}` + (playlist.announce ? ' 📣' : ''),
+        iconURL: interaction.user.avatarURL() || undefined
+    };
+    return embedmsg;
 }
 
 function isYouTubeURL(url: string): boolean {
