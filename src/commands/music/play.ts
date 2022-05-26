@@ -173,7 +173,7 @@ export const command: Command = {
                                     { name: 'Description', value: getPrettyEmbedString(result.description) },
                                     { name: 'Owner', value: getPrettyEmbedString(result.owner), inline: true },
                                     {
-                                        name: 'Videos',
+                                        name: result.type === PlaylistType.YouTube ? 'Videos' : 'Tracks',
                                         value: getPrettyEmbedString(String(result.itemCount)),
                                         inline: true
                                     },
