@@ -31,7 +31,7 @@ export const command: Command = {
                     })
                     .then(done)
                     .catch(async (err) => {
-                        await interaction.editReply(createErrorEmbed('🚩 Error roasting: `' + err + '`'));
+                        await interaction.editReply(createErrorEmbed('🚩 Error roasting: `' + err + '`', true));
                         error(err);
                     });
             }

@@ -68,7 +68,7 @@ export const command: Command = {
                     )
                     .then(done)
                     .catch(async (err) => {
-                        await interaction.editReply(createErrorEmbed('🚩 Error clearing queue: `' + err + '`'));
+                        await interaction.editReply(createErrorEmbed('🚩 Error clearing queue: `' + err + '`', true));
                         error(err);
                     });
             }

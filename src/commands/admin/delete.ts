@@ -59,7 +59,8 @@ export const command: Command = {
                                         `${user}` +
                                         (bulk.size < amount!
                                             ? '\n`⚠️ Messages older than 14 days cannot be bulk deleted.`'
-                                            : '`')
+                                            : '`'),
+                                    true
                                 )
                             );
                         } else {
@@ -74,7 +75,8 @@ export const command: Command = {
                                         ' messages.' +
                                         (bulk.size < amount!
                                             ? '\n⚠️ Messages older than 14 days cannot be bulk deleted.`'
-                                            : '`')
+                                            : '`'),
+                                    true
                                 )
                             );
                         }
@@ -82,12 +84,12 @@ export const command: Command = {
                         // No permission
                         await safeReply(
                             interaction,
-                            createEmbed(' ', '`⛔ You do not have access permission for this command!`')
+                            createEmbed(' ', '`⛔ You do not have access permission for this command!`', true)
                         );
                     }
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error deleting messages: `' + err + '`'));
+                    await safeReply(interaction, createErrorEmbed('🚩 Error deleting messages: `' + err + '`', true));
                     error(err);
                 }
             }

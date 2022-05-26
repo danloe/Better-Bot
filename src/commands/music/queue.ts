@@ -24,7 +24,7 @@ export const command: Command = {
                     startCollector(client, interaction, subscription, queue);
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error showing the queue: `' + err + '`'));
+                    await safeReply(interaction, createErrorEmbed('🚩 Error showing the queue: `' + err + '`', true));
                     error(err);
                 }
             }

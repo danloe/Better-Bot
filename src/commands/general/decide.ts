@@ -54,7 +54,7 @@ export const command: Command = {
                         return;
                     }
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error deciding: `' + err + '`'));
+                    await safeReply(interaction, createErrorEmbed('🚩 Error deciding: `' + err + '`', true));
                     error(err);
                 }
             }

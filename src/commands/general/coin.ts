@@ -49,7 +49,7 @@ export const command: Command = {
                     await interaction.editReply({ content: ' ', embeds: [new MessageEmbed().setImage(coinImage)] });
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error flipping coin: `' + err + '`'));
+                    await safeReply(interaction, createErrorEmbed('🚩 Error flipping coin: `' + err + '`', true));
                     error(err);
                 }
             }

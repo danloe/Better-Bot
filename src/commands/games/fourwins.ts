@@ -376,7 +376,10 @@ export const command: Command = {
                     }
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error creating a Four Wins game: `' + err + '`'));
+                    await safeReply(
+                        interaction,
+                        createErrorEmbed('🚩 Error creating a Four Wins game: `' + err + '`', true)
+                    );
                     error(err);
                 }
             }

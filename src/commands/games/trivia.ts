@@ -354,7 +354,10 @@ export const command: Command = {
                     lobby.open();
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error creating a Trivia game: `' + err + '`'));
+                    await safeReply(
+                        interaction,
+                        createErrorEmbed('🚩 Error creating a Trivia game: `' + err + '`', true)
+                    );
                     error(err);
                 }
             }

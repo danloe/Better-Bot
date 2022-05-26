@@ -375,7 +375,7 @@ export const command: Command = {
                 } catch (err) {
                     await safeReply(
                         interaction,
-                        createErrorEmbed('🚩 Error creating a Tic Tac Toe game: `' + err + '`')
+                        createErrorEmbed('🚩 Error creating a Tic Tac Toe game: `' + err + '`', true)
                     );
                     error(err);
                 }

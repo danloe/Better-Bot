@@ -194,7 +194,7 @@ export const command: Command = {
                     }
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error adding track(s): `' + err + '`'));
+                    await safeReply(interaction, createErrorEmbed('🚩 Error adding track(s): `' + err + '`', true));
                     error(err);
                 }
             }

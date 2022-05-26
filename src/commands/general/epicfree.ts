@@ -67,7 +67,7 @@ export const command: Command = {
                 } catch (err) {
                     await safeReply(
                         interaction,
-                        createErrorEmbed('🚩 Error showing Epic Games Free Games: `' + err + '`')
+                        createErrorEmbed('🚩 Error showing Epic Games Free Games: `' + err + '`', true)
                     );
                     error(err);
                 }

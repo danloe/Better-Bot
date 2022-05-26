@@ -322,7 +322,7 @@ export const command: Command = {
                 } catch (err) {
                     await safeReply(
                         interaction,
-                        createErrorEmbed('🚩 Error creating a Find The Emoji game: `' + err + '`')
+                        createErrorEmbed('🚩 Error creating a Find The Emoji game: `' + err + '`', true)
                     );
                     error(err);
                 }
