@@ -23,15 +23,9 @@ export const command: Command = {
                             createEmbed('Shuffled', '`✅ The Queue is no longer in OOOORDER.`', true)
                         );
                     }
-
                     done();
                 } catch (err) {
-                    try {
-                        await safeReply(interaction, createErrorEmbed('🚩 Error shuffling the queue: `' + err + '`', true));
-                    } catch (err2) {
-                        console.log(err2);
-                    }
-                    console.log(err);
+                    await safeReply(interaction, createErrorEmbed('🚩 Error shuffling the queue: `' + err + '`', true));
                     error(err);
                 }
             }

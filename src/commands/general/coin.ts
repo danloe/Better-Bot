@@ -47,15 +47,9 @@ export const command: Command = {
                     await interaction.reply({ content: ' ', embeds: [new MessageEmbed().setImage(throwImage)] });
                     await wait(4_000);
                     await interaction.editReply({ content: ' ', embeds: [new MessageEmbed().setImage(coinImage)] });
-
                     done();
                 } catch (err) {
-                    try {
-                        await safeReply(interaction, createErrorEmbed('🚩 Error flipping coin: `' + err + '`'));
-                    } catch (err2) {
-                        console.log(err2);
-                    }
-                    console.log(err);
+                    await safeReply(interaction, createErrorEmbed('🚩 Error flipping coin: `' + err + '`'));
                     error(err);
                 }
             }

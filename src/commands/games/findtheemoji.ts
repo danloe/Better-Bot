@@ -320,15 +320,10 @@ export const command: Command = {
                     lobby.open();
                     done();
                 } catch (err) {
-                    try {
-                        await safeReply(
-                            interaction,
-                            createErrorEmbed('🚩 Error creating a Find The Emoji game: `' + err + '`')
-                        );
-                    } catch (err2) {
-                        console.log(err2);
-                    }
-                    console.log(err);
+                    await safeReply(
+                        interaction,
+                        createErrorEmbed('🚩 Error creating a Find The Emoji game: `' + err + '`')
+                    );
                     error(err);
                 }
             }

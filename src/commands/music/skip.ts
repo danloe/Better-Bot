@@ -35,15 +35,7 @@ export const command: Command = {
                     await safeReply(interaction, createEmbed('Skipped', msg, true));
                     done();
                 } catch (err) {
-                    try {
-                        await safeReply(
-                            interaction,
-                            createErrorEmbed('🚩 Error skipping track(s): `' + err + '`', true)
-                        );
-                    } catch (err2) {
-                        console.log(err2);
-                    }
-                    console.log(err);
+                    await safeReply(interaction, createErrorEmbed('🚩 Error skipping track(s): `' + err + '`', true));
                     error(err);
                 }
             }

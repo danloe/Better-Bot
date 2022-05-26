@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BetterClient from '../../client';
-import { createErrorEmbed, safeReply } from '../../helpers';
+import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 import { command as skip } from './skip';
 import { command as clear } from './clear';
 import { command as shuffle } from './shuffle';
@@ -19,31 +19,19 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction) {
                 try {
-                    const queue = await client.musicManager.getQueue(interaction);
-
+                    const queue = client.musicManager.getQueue(interaction);
                     const subscription = client.musicManager.subscriptions.get(interaction.guildId!)!;
-
                     startCollector(client, interaction, subscription, queue);
-
-                    await safeReply(interaction, {
-                        embeds: [queue.getQueueMessageEmbed(subscription!)],
-                        components: [queue.getQueueMessageRow()]
-                    });
                     done();
                 } catch (err) {
-                    try {
-                        await safeReply(interaction, createErrorEmbed('🚩 Error showing the queue: `' + err + '`'));
-                    } catch (err2) {
-                        console.log(err2);
-                    }
-                    console.log(err);
+                    await safeReply(interaction, createErrorEmbed('🚩 Error showing the queue: `' + err + '`'));
                     error(err);
                 }
             }
         })
 };
 
-function startCollector(
+async function startCollector(
     client: BetterClient,
     interaction: CommandInteraction | ButtonInteraction,
     subscription: MusicSubscription,
@@ -56,7 +44,7 @@ function startCollector(
 
     collector.on('collect', async (button) => {
         try {
-            await button.deferUpdate();
+            await safeDeferReply(button);
             switch (button.customId) {
                 case 'queue_previous':
                     if (queue.currentPage > 1) {
@@ -78,10 +66,6 @@ function startCollector(
                     }
                     break;
             }
-            await safeReply(interaction, {
-                embeds: [queue.getQueueMessageEmbed(subscription)],
-                components: [queue.getQueueMessageRow()]
-            });
             collector.stop();
             startCollector(client, interaction, subscription, queue);
         } catch (err) {
@@ -100,5 +84,10 @@ function startCollector(
                 console.log(err);
             }
         }
+    });
+
+    await safeReply(interaction, {
+        embeds: [queue.getQueueMessageEmbed(subscription)],
+        components: [queue.getQueueMessageRow()]
     });
 }

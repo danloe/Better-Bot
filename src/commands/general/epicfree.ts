@@ -65,15 +65,10 @@ export const command: Command = {
                     }
                     done();
                 } catch (err) {
-                    try {
-                        await safeReply(
-                            interaction,
-                            createErrorEmbed('🚩 Error showing Epic Games Free Games: `' + err + '`')
-                        );
-                    } catch (err2) {
-                        console.log(err2);
-                    }
-                    console.log(err);
+                    await safeReply(
+                        interaction,
+                        createErrorEmbed('🚩 Error showing Epic Games Free Games: `' + err + '`')
+                    );
                     error(err);
                 }
             }

@@ -11,27 +11,17 @@ export const command: Command = {
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
-    ) => new Promise<void>(async (done, error) => {
-        if (interaction) {
-            try {
-                await client.musicManager.stop(interaction);
-                await safeReply(
-                    interaction,
-                    createEmbed('Stopped', '`✅ The audio playback has stopped.`', true)
-                );
-                done();
-            } catch (err) {
+    ) =>
+        new Promise<void>(async (done, error) => {
+            if (interaction) {
                 try {
-                    await safeReply(
-                        interaction,
-                        createErrorEmbed('🚩 Error stopping the track: `' + err + '`', true)
-                    );
-                } catch (err2) {
-                    console.log(err2);
+                    await client.musicManager.stop(interaction);
+                    await safeReply(interaction, createEmbed('Stopped', '`✅ The audio playback has stopped.`', true));
+                    done();
+                } catch (err) {
+                    await safeReply(interaction, createErrorEmbed('🚩 Error stopping the track: `' + err + '`', true));
+                    error(err);
                 }
-                console.log(err);
-                error(err);
             }
-        }
-    })
+        })
 };

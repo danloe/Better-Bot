@@ -87,15 +87,7 @@ export const command: Command = {
                     }
                     done();
                 } catch (err) {
-                    try {
-                        await safeReply(
-                            interaction,
-                            createErrorEmbed('🚩 Error deleting messages: `' + err + '`')
-                        );
-                    } catch (err2) {
-                        console.log(err2);
-                    }
-                    console.log(err);
+                    await safeReply(interaction, createErrorEmbed('🚩 Error deleting messages: `' + err + '`'));
                     error(err);
                 }
             }

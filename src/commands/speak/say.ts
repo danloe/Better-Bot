@@ -39,15 +39,7 @@ export const command: Command = {
                     await safeReply(interaction, '`🗨️' + getLanguageEmoji(lang) + ' ' + input + '`');
                     done();
                 } catch (err) {
-                    try {
-                        await safeReply(
-                            interaction,
-                            createErrorEmbed('🚩 Error saying something: `' + err + '`')
-                        );
-                    } catch (err2) {
-                        console.log(err2);
-                    }
-                    console.log(err);
+                    await safeReply(interaction, createErrorEmbed('🚩 Error saying something: `' + err + '`'));
                     error(err);
                 }
             }

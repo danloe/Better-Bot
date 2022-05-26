@@ -11,27 +11,20 @@ export const command: Command = {
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
-    ) => new Promise<void>(async (done, error) => {
-        if (interaction) {
-            try {
-                await client.musicManager.pause(interaction);
-                await safeReply(
-                    interaction,
-                    createEmbed('Paused', '`✅ The current track is now on pause.`', true)
-                );
-                done();
-            } catch (err) {
+    ) =>
+        new Promise<void>(async (done, error) => {
+            if (interaction) {
                 try {
+                    await client.musicManager.pause(interaction);
                     await safeReply(
                         interaction,
-                        createErrorEmbed('🚩 Error pausing the track: `' + err + '`', true)
+                        createEmbed('Paused', '`✅ The current track is now on pause.`', true)
                     );
-                } catch (err2) {
-                    console.log(err2);
+                    done();
+                } catch (err) {
+                    await safeReply(interaction, createErrorEmbed('🚩 Error pausing the track: `' + err + '`', true));
+                    error(err);
                 }
-                console.log(err);
-                error(err);
             }
-        }
-    })
+        })
 };
