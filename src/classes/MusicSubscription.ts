@@ -203,7 +203,7 @@ export class MusicSubscription {
     /**
      * Stops audio playback.
      */
-     public pause() {
+    public pause() {
         this.audioPlayer.pause();
     }
 
@@ -211,7 +211,7 @@ export class MusicSubscription {
      * Skips current audio playback.
      */
     public skip() {
-        if(this.isIdle) {
+        if (this.isIdle()) {
             this.play();
         } else {
             this.audioPlayer.stop();

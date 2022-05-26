@@ -67,3 +67,25 @@ export async function getSpotifyPlaylistsApiResponse(
     if (response!.error) reject('Playlist not found. Is it private?');
     return response;
 }
+
+export async function getSpotifyAlbumsApiResponse(
+    client: BetterClient,
+    url: string,
+    reject: (reason?: any) => void
+): Promise<any> {
+    if (client.SpotifyAuthorization == '' || client.SpotifyAuthorizationTimeout < new Date()) {
+        await getSpotifyAuthorizationToken(client, reject);
+    }
+    const apiUrl = 'https://api.spotify.com/v1/albums/';
+    const albumId = url.match(/(?<=album\/)([a-zA-Z0-9-_]+)?/)![0];
+    const requestUrl = apiUrl + albumId;
+    let response: any = await fetch(requestUrl, {
+        method: 'GET',
+        headers: {
+            Authorization: client.SpotifyAuthorization
+        }
+    });
+    response = await response.json();
+    if (response!.error) reject('Album not found. Is it available in our market?');
+    return response;
+}

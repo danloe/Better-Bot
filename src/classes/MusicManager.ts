@@ -9,7 +9,7 @@ import {
     getYoutubePlaylistTracks,
     getYoutubePlaylist,
     getLogoUrlfromUrl,
-    getSpotifyPlaylistTracks,
+    getSpotifyAlbumOrPlaylistTracks,
     getSpotifyTrack
 } from '../helpers';
 import { ButtonInteraction, CommandInteraction, GuildMember, Snowflake } from 'discord.js';
@@ -84,8 +84,19 @@ export class MusicManager {
                         track = await getSpotifyTrack(input, this.client, interaction.user.username, announce);
                         break;
 
+                    case InputType.SpotifyAlbum:
+                        [playlist, tracks] = await getSpotifyAlbumOrPlaylistTracks(
+                            input,
+                            this.client,
+                            interaction,
+                            announce,
+                            reverse,
+                            shuffle
+                        );
+                        break;
+
                     case InputType.SpotifyPlaylist:
-                        [playlist, tracks] = await getSpotifyPlaylistTracks(
+                        [playlist, tracks] = await getSpotifyAlbumOrPlaylistTracks(
                             input,
                             this.client,
                             interaction,
@@ -434,11 +445,4 @@ export class MusicManager {
         }
         return subscription!;
     }
-}
-
-export enum PlayerStatus {
-    Playing,
-    Paused,
-    Stopped,
-    Empty
 }

@@ -95,5 +95,6 @@ export enum InputType {
     SoundCloud,
     Newgrounds,
     SpotifyTrack,
+    SpotifyAlbum,
     SpotifyPlaylist
 }

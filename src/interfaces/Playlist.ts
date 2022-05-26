@@ -12,5 +12,6 @@ export interface Playlist {
 
 export enum PlaylistType {
     YouTube,
-    Spotify
+    SpotifyPlaylist,
+    SpotifyAlbum
 }

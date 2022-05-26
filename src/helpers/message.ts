@@ -49,6 +49,8 @@ export function getTrackTypeColor(trackType: InputType): ColorResolvable {
             return '#fda238';
         case InputType.SpotifyTrack:
             return '#1DB954';
+        case InputType.SpotifyAlbum:
+            return '#1DB954';
         case InputType.SpotifyPlaylist:
             return '#1DB954';
         default:
@@ -84,15 +86,17 @@ export function getTrackTypeString(track: Track): string {
         case InputType.YouTube:
             return 'YouTube';
         case InputType.YouTubePlaylist:
-            return 'YouTube';
+            return 'YouTube Playlist';
         case InputType.SoundCloud:
             return 'SoundCloud';
         case InputType.Newgrounds:
             return 'Newgrounds';
         case InputType.SpotifyTrack:
-            return 'Spotify';
+            return 'Spotify Track';
+        case InputType.SpotifyAlbum:
+            return 'Spotify Album';
         case InputType.SpotifyPlaylist:
-            return 'Spotify';
+            return 'Spotify Playlist';
         default:
             return 'Unknown';
     }

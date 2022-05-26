@@ -12,7 +12,7 @@ import BetterClient from '../client';
 import fetch from 'node-fetch';
 import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { safeDeferReply, safeReply, shuffleArray } from './general';
-import { getSpotifyPlaylistsApiResponse, getSpotifyTracksApiResponse } from './spotifyAPI';
+import { getSpotifyAlbumsApiResponse, getSpotifyPlaylistsApiResponse, getSpotifyTracksApiResponse } from './spotifyApi';
 import { JSDOM } from 'jsdom';
 
 const youTubeThumbnail = 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg';
@@ -31,6 +31,7 @@ export function determineInputType(args: string): InputType {
         if (isSoundCloudURL(args)) return InputType.SoundCloud;
         if (isNewgroundsURL(args)) return InputType.Newgrounds;
         if (isSpotifyTrackURL(args)) return InputType.SpotifyTrack;
+        if (isSpotifyAlbumURL(args)) return InputType.SpotifyAlbum;
         if (isSpotifyPlaylistURL(args)) return InputType.SpotifyPlaylist;
         return InputType.DirectFile;
     } else {
@@ -96,7 +97,15 @@ export function getYoutubePlaylist(url: string, announce: boolean) {
                 method: 'GET'
             });
             response = await response.json();
-            if (response!.error) reject('Playlist not found. Is it private?');
+
+            if (response!.error) {
+                if (response!.error!.message!.includes('API key')) {
+                    reject('Google ' + response!.error!.message);
+                    return;
+                }
+                reject('Playlist not found. Is it private?');
+                return;
+            }
 
             let playlistItem = response.items![0];
             let playlist: Playlist;
@@ -115,7 +124,6 @@ export function getYoutubePlaylist(url: string, announce: boolean) {
             };
             resolve(playlist);
         } catch (error) {
-            console.log(error);
             reject('Could not load playlist. Check URL and privacy status or try again later.');
         }
     });
@@ -264,7 +272,7 @@ export function getSpotifyTrack(url: string, client: BetterClient, requestor: st
     });
 }
 
-export function getSpotifyPlaylistTracks(
+export function getSpotifyAlbumOrPlaylistTracks(
     url: string,
     client: BetterClient,
     interaction: CommandInteraction | ButtonInteraction,
@@ -274,26 +282,51 @@ export function getSpotifyPlaylistTracks(
 ) {
     return new Promise<[Playlist, Track[]]>(async (resolve, reject) => {
         try {
-            let response = await getSpotifyPlaylistsApiResponse(client, url, reject);
-            let playlistTracks = response.tracks.items;
-            let playlist: Playlist = {
-                type: PlaylistType.Spotify,
-                name: JSDOM.fragment(response.name).textContent || 'Unknown',
-                description: JSDOM.fragment(response.description).textContent || 'No desciption available.',
-                url: response.external_urls.spotify,
-                itemCount: playlistTracks.length,
-                announce: announce,
-                owner: response.owner.display_name || 'Unknown',
-                publishedAt: 'Unknown',
-                thumbnailUrl: response.images[0]?.url || spotifyThumbnail
-            };
+            let response: any;
+            let playlist: Playlist;
+            let responseTracks: any[];
+
+            if (url.includes('/album/')) {
+                response = await getSpotifyAlbumsApiResponse(client, url, reject);
+                responseTracks = response.tracks.items;
+                playlist = {
+                    type: PlaylistType.SpotifyAlbum,
+                    name: JSDOM.fragment(response.name).textContent || 'Unknown',
+                    description:
+                        'Album Type: ' +
+                        JSDOM.fragment(response.album_type).textContent +
+                        (response.copyrights
+                            ? ', Copyright: (' + response.copyrights[0]!.type + ') ' + response.copyrights[0]!.text
+                            : ''),
+                    url: response.external_urls.spotify,
+                    itemCount: responseTracks.length,
+                    announce: announce,
+                    owner: response.artists[0]?.name || 'Unknown',
+                    publishedAt: response.release_date,
+                    thumbnailUrl: response.images[0]?.url || spotifyThumbnail
+                };
+            } else {
+                response = await getSpotifyPlaylistsApiResponse(client, url, reject);
+                responseTracks = response.tracks.items;
+                playlist = {
+                    type: PlaylistType.SpotifyPlaylist,
+                    name: JSDOM.fragment(response.name).textContent || 'Unknown',
+                    description: JSDOM.fragment(response.description).textContent || 'No desciption available.',
+                    url: response.external_urls.spotify,
+                    itemCount: responseTracks.length,
+                    announce: announce,
+                    owner: response.owner.display_name || 'Unknown',
+                    publishedAt: 'Unknown',
+                    thumbnailUrl: response.images[0]?.url || spotifyThumbnail
+                };
+            }
 
             let tracks: Track[] = [];
             let stopLoop = false;
             let abortLoop = false;
             let loaded = 0;
             let failed = 0;
-            let embedmsg = getLoadingMessageEmbed(interaction, playlist, tracks, playlistTracks, loaded, failed);
+            let embedmsg = getLoadingMessageEmbed(interaction, playlist, tracks, responseTracks, loaded, failed);
             const row = new MessageActionRow().addComponents([
                 new MessageButton().setCustomId('loading_stop').setLabel('Stop & Accept').setStyle('SECONDARY'),
                 new MessageButton().setCustomId('loading_abort').setLabel('Abort').setStyle('DANGER')
@@ -302,7 +335,7 @@ export function getSpotifyPlaylistTracks(
             await safeReply(interaction, { embeds: [embedmsg], components: [row] });
 
             let messageTrigger = setInterval(async () => {
-                embedmsg = getLoadingMessageEmbed(interaction, playlist, tracks, playlistTracks, loaded, failed);
+                embedmsg = getLoadingMessageEmbed(interaction, playlist, tracks, responseTracks, loaded, failed);
 
                 const collector = interaction.channel!.createMessageComponentCollector({
                     componentType: 'BUTTON',
@@ -328,25 +361,36 @@ export function getSpotifyPlaylistTracks(
             }, 3_000);
 
             if (shuffle) {
-                shuffleArray(playlistTracks);
+                shuffleArray(responseTracks);
             } else if (reverse) {
-                playlistTracks = playlistTracks.reverse();
+                responseTracks = responseTracks.reverse();
             }
 
-            for (const track of playlistTracks) {
+            for (const track of responseTracks) {
                 try {
-                    tracks.push(
-                        await getYouTubeTrack(
-                            track.track.artists[0].name + ' ' + track.track.name,
-                            interaction.user.username,
-                            announce,
-                            InputType.SpotifyPlaylist
-                        )
-                    );
+                    if (playlist.type === PlaylistType.SpotifyAlbum) {
+                        tracks.push(
+                            await getYouTubeTrack(
+                                track.artists[0].name + ' ' + track.name,
+                                interaction.user.username,
+                                announce,
+                                InputType.SpotifyPlaylist
+                            )
+                        );
+                    } else {
+                        tracks.push(
+                            await getYouTubeTrack(
+                                track.track.artists[0].name + ' ' + track.track.name,
+                                interaction.user.username,
+                                announce,
+                                InputType.SpotifyAlbum
+                            )
+                        );
+                    }
                     loaded += 1;
                     if (stopLoop) break;
                     if (abortLoop) {
-                        reject('Loading Spotify Playlist was aborted.');
+                        reject('Loading Tracks from Spotify was aborted.');
                         return;
                     }
                 } catch (error) {
@@ -444,6 +488,15 @@ function isSpotifyTrackURL(url: string): boolean {
 
 function isSpotifyPlaylistURL(url: string): boolean {
     const urls = ['https://open.spotify.com/playlist/'];
+
+    for (let u of urls) {
+        if (url.startsWith(u)) return true;
+    }
+    return false;
+}
+
+function isSpotifyAlbumURL(url: string): boolean {
+    const urls = ['https://open.spotify.com/album/'];
 
     for (let u of urls) {
         if (url.startsWith(u)) return true;
