@@ -66,7 +66,8 @@ export class MusicManager {
                         playlist = await getYoutubePlaylist(input, announce);
                         tracks = await getYoutubePlaylistTracks(
                             input,
-                            50,
+                            offset,
+                            limit,
                             interaction.user.username,
                             announce,
                             reverse,

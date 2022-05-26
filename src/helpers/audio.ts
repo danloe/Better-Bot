@@ -127,7 +127,8 @@ export function getYoutubePlaylist(url: string, announce: boolean) {
 
 export function getYoutubePlaylistTracks(
     url: string,
-    maxResults: number = 50,
+    offset: number,
+    limit: number,
     requestor: string,
     announce: boolean,
     reverse: boolean,
@@ -135,55 +136,79 @@ export function getYoutubePlaylistTracks(
 ) {
     return new Promise<Track[]>(async (resolve, reject) => {
         try {
-            const apiUrl = 'https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet';
-            const apiMaxResults = '&maxResults=' + String(maxResults);
+            const apiUrl = 'https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50';
             const playlistId = '&playlistId=' + url.match(/(?<=list=)([a-zA-Z0-9-_]+)?/)![0];
             const apiKey = '&key=' + process.env.GOOGLE_API_KEY;
-            const requestUrl = apiUrl + apiMaxResults + playlistId + apiKey;
 
-            let response: any = await fetch(requestUrl, {
-                method: 'GET'
-            });
-            response = await response.json();
-            if (response!.error) reject('Playlist Tracks not found. Are they private?');
-
-            let videos = response.items;
+            let nextPageToken = '';
             let tracks: Track[] = [];
+            let nextPage = true;
+            do {
+                const requestUrl = apiUrl + nextPageToken + playlistId + apiKey;
+                let response: any = await fetch(requestUrl, {
+                    method: 'GET'
+                });
+                response = await response.json();
 
-            videos.forEach((video: any) => {
-                let snippet = video.snippet;
-                tracks.push(
-                    new Track(
-                        InputType.YouTubePlaylist,
-                        InputType.YouTube,
-                        'https://youtu.be/' + snippet.resourceId.videoId,
-                        snippet.title,
-                        requestor,
-                        announce,
-                        'https://youtu.be/' + snippet.resourceId.videoId,
-                        0,
-                        snippet.thumbnails.default.url,
-                        snippet.description,
-                        '',
-                        snippet.publishedAt
-                    )
-                );
-
-                if (shuffle) {
-                    let currentIndex = tracks.length;
-                    let randomIndex = 0;
-
-                    while (currentIndex != 0) {
-                        randomIndex = Math.floor(Math.random() * currentIndex);
-                        currentIndex--;
-                        [tracks[currentIndex], tracks[randomIndex]] = [tracks[randomIndex], tracks[currentIndex]];
+                if (response!.error) {
+                    if (response!.error!.message!.includes('API key')) {
+                        reject('Google ' + response!.error!.message);
+                        return;
                     }
-                } else if (reverse) {
-                    tracks = tracks.reverse();
+                    console.log(response!.error);
+                    reject('Playlist Tracks not found. Are they private?');
+                    return;
                 }
 
-                resolve(tracks);
-            });
+                let videos = response.items;
+                videos.forEach((video: any) => {
+                    let snippet = video.snippet;
+                    tracks.push(
+                        new Track(
+                            InputType.YouTubePlaylist,
+                            InputType.YouTube,
+                            'https://youtu.be/' + snippet.resourceId.videoId,
+                            snippet.title,
+                            requestor,
+                            announce,
+                            'https://youtu.be/' + snippet.resourceId.videoId,
+                            0,
+                            snippet.thumbnails?.default?.url || youTubeThumbnail,
+                            snippet.description,
+                            '',
+                            snippet.publishedAt
+                        )
+                    );
+                });
+
+                if (tracks.length >= limit + offset) nextPage = false;
+
+                if (response.nextPageToken) {
+                    nextPageToken = '&pageToken=' + response.nextPageToken;
+                } else {
+                    nextPage = false;
+                }
+            } while (nextPage);
+
+            if (offset) {
+                if (tracks.length > offset) {
+                    tracks.splice(0, offset - 1);
+                }
+            }
+
+            if (limit) {
+                if (tracks.length > limit) {
+                    tracks.splice(limit, tracks.length - limit);
+                }
+            }
+
+            if (shuffle) {
+                tracks = shuffleArray(tracks);
+            } else if (reverse) {
+                tracks = tracks.reverse();
+            }
+
+            resolve(tracks);
         } catch (error) {
             reject(error);
         }
@@ -371,7 +396,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
             }
 
             if (shuffle) {
-                shuffleArray(responseTracks);
+                responseTracks = shuffleArray(responseTracks);
             } else if (reverse) {
                 responseTracks = responseTracks.reverse();
             }
