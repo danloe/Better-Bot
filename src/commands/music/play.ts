@@ -21,7 +21,7 @@ export const command: Command = {
         .addStringOption((option) =>
             option
                 .setName('input')
-                .setDescription('URL to a File, Search Text or YouTube Playlist')
+                .setDescription('URL to File, YouTube, Spotify, SoundCloud, Newgrounds or Search Text')
                 .setRequired(true)
                 .setAutocomplete(true)
         )
