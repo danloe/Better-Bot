@@ -168,7 +168,7 @@ export class MusicManager {
                     return;
                 }
 
-                await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20e3).catch((_) => {
+                await entersState(subscription.voiceConnection!, VoiceConnectionStatus.Ready, 20e3).catch((_) => {
                     reject('Failed to join voice channel within 20 seconds, please try again later!');
                     return;
                 });
@@ -194,7 +194,7 @@ export class MusicManager {
         return new Promise<void>(async (done, error) => {
             try {
                 await safeDeferReply(interaction, true);
-                const subscription = this.getSubscription(interaction);
+                const subscription = this.getSubscription(interaction, true);
 
                 if (!subscription) {
                     error(
@@ -204,7 +204,7 @@ export class MusicManager {
                 }
 
                 try {
-                    await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20e3);
+                    await entersState(subscription.voiceConnection!, VoiceConnectionStatus.Ready, 20e3);
                 } catch (err) {
                     console.warn(err);
                     error('Failed to join voice channel within 20 seconds, please try again later!');
@@ -269,26 +269,22 @@ export class MusicManager {
             try {
                 await safeDeferReply(interaction);
                 const queue = this.getQueue(interaction);
-                let subscription = this.subscriptions.get(interaction.guildId!);
+                const subscription = this.getSubscription(interaction, true);
 
-                if ((!subscription && queue.hasTracks()) || subscription?.isPaused()) {
-                    subscription = this.getSubscription(interaction);
-                    if (!subscription) {
-                        error('Not in a voice channel.');
-                        return;
-                    }
-                    try {
-                        await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20e3);
-                    } catch (err) {
-                        console.warn(err);
-                        error('Failed to join voice channel within 20 seconds, please try again later!');
-                        return;
-                    }
-                    subscription.play();
-                } else if (!queue.hasTracks()) {
+                if (!queue.hasTracks() && !subscription.isPaused()) {
                     error('Nothing to play.');
                     return;
                 }
+
+                try {
+                    await entersState(subscription.voiceConnection!, VoiceConnectionStatus.Ready, 20e3);
+                } catch (err) {
+                    console.warn(err);
+                    error('Failed to join voice channel within 20 seconds, please try again later!');
+                    return;
+                }
+
+                subscription.play();
                 done();
             } catch (err) {
                 error(err);
@@ -318,7 +314,7 @@ export class MusicManager {
                 }
 
                 if (amount > 0) queue.remove(1, amount);
-                subscription.audioPlayer.stop();
+                subscription.audioPlayer!.stop();
                 done(queue);
             } catch (err) {
                 error(err);
@@ -447,13 +443,13 @@ export class MusicManager {
                         this.getQueue(interaction),
                         this.client.config.volume
                     );
-                    subscription.voiceConnection.on('error', console.warn);
+                    subscription.voiceConnection!.on('error', console.warn);
                 }
             } else {
-                subscription = new MusicSubscription(null, this.getQueue(interaction), this.client.config.volume);
+                subscription = new MusicSubscription(undefined, this.getQueue(interaction), this.client.config.volume);
             }
-            this.subscriptions.set(interaction.guildId!, subscription);
-        } else if ((!subscription.voiceConnection || !subscription.isVoiceConnectionReady()) && join) {
+            this.subscriptions.set(interaction.guildId!, subscription!);
+        } else if ((!subscription.voiceConnection! || !subscription.isVoiceConnectionReady()) && join) {
             if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                 const channel = interaction.member.voice.channel;
                 subscription = new MusicSubscription(
@@ -465,7 +461,7 @@ export class MusicManager {
                     this.getQueue(interaction),
                     subscription.volume
                 );
-                subscription.voiceConnection.on('error', console.warn);
+                subscription.voiceConnection!.on('error', console.warn);
             }
         }
         return subscription!;

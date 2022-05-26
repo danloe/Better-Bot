@@ -25,9 +25,9 @@ const discordTTS = require('discord-tts');
 const wait = promisify(setTimeout);
 
 export class MusicSubscription {
-    public readonly voiceConnection: VoiceConnection;
-    public readonly audioPlayer: AudioPlayer;
-    public readonly voicePlayer: AudioPlayer;
+    public readonly voiceConnection: VoiceConnection | undefined;
+    public readonly audioPlayer: AudioPlayer | undefined;
+    public readonly voicePlayer: AudioPlayer | undefined;
     public queue: Queue;
     public currentTrack: Track | undefined;
     public lastChannel: TextBasedChannel | undefined = undefined;
@@ -42,14 +42,14 @@ export class MusicSubscription {
     private voiceResource: AudioResource | undefined;
     private connectionTimeoutObj: NodeJS.Timeout | undefined;
 
-    public constructor(voiceConnection: VoiceConnection, queue: Queue, volume: number) {
-        this.voiceConnection = voiceConnection;
-        this.audioPlayer = createAudioPlayer();
-        this.voicePlayer = createAudioPlayer();
+    public constructor(voiceConnection: VoiceConnection | undefined, queue: Queue, volume: number) {
         this.queue = queue;
         this.volume = volume;
 
-        if (this.voiceConnection) {
+        if (voiceConnection) {
+            this.voiceConnection = voiceConnection;
+            this.audioPlayer = createAudioPlayer();
+            this.voicePlayer = createAudioPlayer();
             this.voiceConnection.on<'stateChange'>(
                 'stateChange',
                 async (_: VoiceConnectionState, newState: VoiceConnectionState) => {
@@ -66,30 +66,30 @@ export class MusicSubscription {
                              * the voice connection.
                              */
                             try {
-                                await entersState(this.voiceConnection, VoiceConnectionStatus.Connecting, 5_000);
+                                await entersState(this.voiceConnection!, VoiceConnectionStatus.Connecting, 5_000);
                                 // Probably moved voice channel
                             } catch {
-                                this.voiceConnection.destroy();
+                                this.voiceConnection!.destroy();
                                 // Probably removed from voice channel
                             }
-                        } else if (this.voiceConnection.rejoinAttempts < 5) {
+                        } else if (this.voiceConnection!.rejoinAttempts < 5) {
                             /**
                              * The disconnect in this case is recoverable, and we also have <5 repeated attempts so we will reconnect.
                              */
-                            await wait((this.voiceConnection.rejoinAttempts + 1) * 5_000);
-                            this.voiceConnection.rejoin();
+                            await wait((this.voiceConnection!.rejoinAttempts + 1) * 5_000);
+                            this.voiceConnection!.rejoin();
                         } else {
                             /**
                              * The disconnect in this case may be recoverable, but we have no more remaining attempts - destroy.
                              */
-                            this.voiceConnection.destroy();
+                            this.voiceConnection!.destroy();
                         }
                     } else if (newState.status === VoiceConnectionStatus.Destroyed) {
                         /**
                          * Once destroyed, stop the subscription.
                          */
-                        this.audioPlayer.pause();
-                        this.voicePlayer.pause();
+                        this.audioPlayer!.pause();
+                        this.voicePlayer!.pause();
                     } else if (
                         !this.readyLock &&
                         (newState.status === VoiceConnectionStatus.Connecting ||
@@ -102,11 +102,11 @@ export class MusicSubscription {
                          */
                         this.readyLock = true;
                         try {
-                            await entersState(this.voiceConnection, VoiceConnectionStatus.Ready, 20_000);
+                            await entersState(this.voiceConnection!, VoiceConnectionStatus.Ready, 20_000);
                             if (this.autoplay) this.processQueue();
                         } catch {
-                            if (this.voiceConnection.state.status !== VoiceConnectionStatus.Destroyed)
-                                this.voiceConnection.destroy();
+                            if (this.voiceConnection!.state.status !== VoiceConnectionStatus.Destroyed)
+                                this.voiceConnection!.destroy();
                         } finally {
                             this.readyLock = false;
                         }
@@ -133,8 +133,8 @@ export class MusicSubscription {
                     } else if (newState.status === AudioPlayerStatus.Paused) {
                         // If the Playing state has been entered, then the player was paused.
                         if (this.pausedForVoice) {
-                            this.voiceConnection.subscribe(this.voicePlayer);
-                            this.voicePlayer.play(this.voiceResource!);
+                            this.voiceConnection!.subscribe(this.voicePlayer!);
+                            this.voicePlayer!.play(this.voiceResource!);
                         }
                     }
                 }
@@ -147,17 +147,17 @@ export class MusicSubscription {
                     if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
                         // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
                         // The queue is then processed to start playing the next track, if one is available.
-                        this.voiceConnection.subscribe(this.audioPlayer);
+                        this.voiceConnection!.subscribe(this.audioPlayer!);
 
                         // Start connection timeout check
                         this.startConnectionTimeout();
 
                         if (this.pausedForVoice) {
                             this.pausedForVoice = false;
-                            this.audioPlayer.unpause();
+                            this.audioPlayer!.unpause();
                         } else if (this.announcement) {
                             this.announcement = false;
-                            this.audioPlayer.play(this.audioResource!);
+                            this.audioPlayer!.play(this.audioResource!);
                         }
                     } else if (newState.status === AudioPlayerStatus.Playing) {
                         // If the Playing state has been entered, then a new track has started playback.
@@ -168,24 +168,24 @@ export class MusicSubscription {
                 }
             );
 
-            this.audioPlayer.on('error', (error: { resource: any }) => {
+            this.audioPlayer!.on('error', (error: { resource: any }) => {
                 console.log(error);
                 this.processQueue();
             });
 
             this.voicePlayer.on('error', (error: { resource: any }) => console.log(error));
 
-            voiceConnection.subscribe(this.audioPlayer);
+            voiceConnection.subscribe(this.audioPlayer!);
         }
     }
 
     private startConnectionTimeout() {
         this.connectionTimeoutObj = setTimeout(() => {
             if (
-                this.audioPlayer.state.status !== AudioPlayerStatus.Playing &&
-                this.voicePlayer.state.status !== AudioPlayerStatus.Playing
+                this.audioPlayer!.state.status !== AudioPlayerStatus.Playing &&
+                this.voicePlayer!.state.status !== AudioPlayerStatus.Playing
             ) {
-                this.voiceConnection.destroy();
+                this.voiceConnection!.destroy();
             }
         }, 60000);
     }
@@ -198,7 +198,7 @@ export class MusicSubscription {
      * Tells if the voice connection is established.
      */
     public isVoiceConnectionReady(): boolean {
-        if (this.voiceConnection?.state.status === VoiceConnectionStatus.Ready) return true;
+        if (this.voiceConnection!.state.status === VoiceConnectionStatus.Ready) return true;
         return false;
     }
 
@@ -207,15 +207,15 @@ export class MusicSubscription {
      */
     public stop() {
         this.autoplay = false;
-        this.audioPlayer.stop();
-        this.voiceConnection.destroy();
+        this.audioPlayer!.stop();
+        this.voiceConnection!.destroy();
     }
 
     /**
      * Stops audio playback.
      */
     public pause() {
-        this.audioPlayer.pause();
+        this.audioPlayer!.pause();
     }
 
     /**
@@ -225,7 +225,7 @@ export class MusicSubscription {
         if (this.isIdle()) {
             this.play();
         } else {
-            this.audioPlayer.stop();
+            this.audioPlayer!.stop();
         }
     }
 
@@ -234,7 +234,7 @@ export class MusicSubscription {
      */
     public play() {
         if (this.isPaused()) {
-            this.audioPlayer.unpause();
+            this.audioPlayer!.unpause();
         } else {
             this.pausedForVoice = false;
             this.processQueue();
@@ -246,8 +246,8 @@ export class MusicSubscription {
      */
     public setVolume(value: number) {
         this.volume = value;
-        if (this.audioResource) this.audioResource.volume.setVolume(value);
-        if (this.voiceResource) this.voiceResource.volume.setVolume(value * this.voiceVolumeMultiplier);
+        if (this.audioResource) this.audioResource.volume?.setVolume(value);
+        if (this.voiceResource) this.voiceResource.volume?.setVolume(value * this.voiceVolumeMultiplier);
     }
 
     /**
@@ -264,24 +264,24 @@ export class MusicSubscription {
         if (this.isPlaying()) {
             this.pausedForVoice = true;
             this.voiceResource = resource;
-            this.voiceResource.volume.setVolume(this.volume * 1.5);
-            this.audioPlayer.pause();
+            this.voiceResource.volume?.setVolume(this.volume * 1.5);
+            this.audioPlayer!.pause();
         } else {
-            this.voiceConnection.subscribe(this.voicePlayer);
-            this.voicePlayer.play(resource);
+            this.voiceConnection!.subscribe(this.voicePlayer!);
+            this.voicePlayer!.play(resource);
         }
     }
 
     public isPaused(): boolean {
-        return this.audioPlayer.state.status == AudioPlayerStatus.Paused;
+        return this.audioPlayer!.state.status == AudioPlayerStatus.Paused;
     }
 
     public isIdle(): boolean {
-        return this.audioPlayer.state.status == AudioPlayerStatus.Idle;
+        return this.audioPlayer!.state.status == AudioPlayerStatus.Idle;
     }
 
     public isPlaying(): boolean {
-        return this.audioPlayer.state.status == AudioPlayerStatus.Playing;
+        return this.audioPlayer!.state.status == AudioPlayerStatus.Playing;
     }
 
     /**
@@ -290,7 +290,7 @@ export class MusicSubscription {
     private async processQueue(): Promise<void> {
         try {
             // If the queue is locked (already being processed), is empty, or the audio player is already playing something, return
-            if (this.queueLock || this.audioPlayer.state.status !== AudioPlayerStatus.Idle) {
+            if (this.queueLock || this.audioPlayer!.state.status !== AudioPlayerStatus.Idle) {
                 return;
             }
             // If the queue is empty, set current track to undefined and return
@@ -307,7 +307,7 @@ export class MusicSubscription {
             try {
                 // Attempt to convert the Track into an AudioResource (i.e. start streaming the video)
                 this.audioResource = await nextTrack.createAudioResource();
-                this.audioResource.volume.setVolume(this.volume);
+                this.audioResource.volume?.setVolume(this.volume);
                 if (nextTrack.announce) {
                     const stream = discordTTS.getVoiceStream(getAnnouncementString(nextTrack.name), {
                         lang: 'en',
@@ -317,13 +317,13 @@ export class MusicSubscription {
                         inputType: StreamType.Arbitrary,
                         inlineVolume: true
                     });
-                    this.voiceResource.volume.setVolume(this.volume * this.voiceVolumeMultiplier);
+                    this.voiceResource.volume?.setVolume(this.volume * this.voiceVolumeMultiplier);
 
-                    this.voiceConnection.subscribe(this.voicePlayer);
-                    this.voicePlayer.play(this.voiceResource);
+                    this.voiceConnection!.subscribe(this.voicePlayer!);
+                    this.voicePlayer!.play(this.voiceResource);
                     this.announcement = true;
                 } else {
-                    this.audioPlayer.play(this.audioResource);
+                    this.audioPlayer!.play(this.audioResource);
                 }
                 this.currentTrack = nextTrack;
                 this.queueLock = false;
