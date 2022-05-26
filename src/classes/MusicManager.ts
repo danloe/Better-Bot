@@ -176,7 +176,7 @@ export class MusicManager {
         return new Promise<void>(async (done, error) => {
             try {
                 await safeDeferReply(interaction, true);
-                const subscription = this.createSubscription(interaction, true);
+                const subscription = this.createSubscription(interaction);
 
                 if (!subscription) {
                     error(
@@ -238,7 +238,7 @@ export class MusicManager {
                     return;
                 }
 
-                subscription!.audioPlayer.pause();
+                subscription!.pause();
                 done();
             } catch (err) {
                 error(err);
@@ -249,22 +249,28 @@ export class MusicManager {
     resume(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                const subscription = this.subscriptions.get(interaction.guildId!);
+                await safeDeferReply(interaction);
+                const queue = this.getQueue(interaction);
+                let subscription = this.subscriptions.get(interaction.guildId!);
 
-                if (!subscription) {
-                    error('Not in a voice channel.');
+                if ((!subscription && queue.hasTracks()) || subscription?.isPaused()) {
+                    subscription = this.createSubscription(interaction);
+                    if (!subscription) {
+                        error('Not in a voice channel.');
+                        return;
+                    }
+                    try {
+                        await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20e3);
+                    } catch (err) {
+                        console.warn(err);
+                        error('Failed to join voice channel within 20 seconds, please try again later!');
+                        return;
+                    }
+                    subscription.play();
+                } else if (!queue.hasTracks()) {
+                    error('Nothing to play.');
                     return;
                 }
-
-                try {
-                    await entersState(subscription.voiceConnection, VoiceConnectionStatus.Ready, 20e3);
-                } catch (err) {
-                    console.warn(err);
-                    error('Failed to join voice channel within 20 seconds, please try again later!');
-                    return;
-                }
-
-                subscription.play();
                 done();
             } catch (err) {
                 error(err);
@@ -408,10 +414,7 @@ export class MusicManager {
         return queue;
     }
 
-    createSubscription(
-        interaction: CommandInteraction | ButtonInteraction,
-        autoplay: boolean = false
-    ): MusicSubscription {
+    createSubscription(interaction: CommandInteraction | ButtonInteraction): MusicSubscription {
         let subscription = this.subscriptions.get(interaction.guildId!);
 
         if (!subscription || !subscription.isVoiceConnectionReady()) {
@@ -423,8 +426,7 @@ export class MusicManager {
                         guildId: channel.guild.id,
                         adapterCreator: channel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator // TODO: remove cast when fixed
                     }),
-                    this.getQueue(interaction),
-                    autoplay
+                    this.getQueue(interaction)
                 );
                 subscription.voiceConnection.on('error', console.warn);
                 this.subscriptions.set(interaction.guildId!, subscription);

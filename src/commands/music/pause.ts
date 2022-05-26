@@ -17,14 +17,14 @@ export const command: Command = {
                 await client.musicManager.pause(interaction);
                 await safeReply(
                     interaction,
-                    createEmbed('Paused', '`✅ The current track is now on pause.`', false)
+                    createEmbed('Paused', '`✅ The current track is now on pause.`', true)
                 );
                 done();
             } catch (err) {
                 try {
                     await safeReply(
                         interaction,
-                        createErrorEmbed('🚩 Error pausing the track: `' + err + '`')
+                        createErrorEmbed('🚩 Error pausing the track: `' + err + '`', true)
                     );
                 } catch (err2) {
                     console.log(err2);

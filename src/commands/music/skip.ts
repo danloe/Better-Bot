@@ -32,13 +32,13 @@ export const command: Command = {
                         if (input == 0) msg = '`✅ Skipped to the next track';
                         msg = msg + ' [' + (queue.length - 1) + ' more in queue]`';
                     }
-                    await safeReply(interaction, createEmbed('Skipped', msg, false));
+                    await safeReply(interaction, createEmbed('Skipped', msg, true));
                     done();
                 } catch (err) {
                     try {
                         await safeReply(
                             interaction,
-                            createErrorEmbed('🚩 Error skipping track(s): `' + err + '`')
+                            createErrorEmbed('🚩 Error skipping track(s): `' + err + '`', true)
                         );
                     } catch (err2) {
                         console.log(err2);

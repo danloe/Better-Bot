@@ -15,6 +15,7 @@ import { safeDeferReply, safeReply, shuffleArray } from './general';
 import { getSpotifyPlaylistsApiResponse, getSpotifyTracksApiResponse } from './spotifyAPI';
 import { JSDOM } from 'jsdom';
 
+const youTubeThumbnail = 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg';
 const spotifyThumbnail = 'https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg';
 
 export function determineInputType(args: string): InputType {
@@ -109,9 +110,7 @@ export function getYoutubePlaylist(url: string, announce: boolean) {
                 description: snippet.description,
                 publishedAt: snippet.publishedAt,
                 owner: snippet.channelTitle,
-                thumbnailUrl: snippet.thumbnails?.default?.url
-                    ? snippet.thumbnails.default.url
-                    : await getLogoUrlfromUrl('https://youtube.com/'),
+                thumbnailUrl: snippet.thumbnails?.default?.url ? snippet.thumbnails.default.url : youTubeThumbnail,
                 announce: announce
             };
             resolve(playlist);

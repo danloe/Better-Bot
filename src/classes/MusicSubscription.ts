@@ -40,12 +40,11 @@ export class MusicSubscription {
     private nextVoiceResource: AudioResource | undefined;
     private connectionTimeoutObj: NodeJS.Timeout | undefined;
 
-    public constructor(voiceConnection: VoiceConnection, queue: Queue, autoplay: boolean = true) {
+    public constructor(voiceConnection: VoiceConnection, queue: Queue) {
         this.voiceConnection = voiceConnection;
         this.audioPlayer = createAudioPlayer();
         this.voicePlayer = createAudioPlayer();
         this.queue = queue;
-        this.autoplay = autoplay;
 
         this.voiceConnection.on<'stateChange'>(
             'stateChange',
@@ -85,7 +84,8 @@ export class MusicSubscription {
                     /**
                      * Once destroyed, stop the subscription.
                      */
-                    this.stop();
+                    this.audioPlayer.pause();
+                    this.voicePlayer.pause();
                 } else if (
                     !this.readyLock &&
                     (newState.status === VoiceConnectionStatus.Connecting ||
@@ -154,7 +154,6 @@ export class MusicSubscription {
                 // If the Playing state has been entered, then a new track has started playback.
                 // Stop connection timeout check
                 this.stopConnectionTimeout();
-
                 this.autoplay = true;
             }
         });
@@ -197,25 +196,35 @@ export class MusicSubscription {
      */
     public stop() {
         this.autoplay = false;
+        this.audioPlayer.stop();
         this.voiceConnection.destroy();
+    }
+
+    /**
+     * Stops audio playback.
+     */
+     public pause() {
+        this.audioPlayer.pause();
     }
 
     /**
      * Skips current audio playback.
      */
     public skip() {
-        this.autoplay = true;
-        this.audioPlayer.stop();
+        if(this.isIdle) {
+            this.play();
+        } else {
+            this.audioPlayer.stop();
+        }
     }
 
     /**
      * Plays audio.
      */
     public play() {
-        if (this.autoplay) {
+        if (this.isPaused()) {
             this.audioPlayer.unpause();
         } else {
-            this.autoplay = true;
             this.pausedForVoice = false;
             this.processQueue();
         }
@@ -225,7 +234,7 @@ export class MusicSubscription {
      * Plays voice audio.
      */
     public playVoice(resource: AudioResource) {
-        if (this.audioPlayer.state.status === AudioPlayerStatus.Playing) {
+        if (this.isPlaying()) {
             this.pausedForVoice = true;
             this.nextVoiceResource = resource;
             this.audioPlayer.pause();
@@ -233,6 +242,18 @@ export class MusicSubscription {
             this.voiceConnection.subscribe(this.voicePlayer);
             this.voicePlayer.play(resource);
         }
+    }
+
+    public isPaused(): boolean {
+        return this.audioPlayer.state.status == AudioPlayerStatus.Paused;
+    }
+
+    public isIdle(): boolean {
+        return this.audioPlayer.state.status == AudioPlayerStatus.Idle;
+    }
+
+    public isPlaying(): boolean {
+        return this.audioPlayer.state.status == AudioPlayerStatus.Playing;
     }
 
     /**

@@ -370,9 +370,10 @@ export const command: Command = {
 };
 
 function getCategoryOptions(): APIApplicationCommandOptionChoice<string>[] {
-    let options = [];
-    for (let item in CategoryNamesPretty) {
-        if (isNaN(Number(item))) {
+    let options: any[] = [];
+    let item: any;
+    for (item in CategoryNamesPretty) {
+        if (isNaN(item)) {
             options.push({ name: item, value: item });
         }
     }

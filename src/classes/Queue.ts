@@ -134,4 +134,8 @@ export class Queue extends Array<Track> {
     private updateQueuePages() {
         this.totalPages = Math.ceil(this.length / 10);
     }
+
+    hasTracks(): boolean {
+        return this.length > 0;
+    }
 }

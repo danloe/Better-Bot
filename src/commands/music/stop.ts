@@ -17,14 +17,14 @@ export const command: Command = {
                 await client.musicManager.stop(interaction);
                 await safeReply(
                     interaction,
-                    createEmbed('Stopped', '`✅ The audio playback has stopped.`', false)
+                    createEmbed('Stopped', '`✅ The audio playback has stopped.`', true)
                 );
                 done();
             } catch (err) {
                 try {
                     await safeReply(
                         interaction,
-                        createErrorEmbed('🚩 Error stopping the track: `' + err + '`')
+                        createErrorEmbed('🚩 Error stopping the track: `' + err + '`', true)
                     );
                 } catch (err2) {
                     console.log(err2);
