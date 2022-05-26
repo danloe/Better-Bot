@@ -64,7 +64,7 @@
       * YouTube auto generated playlists
   * SoundCloud
   * Newgrounds
-  * Spotify Tracks & Playlists
+  * Spotify Tracks, Albums & Playlists
   * Direct Link To File
 * Autocomplete
   * YouTube search suggestions
