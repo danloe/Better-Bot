@@ -55,7 +55,13 @@ export class Track {
                             highWaterMark: 1 << 22
                         });
                         demuxProbe(stream).then((probe: { stream: any; type: any }) => {
-                            resolve(createAudioResource(probe.stream, { metadata: this, inputType: probe.type }));
+                            resolve(
+                                createAudioResource(probe.stream, {
+                                    metadata: this,
+                                    inputType: probe.type,
+                                    inlineVolume: true
+                                })
+                            );
                         });
                         return;
 
@@ -66,7 +72,13 @@ export class Track {
                             //process.env.SC_CLIENTID
                         );
                         demuxProbe(stream).then((probe: { stream: any; type: any }) => {
-                            resolve(createAudioResource(probe.stream, { metadata: this, inputType: probe.type }));
+                            resolve(
+                                createAudioResource(probe.stream, {
+                                    metadata: this,
+                                    inputType: probe.type,
+                                    inlineVolume: true
+                                })
+                            );
                         });
                         return;
 
@@ -78,7 +90,11 @@ export class Track {
                         stream = this.url;
                         break;
                 }
-                const resource = createAudioResource(stream, { metadata: this, inputType: StreamType.Arbitrary });
+                const resource = createAudioResource(stream, {
+                    metadata: this,
+                    inputType: StreamType.Arbitrary,
+                    inlineVolume: true
+                });
                 resolve(resource);
             } catch (error) {
                 console.log(error);
