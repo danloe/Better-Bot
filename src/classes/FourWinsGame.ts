@@ -1,6 +1,7 @@
 import { MessageEmbed, TextBasedChannel, User } from 'discord.js';
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
+import BetterClient from '../client';
 
 /*
 ⚪⚪⚪⚪⚪⚪⚪
@@ -13,16 +14,19 @@ import { GameLobby, GameState } from './GameLobby';
 */
 
 export class FourWinsGame extends GameLobby {
-    public readonly charField = '⚪';
-    public readonly charRed = '🔴';
-    public readonly charYellow = '🟡';
+    public readonly charField;
+    public readonly charRed;
+    public readonly charYellow;
     gameField: string[][] = [];
     playerYellowTurn: boolean = false;
 
-    public constructor(host: User, channel: TextBasedChannel) {
-        super(GameType.FourWins, host, channel, 2, 2);
+    public constructor(client: BetterClient, host: User, channel: TextBasedChannel) {
+        super(client, GameType.FourWins, host, channel, 2, 2);
         this.name = 'Four Wins';
-        this.thumbnail = 'https://www.dropbox.com/s/0jq0iqts4a9vque/fourwins.png?dl=1';
+        this.thumbnail = client.config.fourWins_thumbnail;
+        this.charField = client.config.ticTacToe_charField;
+        this.charRed = client.config.fourWins_charRed;
+        this.charYellow = client.config.fourWins_charYellow;
 
         this.createGameField();
         this.state = GameState.Waiting;

@@ -19,7 +19,7 @@ class BetterClient extends Client {
     public async init() {
         discordModals(this);
         this.login(process.env.BOT_TOKEN);
-        //connect(process.env.MONGO_URI);
+        //connect(process.env.MONGODB_URI);
 
         // Commands
         const commandPath = path.join(__dirname, '..', 'commands');

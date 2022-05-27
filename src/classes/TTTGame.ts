@@ -9,6 +9,7 @@ import {
 } from 'discord.js';
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
+import BetterClient from '../client';
 
 /*
 🔳⭕🔳
@@ -28,16 +29,19 @@ const winningCombinations = [
 ];
 
 export class TTTGame extends GameLobby {
-    public readonly charField = '🔳';
-    public readonly charX = '❌';
-    public readonly charO = '⭕';
+    public readonly charField;
+    public readonly charX;
+    public readonly charO;
     gameField: string[] = [];
     playerOturn: boolean = false;
 
-    public constructor(host: User, channel: TextBasedChannel) {
-        super(GameType.TicTacToe, host, channel, 2, 2);
+    public constructor(client: BetterClient, host: User, channel: TextBasedChannel) {
+        super(client, GameType.TicTacToe, host, channel, 2, 2);
         this.name = 'Tic Tac Toe';
-        this.thumbnail = 'https://www.dropbox.com/s/fkqrplz0duuqto9/ttt.png?dl=1';
+        this.thumbnail = client.config.ticTacToe_thumbnail;
+        this.charField = client.config.ticTacToe_charField;
+        this.charX = client.config.ticTacToe_charX;
+        this.charO = client.config.ticTacToe_charO;
 
         this.createGameField();
         this.state = GameState.Waiting;

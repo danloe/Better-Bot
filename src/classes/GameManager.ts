@@ -24,16 +24,16 @@ export class GameManager {
                 }
                 switch (gameType) {
                     case GameType.TicTacToe:
-                        lobby = new TTTGame(host, interaction.channel!);
+                        lobby = new TTTGame(this.client, host, interaction.channel!);
                         break;
                     case GameType.FourWins:
-                        lobby = new FourWinsGame(host, interaction.channel!);
+                        lobby = new FourWinsGame(this.client, host, interaction.channel!);
                         break;
                     case GameType.Trivia:
-                        lobby = new TriviaGame(host, interaction.channel!, maxPlayers);
+                        lobby = new TriviaGame(this.client, host, interaction.channel!, maxPlayers);
                         break;
                     case GameType.FindTheEmoji:
-                        lobby = new FindTheEmojiGame(host, interaction.channel!, maxPlayers);
+                        lobby = new FindTheEmojiGame(this.client, host, interaction.channel!, maxPlayers);
                         break;
                 }
                 this.games.set(host.id, lobby!);

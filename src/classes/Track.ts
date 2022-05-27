@@ -17,7 +17,7 @@ export class Track {
     uploaded: string;
 
     constructor(
-        type: InputType,
+        inputType: InputType,
         audiotype: InputType,
         url: string,
         name: string,
@@ -30,7 +30,7 @@ export class Track {
         genre: string = 'Unknown',
         uploaded: string = 'Unknown'
     ) {
-        this.inputType = type;
+        this.inputType = inputType;
         this.audiotype = audiotype;
         this.url = url;
         this.name = name;

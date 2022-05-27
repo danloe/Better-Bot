@@ -9,21 +9,23 @@ import {
 } from 'discord.js';
 import { GameType } from './GameManager';
 import EventEmitter from 'node:events';
+import BetterClient from '../client';
 
 export class GameLobby extends EventEmitter {
     public game: GameType;
     public host: User;
-    public players: User[] = [];
+    public players!: User[];
     public channel: TextBasedChannel;
     public state: GameState = GameState.Waiting;
     public minPlayers = 1;
     public maxPlayers = 1;
-    public winners: User[] = [];
+    public winners!: User[];
     public interactionTimeout = 60_000;
     public name = '';
     public thumbnail = '';
 
     public constructor(
+        client: BetterClient,
         game: GameType,
         host: User,
         channel: TextBasedChannel,

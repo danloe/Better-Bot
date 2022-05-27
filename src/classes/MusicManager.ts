@@ -441,12 +441,12 @@ export class MusicManager {
                             adapterCreator: channel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator // TODO: remove cast when fixed
                         }),
                         this.getQueue(interaction),
-                        this.client.config.volume
+                        this.client.config.defaultVolume
                     );
                     subscription.voiceConnection!.on('error', console.warn);
                 }
             } else {
-                subscription = new MusicSubscription(undefined, this.getQueue(interaction), this.client.config.volume);
+                subscription = new MusicSubscription(undefined, this.getQueue(interaction), this.client.config.defaultVolume);
             }
             this.subscriptions.set(interaction.guildId!, subscription!);
         } else if ((!subscription.voiceConnection! || !subscription.isVoiceConnectionReady()) && join) {

@@ -10,6 +10,7 @@ import {
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
 import { Category, CategoryData, getQuestions, Question, QuestionDifficulty, QuestionType } from 'open-trivia-db';
+import BetterClient from '../client';
 
 /*
   _____ ____  _____     _____    _    
@@ -23,12 +24,12 @@ import { Category, CategoryData, getQuestions, Question, QuestionDifficulty, Que
 export const answerDisplayTime: number = 7_000;
 
 export class TriviaGame extends GameLobby {
-    amount: number = 10;
-    difficulty: QuestionDifficulty | null = null;
-    type: QuestionType | null = null;
-    category: Category | null = null;
+    amount!: number;
+    difficulty!: QuestionDifficulty;
+    type!: QuestionType;
+    category!: Category;
     questions: Question[] = [];
-    categoryInfo: CategoryData | undefined;
+    categoryInfo!: CategoryData;
 
     round: number = 0;
     question: Question | null = null;
@@ -39,10 +40,10 @@ export class TriviaGame extends GameLobby {
     readQuestions = false;
     questionRead = true;
 
-    public constructor(host: User, channel: TextBasedChannel, maxPlayers: number) {
-        super(GameType.Trivia, host, channel, 1, maxPlayers);
+    public constructor(client: BetterClient, host: User, channel: TextBasedChannel, maxPlayers: number) {
+        super(client, GameType.Trivia, host, channel, 1, maxPlayers);
         this.name = 'Trivia';
-        this.thumbnail = 'https://opentdb.com/images/logo-banner.png';
+        this.thumbnail = client.config.trivia_thumbnail;
     }
 
     async getQuestions(): Promise<Question[]> {

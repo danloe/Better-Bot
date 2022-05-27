@@ -10,6 +10,7 @@ import {
 import { GameType } from './GameManager';
 import { GameDifficulty, GameLobby, GameState } from './GameLobby';
 import emoji from 'node-emoji';
+import BetterClient from '../client';
 
 /*
 
@@ -36,10 +37,10 @@ export class FindTheEmojiGame extends GameLobby {
     answerGiven: User[] = [];
     answeredCorrectly: User | null = null;
 
-    public constructor(host: User, channel: TextBasedChannel, maxPlayers: number) {
-        super(GameType.FindTheEmoji, host, channel, 1, maxPlayers);
+    public constructor(client: BetterClient, host: User, channel: TextBasedChannel, maxPlayers: number) {
+        super(client, GameType.FindTheEmoji, host, channel, 1, maxPlayers);
         this.name = 'Find The Emoji';
-        this.thumbnail = 'https://www.dropbox.com/s/4z3kjx5pe2kbdlw/fte.jpg?dl=1';
+        this.thumbnail = client.config.findTheEmoji_thumbnail;
     }
 
     selectEmoji(player: User, index: number) {
