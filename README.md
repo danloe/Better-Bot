@@ -122,7 +122,7 @@ Follow these steps to get the bot up and running.
 [![npm][npm-shield]][npm-url]
 >npm comes with nodejs, update with the following command:
   ```sh
-  npm i npm@latest -g
+  npm i -g npm@latest
   ```
 >install ffmpeg with environment variable[^ffmpeg]
 
