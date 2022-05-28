@@ -124,7 +124,7 @@ Follow these steps to get the bot up and running.
   ```sh
   npm i -g npm@latest
   ```
->install ffmpeg with environment variable[^ffmpeg]
+>install ffmpeg and add it to the PATH environment variable[^ffmpeg]
 
 [^ffmpeg]:required for playing unsupported audio sources
     
