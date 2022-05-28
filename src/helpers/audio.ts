@@ -1,7 +1,7 @@
 import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
-import { Track, InputType } from '../classes';
+import { Track, InputType, Queue } from '../classes';
 import { getLoadingMessage, timeStringToDurationString as timeStringToSecondsNumber } from './message';
 import { Playlist, PlaylistType } from '../interfaces';
 import BetterClient from '../client';
@@ -307,6 +307,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
         try {
             let response: any;
             let playlist: Playlist;
+            let tracks: Track[] = [];
             let responseTracks: any[];
 
             if (url.includes('/album/')) {
@@ -344,45 +345,6 @@ export function getSpotifyAlbumOrPlaylistTracks(
                 };
             }
 
-            let tracks: Track[] = [];
-            let stopLoop = false;
-            let abortLoop = false;
-            let loaded = 0;
-            let failed = 0;
-            let embedmsg = getLoadingMessageEmbed(interaction, playlist, tracks, responseTracks, loaded, failed);
-            const row = new MessageActionRow().addComponents([
-                new MessageButton().setCustomId('loading_stop').setLabel('Stop & Accept').setStyle('SECONDARY'),
-                new MessageButton().setCustomId('loading_abort').setLabel('Abort').setStyle('DANGER')
-            ]);
-
-            await safeReply(interaction, { embeds: [embedmsg], components: [row] });
-
-            let messageTrigger = setInterval(async () => {
-                embedmsg = getLoadingMessageEmbed(interaction, playlist, tracks, responseTracks, loaded, failed);
-
-                const collector = interaction.channel!.createMessageComponentCollector({
-                    componentType: 'BUTTON',
-                    time: 3_000
-                });
-
-                collector.on('collect', async (button) => {
-                    try {
-                        clearInterval(messageTrigger);
-                        await safeDeferReply(button);
-                        if (button.customId === 'loading_stop') {
-                            stopLoop = true;
-                        } else if (button.customId === 'loading_abort') {
-                            abortLoop = true;
-                        }
-                        await safeReply(interaction, { embeds: [embedmsg], components: [] });
-                    } catch (err) {
-                        console.log(err);
-                    }
-                });
-
-                await safeReply(interaction, { embeds: [embedmsg], components: [row] });
-            }, 3_000);
-
             if (offset) {
                 if (responseTracks.length > offset) {
                     responseTracks.splice(0, offset - 1);
@@ -401,40 +363,33 @@ export function getSpotifyAlbumOrPlaylistTracks(
                 responseTracks = responseTracks.reverse();
             }
 
-            for (const track of responseTracks) {
-                try {
-                    if (playlist.type === PlaylistType.SpotifyAlbum) {
-                        tracks.push(
-                            await getYouTubeTrack(
-                                track.artists[0].name + ' ' + track.name,
-                                interaction.user.username,
-                                announce,
-                                InputType.SpotifyPlaylist
-                            )
-                        );
-                    } else {
-                        tracks.push(
-                            await getYouTubeTrack(
-                                track.track.artists[0].name + ' ' + track.track.name,
-                                interaction.user.username,
-                                announce,
-                                InputType.SpotifyAlbum
-                            )
-                        );
-                    }
-                    loaded += 1;
-                    if (stopLoop) break;
-                    if (abortLoop) {
-                        reject('Loading Tracks from Spotify was aborted.');
-                        return;
-                    }
-                } catch (error) {
-                    failed += 1;
-                    continue;
-                }
+            // Get first track
+            if (playlist.type === PlaylistType.SpotifyAlbum) {
+                tracks.push(
+                    await getYouTubeTrack(
+                        responseTracks[0].artists[0].name + ' ' + responseTracks[0].name,
+                        interaction.user.username,
+                        announce,
+                        InputType.SpotifyPlaylist
+                    )
+                );
+            } else {
+                tracks.push(
+                    await getYouTubeTrack(
+                        responseTracks[0].track.artists[0].name + ' ' + responseTracks[0].track.name,
+                        interaction.user.username,
+                        announce,
+                        InputType.SpotifyAlbum
+                    )
+                );
             }
-            clearInterval(messageTrigger);
-            await safeReply(interaction, { embeds: [embedmsg], components: [] });
+
+            // Remove first track
+            responseTracks.splice(0, 1);
+
+            // Load other tracks in background
+            const queue = client.musicManager.getQueue(interaction);
+            loadAndQueueAsync(interaction, playlist, queue, responseTracks, announce);
 
             resolve([playlist, tracks]);
         } catch (error) {
@@ -443,27 +398,111 @@ export function getSpotifyAlbumOrPlaylistTracks(
     });
 }
 
+function loadAndQueueAsync(
+    interaction: CommandInteraction | ButtonInteraction,
+    playlist: Playlist,
+    queue: Queue,
+    responseTracks: any[],
+    announce: boolean
+) {
+    return new Promise<void>(async (resolve, reject) => {
+        let stopLoop = false;
+        let loaded = 1;
+        let failed = 0;
+        let embedmsg!: MessageEmbed;
+
+        // Start interval message
+        let messageTrigger = setInterval(async () => {
+            embedmsg = getLoadingMessageEmbed(interaction, playlist, responseTracks, loaded, failed);
+            const row = new MessageActionRow().addComponents([
+                new MessageButton().setCustomId('loading_stop').setLabel('Stop Import').setStyle('DANGER')
+            ]);
+
+            const collector = interaction.channel!.createMessageComponentCollector({
+                componentType: 'BUTTON',
+                time: 3_000
+            });
+
+            collector.on('collect', async (button) => {
+                try {
+                    clearInterval(messageTrigger);
+                    await safeDeferReply(button);
+                    if (button.customId === 'loading_stop') {
+                        stopLoop = true;
+                    }
+                    await safeReply(interaction, { embeds: [embedmsg], components: [] });
+                } catch (err) {
+                    console.log(err);
+                }
+            });
+
+            await safeReply(interaction, { embeds: [embedmsg], components: [row] });
+        }, 3_000);
+
+        // Get tracks
+        for (const track of responseTracks) {
+            try {
+                if (playlist.type === PlaylistType.SpotifyAlbum) {
+                    queue.queue(
+                        await getYouTubeTrack(
+                            track.artists[0].name + ' ' + track.name,
+                            interaction.user.username,
+                            announce,
+                            InputType.SpotifyPlaylist
+                        )
+                    );
+                } else {
+                    queue.queue(
+                        await getYouTubeTrack(
+                            track.track.artists[0].name + ' ' + track.track.name,
+                            interaction.user.username,
+                            announce,
+                            InputType.SpotifyAlbum
+                        )
+                    );
+                }
+                loaded += 1;
+                if (stopLoop) {
+                    break;
+                }
+            } catch (error) {
+                failed += 1;
+                continue;
+            }
+        }
+        clearInterval(messageTrigger);
+        embedmsg = getLoadingMessageEmbed(interaction, playlist, responseTracks, loaded, failed, true);
+        await safeReply(interaction, { embeds: [embedmsg], components: [] });
+        resolve();
+    });
+}
+
 function getLoadingMessageEmbed(
     interaction: CommandInteraction | ButtonInteraction,
     playlist: Playlist,
-    tracks: any,
     playlistTracks: any,
     loaded: number,
-    failed: number
+    failed: number,
+    done: boolean = false
 ) {
+    let desciptionMsg = '';
+    if (done) {
+        desciptionMsg = '`🔺 ' + String(loaded + 1) + ' Playlist Track(s) loaded and added to the queue.`';
+    } else {
+        desciptionMsg =
+            '`🔺 Playlist is loading...`\n`' +
+            getLoadingMessage(loaded + failed, playlistTracks.length) +
+            ' ' +
+            String(Math.floor(((loaded + failed) / playlistTracks.length) * 100)) +
+            '%`\n' +
+            '`Loaded: ' +
+            String(loaded) +
+            (failed > 0 ? '`\n`Not found: ' + String(failed) : '`');
+    }
     let embedmsg = new MessageEmbed()
         .setColor('#1DB954')
         .setTitle(playlist.name)
-        .setDescription(
-            '`' +
-                getLoadingMessage(tracks.length, playlistTracks.length) +
-                ' ' +
-                String(Math.floor((tracks.length / playlistTracks.length) * 100)) +
-                '%`\n' +
-                '`Loaded: ' +
-                String(loaded) +
-                (failed > 0 ? '`\n`Not found: ' + String(failed) : '`')
-        )
+        .setDescription(desciptionMsg)
         .setThumbnail(playlist.thumbnailUrl || spotifyThumbnail)
         .addField('Description', playlist.description, false)
         .addField('Owner', playlist.owner, true)
