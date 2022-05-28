@@ -17,8 +17,8 @@ import {
 import { promisify } from 'node:util';
 import { Track } from './Track';
 import { Queue } from './Queue';
-import { TextBasedChannel } from 'discord.js';
-import { getAnnouncementString } from '../helpers';
+import { MessageEmbed, TextBasedChannel } from 'discord.js';
+import { createEmbed, getAnnouncementString, getNowPlayingMessage } from '../helpers';
 //import discordTTS from 'discord-tts';
 const discordTTS = require('discord-tts');
 
@@ -29,21 +29,22 @@ export class MusicSubscription {
     public readonly audioPlayer!: AudioPlayer;
     public readonly voicePlayer!: AudioPlayer;
 
-    public queue: Queue;
     public currentTrack!: Track | undefined;
+    public queue: Queue;
     public lastChannel!: TextBasedChannel;
-    public queueLock = false;
-    public readyLock = false;
-    public autoplay = true;
-    public pausedForVoice = false;
-    public announcement = false;
-    public volume = 1;
-    public voiceVolumeMultiplier = 1.8;
-    public displayMessage = true;
-
-    private audioResource!: AudioResource<Track>;
-    private voiceResource!: AudioResource;
+    public audioResource!: AudioResource<Track>;
+    public voiceResource!: AudioResource;
+    
     private connectionTimeoutObj!: NodeJS.Timeout;
+
+    private queueLock = false;
+    private readyLock = false;
+    private autoplay = true;
+    private pausedForVoice = false;
+    private announcement = false;
+    private volume = 1;
+    private voiceVolumeMultiplier = 1.8;
+    private displayMessage = true;
 
     public constructor(voiceConnection: VoiceConnection | undefined, queue: Queue, volume: number) {
         this.queue = queue;
@@ -161,6 +162,7 @@ export class MusicSubscription {
                         } else if (this.announcement) {
                             this.announcement = false;
                             this.audioPlayer.play(this.audioResource!);
+                            this.showNowPlayingMessage();
                         }
                     } else if (newState.status === AudioPlayerStatus.Playing) {
                         // If the Playing state has been entered, then a new track has started playback.
@@ -350,6 +352,7 @@ export class MusicSubscription {
                     this.announcement = true;
                 } else {
                     this.audioPlayer.play(this.audioResource);
+                    this.showNowPlayingMessage();
                 }
                 this.currentTrack = nextTrack;
                 this.queueLock = false;
@@ -361,5 +364,18 @@ export class MusicSubscription {
         } catch (err) {
             console.log(err);
         }
+    }
+
+    private async showNowPlayingMessage() {
+        let [msg, row] = getNowPlayingMessage(
+            this.currentTrack,
+            this.queue,
+            this.audioPlayer,
+            this.audioResource.playbackDuration
+        );
+        await this.lastChannel.send({
+            embeds: [msg],
+            components: [row]
+        });
     }
 }

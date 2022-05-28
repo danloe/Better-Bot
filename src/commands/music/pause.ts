@@ -20,6 +20,7 @@ export const command: Command = {
                         interaction,
                         createEmbed('Paused', '`🔺 The current track is now on pause.`', true)
                     );
+                    
                     done();
                 } catch (err) {
                     await safeReply(interaction, createErrorEmbed('🚩 Error pausing the track: `' + err + '`', true));

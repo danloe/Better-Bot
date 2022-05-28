@@ -1,7 +1,8 @@
-import { EmbedFooterData } from '@discordjs/builders';
-import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
-import { Track, InputType } from '../classes';
+import { EmbedFooterData, embedLength } from '@discordjs/builders';
+import { ColorResolvable, EmbedFieldData, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { Track, InputType, Queue } from '../classes';
 import google from 'googlethis';
+import { AudioPlayer, AudioPlayerStatus } from '@discordjs/voice';
 
 export function createEmbed(
     title: string,
@@ -211,16 +212,16 @@ export async function getLogoUrlfromUrl(url: string): Promise<string> {
     }
 }
 
-export function getLoadingMessage(actual: number, total: number, size = 16): string {
+export function getLoadingMessage(actual: number, total: number, style = 0, size = 20): string {
     let p = Math.floor((actual / total) * 100);
-    let style = '⣀⣄⣤⣦⣶⣷⣿'; // '⣀⣄⣤⣦⣶⣷⣿' '▁▂▃▄▅▆▇█'
+    let bars = ['⣀⣄⣤⣦⣶⣷⣿', '▁▂▃▄▅▆▇█', '□▣■'];
     var full: number,
         m: string,
         middle: number,
         rest: number,
         x: number,
-        full_symbol = style[style.length - 1],
-        barStyleIndex = style.length - 1,
+        full_symbol = bars[style][bars.length - 1],
+        barStyleIndex = bars[style].length - 1,
         bar: string = '';
     if (p == 100) return repeatString(full_symbol, size);
     p = p / 100;
@@ -229,9 +230,9 @@ export function getLoadingMessage(actual: number, total: number, size = 16): str
 
     rest = x - full;
     middle = Math.floor(rest * barStyleIndex);
-    m = style[middle];
+    m = bars[style][middle];
 
-    bar = repeatString(full_symbol, full) + m + repeatString(style[0], size - full - 1);
+    bar = repeatString(full_symbol, full) + m + repeatString(bars[style][0], size - full - 1);
     return bar;
 }
 
@@ -239,4 +240,54 @@ function repeatString(string: string, amount: number) {
     var s = '';
     for (var j = 0; j < amount; j++) s += string;
     return s;
+}
+
+export function getNowPlayingMessage(
+    currentTrack: Track,
+    queue: Queue,
+    audioPlayer: AudioPlayer,
+    durationMs: number,
+    showTrackBar: boolean = false
+): [message: MessageEmbed, row: MessageActionRow] {
+    let embedmsg = new MessageEmbed().setColor('#403075').setTitle('Queue');
+
+    if (currentTrack) {
+        embedmsg
+            .setTitle(currentTrack.name)
+            .setURL(currentTrack.displayUrl)
+            .setThumbnail(currentTrack.artworkUrl)
+            .setDescription('Requested by ' + currentTrack.requestor);
+    }
+
+    if (showTrackBar) {
+        if (!isNaN(currentTrack.duration)) {
+            embedmsg.addField('\u200B', '`' + getLoadingMessage(durationMs / 1000, currentTrack.duration, 2) + '`');
+        } else {
+            embedmsg.addField('\u200B', '`Track is running since:' + String(durationMs / 1000) + 'seconds`');
+        }
+    }
+
+    if (queue.length > 0) {
+        embedmsg.addField('\u200B', '**Next:**');
+
+        for (let i = 0; i < 2; i++) {
+            if (i + 1 > queue.length) break;
+            embedmsg.addField(
+                i + 1 + ': `' + queue[i].name + '`',
+                queue[i].requestor + (queue[i].announce ? ' 📣' : '') + ' | ' + queue[i].displayUrl
+            );
+        }
+    }
+    const row = new MessageActionRow().addComponents([
+        new MessageButton().setCustomId('np_back').setLabel('⏮️').setStyle('SECONDARY'),
+        new MessageButton().setCustomId('np_stop').setLabel('⏹️').setStyle('SECONDARY'),
+        new MessageButton()
+            .setCustomId('np_playresume')
+            .setLabel(audioPlayer.state.status === AudioPlayerStatus.Paused ? '▶️' : '⏸️')
+            .setStyle('SECONDARY'),
+        new MessageButton().setCustomId('np_skip').setLabel('⏭️').setStyle('SECONDARY'),
+        new MessageButton().setCustomId('np_repeat').setLabel('🔂').setStyle('SECONDARY')
+    ]);
+
+    return [embedmsg, row];
 }

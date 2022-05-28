@@ -17,6 +17,7 @@ export const command: Command = {
                 try {
                     await client.musicManager.clear(interaction);
                     await safeReply(interaction, createEmbed('Cleared', '`🔺 The Queue is now empty.`', true));
+                    
                     done();
                 } catch (err) {
                     await safeReply(interaction, createErrorEmbed('🚩 Error clearing queue: `' + err + '`', true));

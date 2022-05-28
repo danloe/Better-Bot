@@ -22,6 +22,7 @@ export const command: Command = {
                     const queue = client.musicManager.getQueue(interaction);
                     const subscription = client.musicManager.subscriptions.get(interaction.guildId!)!;
                     startCollector(client, interaction, subscription, queue);
+                    
                     done();
                 } catch (err) {
                     await safeReply(interaction, createErrorEmbed('🚩 Error showing the queue: `' + err + '`', true));

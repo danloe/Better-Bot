@@ -17,6 +17,7 @@ export const command: Command = {
                 try {
                     await client.musicManager.resume(interaction);
                     await safeReply(interaction, createEmbed('Resumed', '`🔺 The audio has been resumed.`', true));
+                    
                     done();
                 } catch (err) {
                     await safeReply(interaction, createErrorEmbed('🚩 Error resuming the track: `' + err + '`', true));

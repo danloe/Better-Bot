@@ -192,6 +192,21 @@ export const command: Command = {
                             )
                         );
                     }
+
+                    let subscription = client.musicManager.getSubscription(interaction, false);
+                    if (subscription.lastChannel?.id != interaction.channel.id) {
+                        subscription.lastChannel = interaction.channel;
+                        await safeReply(
+                            interaction,
+                            createEmbed(
+                                'Now Playing Message',
+                                '`🔺 The now playing message is now bound to #' + subscription.lastChannel.name + '`',
+                                true
+                            ),
+                            true
+                        );
+                    }
+
                     done();
                 } catch (err) {
                     await safeReply(interaction, createErrorEmbed('🚩 Error adding track(s): `' + err + '`', true));
