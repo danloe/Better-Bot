@@ -39,6 +39,7 @@ export class MusicSubscription {
     public announcement = false;
     public volume = 1;
     public voiceVolumeMultiplier = 1.8;
+    public displayMessage = true;
 
     private audioResource!: AudioResource<Track>;
     private voiceResource!: AudioResource;
@@ -253,6 +254,20 @@ export class MusicSubscription {
     }
 
     /**
+     * Sets the display now playing message setting value.
+     */
+    public setMessageDisplay(value: boolean) {
+        this.displayMessage = value;
+    }
+
+    /**
+     * Gets the display now playing message setting value.
+     */
+    public getMessageDisplay() {
+        return this.displayMessage;
+    }
+
+    /**
      * Gets the audio volume.
      */
     public getVolume(): number {
@@ -274,14 +289,23 @@ export class MusicSubscription {
         }
     }
 
+    /**
+     * Tells if the audioplayer is paused.
+     */
     public isPaused(): boolean {
         return this.audioPlayer.state.status == AudioPlayerStatus.Paused;
     }
 
+    /**
+     * Tells if the audioplayer is idling.
+     */
     public isIdle(): boolean {
         return this.audioPlayer.state.status == AudioPlayerStatus.Idle;
     }
 
+    /**
+     * Tells if the audioplayer is playing.
+     */
     public isPlaying(): boolean {
         return this.audioPlayer.state.status == AudioPlayerStatus.Playing;
     }
