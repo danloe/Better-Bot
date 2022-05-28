@@ -2,13 +2,13 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { createErrorEmbed, safeReply } from '../../helpers';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 import { promisify } from 'node:util';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('coin').setDescription('Throws a coin. Heads or Tails?'),
     run: async (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]

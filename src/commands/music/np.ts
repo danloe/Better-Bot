@@ -6,11 +6,9 @@ import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
-        .setName('volume')
-        .setDescription('Shows or sets the audio volume.')
-        .addIntegerOption((option) =>
-            option.setName('set').setDescription('What percentage?').setMinValue(1).setMaxValue(300).setRequired(false)
-        ),
+        .setName('np')
+        .setDescription('Enable/Disable now playing message when a song starts.')
+        .addBooleanOption((option) => option.setName('set').setDescription('Enable?').setRequired(true)),
     run: (
         client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
@@ -21,27 +19,29 @@ export const command: Command = {
             if (interaction) {
                 try {
                     let input =
-                        interaction instanceof CommandInteraction ? interaction.options.getInteger('set') : null;
+                        interaction instanceof CommandInteraction ? interaction.options.getBoolean('set') : undefined;
 
                     const subscription = client.musicManager.getSubscription(interaction, false);
 
                     if (input) {
-                        let vol = input / 100;
-                        subscription.setVolume(vol);
+                        subscription.setMessageDisplay(input);
                         await safeReply(
                             interaction,
                             createEmbed(
-                                'Volume Set',
-                                '`🔺 The audio volume has been set to ' + String(input) + '%`',
+                                'Now Playing Message Set',
+                                '`🔺 The now playing message is now ' + input ? 'on.`' : 'off.`',
                                 true
                             )
                         );
                     } else {
-                        let vol = subscription.getVolume();
-                        vol = Math.floor(vol * 100);
+                        let state = subscription.getMessageDisplay();
                         await safeReply(
                             interaction,
-                            createEmbed('Volume', '`🔉 The audio volume is at ' + String(vol) + '%`', true)
+                            createEmbed(
+                                'Now Playing Message',
+                                '`🔺 The now playing message is turned ' + state ? 'on.`' : 'off.`',
+                                true
+                            )
                         );
                     }
 

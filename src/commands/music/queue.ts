@@ -1,7 +1,7 @@
 import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 import { command as skip } from './skip';
 import { command as clear } from './clear';
@@ -11,7 +11,7 @@ import { MusicSubscription, Queue } from '../../classes';
 export const command: Command = {
     data: new SlashCommandBuilder().setName('queue').setDescription('Show the Queue.'),
     run: (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
@@ -32,7 +32,7 @@ export const command: Command = {
 };
 
 async function startCollector(
-    client: BetterClient,
+    client: BotterinoClient,
     interaction: CommandInteraction | ButtonInteraction,
     subscription: MusicSubscription,
     queue: Queue

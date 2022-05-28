@@ -1,11 +1,11 @@
 import { Intents } from 'discord.js';
 import dotenv from 'dotenv';
-import BetterClient from './client';
+import BotterinoClient from './client';
 dotenv.config();
 
 try {
     // CLIENT
-    const client = new BetterClient({
+    const client = new BotterinoClient({
         intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]
     });
 

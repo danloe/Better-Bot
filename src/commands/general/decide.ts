@@ -1,7 +1,7 @@
 import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
 
 export const command: Command = {
@@ -15,7 +15,7 @@ export const command: Command = {
                 .setRequired(true)
         ),
     run: (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
@@ -47,7 +47,7 @@ export const command: Command = {
                         let iDecision = Math.floor(Math.random() * splitInput.length);
                         let embedmsg = new MessageEmbed().setColor('#403075').setTitle('Decision');
                         for (let i = 0; i < splitInput.length; i++) {
-                            embedmsg.addField(splitInput[i], i == iDecision ? '✅' : '❌', true);
+                            embedmsg.addField(splitInput[i], i == iDecision ? '🔺' : '❌', true);
                         }
                         await safeReply(interaction, { embeds: [embedmsg] });
                         done();

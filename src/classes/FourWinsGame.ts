@@ -1,7 +1,7 @@
 import { MessageEmbed, TextBasedChannel, User } from 'discord.js';
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 
 /*
 ⚪⚪⚪⚪⚪⚪⚪
@@ -20,7 +20,7 @@ export class FourWinsGame extends GameLobby {
     gameField: string[][] = [];
     playerYellowTurn: boolean = false;
 
-    public constructor(client: BetterClient, host: User, channel: TextBasedChannel) {
+    public constructor(client: BotterinoClient, host: User, channel: TextBasedChannel) {
         super(client, GameType.FourWins, host, channel, 2, 2);
         this.name = 'Four Wins';
         this.thumbnail = client.config.fourWins_thumbnail;

@@ -1,7 +1,7 @@
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 
 interface Run {
-    (client: BetterClient, ...args: any[]): void;
+    (client: BotterinoClient, ...args: any[]): void;
 }
 
 export interface Event {

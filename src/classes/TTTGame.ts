@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 
 /*
 🔳⭕🔳
@@ -35,7 +35,7 @@ export class TTTGame extends GameLobby {
     gameField: string[] = [];
     playerOturn: boolean = false;
 
-    public constructor(client: BetterClient, host: User, channel: TextBasedChannel) {
+    public constructor(client: BotterinoClient, host: User, channel: TextBasedChannel) {
         super(client, GameType.TicTacToe, host, channel, 2, 2);
         this.name = 'Tic Tac Toe';
         this.thumbnail = client.config.ticTacToe_thumbnail;

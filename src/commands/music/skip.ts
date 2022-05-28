@@ -1,7 +1,7 @@
 import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
 
 export const command: Command = {
@@ -12,7 +12,7 @@ export const command: Command = {
             option.setName('input').setDescription('Skip how many tracks?').setRequired(false)
         ),
     run: (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
@@ -28,8 +28,8 @@ export const command: Command = {
                     if (queue.length == 0) {
                         msg = '`No more tracks in queue. Audio has stopped playing.`';
                     } else {
-                        msg = '`✅ ' + String(input) + (input == 1 ? ' track' : ' tracks') + ' skipped';
-                        if (input == 0) msg = '`✅ Skipped to the next track';
+                        msg = '`🔺 ' + String(input) + (input == 1 ? ' track' : ' tracks') + ' skipped';
+                        if (input == 0) msg = '`🔺 Skipped to the next track';
                         msg = msg + ' [' + (queue.length - 1) + ' more in queue]`';
                     }
                     await safeReply(interaction, createEmbed('Skipped', msg, true));

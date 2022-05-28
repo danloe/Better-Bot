@@ -1,11 +1,11 @@
 import { ClientPresenceStatus, ExcludeEnum, PresenceStatusData } from 'discord.js';
 import { ActivityTypes } from 'discord.js/typings/enums';
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 import { Event } from '../interfaces';
 
 export const event: Event = {
     name: 'ready',
-    run: async (client: BetterClient) => {
+    run: async (client: BotterinoClient) => {
         client.user!.setPresence({
             activities: [
                 {

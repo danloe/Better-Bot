@@ -10,7 +10,7 @@ import {
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
 import { Category, CategoryData, getQuestions, Question, QuestionDifficulty, QuestionType } from 'open-trivia-db';
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 
 /*
   _____ ____  _____     _____    _    
@@ -40,7 +40,7 @@ export class TriviaGame extends GameLobby {
     readQuestions = false;
     questionRead = true;
 
-    public constructor(client: BetterClient, host: User, channel: TextBasedChannel, maxPlayers: number) {
+    public constructor(client: BotterinoClient, host: User, channel: TextBasedChannel, maxPlayers: number) {
         super(client, GameType.Trivia, host, channel, 1, maxPlayers);
         this.name = 'Trivia';
         this.thumbnail = client.config.trivia_thumbnail;

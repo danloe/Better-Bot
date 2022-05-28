@@ -1,8 +1,8 @@
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 
 interface Run {
-    (client: BetterClient, interaction?: CommandInteraction | ButtonInteraction, message?: Message, args?: string[]): Promise<void>;
+    (client: BotterinoClient, interaction?: CommandInteraction | ButtonInteraction, message?: Message, args?: string[]): Promise<void>;
 }
 
 export interface Command {

@@ -1,13 +1,13 @@
 import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('shuffle').setDescription('Shuffle all tracks in the queue.'),
     run: (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
@@ -20,7 +20,7 @@ export const command: Command = {
                     if (interaction instanceof CommandInteraction) {
                         await safeReply(
                             interaction,
-                            createEmbed('Shuffled', '`✅ The Queue is no longer in OOOORDER.`', true)
+                            createEmbed('Shuffled', '`🔺 The Queue is no longer in OOOORDER.`', true)
                         );
                     }
                     done();

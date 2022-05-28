@@ -13,7 +13,7 @@ import {
     getSpotifyTrack
 } from '../helpers';
 import { ButtonInteraction, CommandInteraction, GuildMember, Snowflake } from 'discord.js';
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 import { MusicSubscription } from './MusicSubscription';
 import { Queue } from './Queue';
 import { Track, InputType } from './Track';
@@ -30,11 +30,11 @@ import { Playlist } from '../interfaces';
 const discordTTS = require('discord-tts');
 
 export class MusicManager {
-    client: BetterClient;
+    client: BotterinoClient;
     subscriptions: Map<Snowflake, MusicSubscription> = new Map<Snowflake, MusicSubscription>();
     queues: Map<Snowflake, Queue> = new Map<Snowflake, Queue>();
 
-    constructor(client: BetterClient) {
+    constructor(client: BotterinoClient) {
         this.client = client;
     }
 
