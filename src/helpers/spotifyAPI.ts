@@ -47,8 +47,6 @@ export async function getSpotifyTracksApiResponse(
 export async function getSpotifyAlbumsApiResponse(
     client: BetterClient,
     url: string,
-    offset: number,
-    limit: number,
     reject: (reason?: any) => void
 ): Promise<any> {
     if (client.SpotifyAuthorization == '' || client.SpotifyAuthorizationTimeout < new Date()) {
@@ -71,8 +69,6 @@ export async function getSpotifyAlbumsApiResponse(
 export async function getSpotifyPlaylistsApiResponse(
     client: BetterClient,
     url: string,
-    offset: number,
-    limit: number,
     reject: (reason?: any) => void
 ): Promise<any> {
     if (client.SpotifyAuthorization == '' || client.SpotifyAuthorizationTimeout < new Date()) {
@@ -81,8 +77,34 @@ export async function getSpotifyPlaylistsApiResponse(
     const apiUrl = 'https://api.spotify.com/v1/playlists/';
     const playlistId = url.match(/(?<=playlist\/)([a-zA-Z0-9-_]+)?/)![0];
     const fields =
-        '?fields=name,description,owner,external_urls,id,images,tracks.items(track(album(images),artists,duration_ms,name))';
+        '?fields=name,external_urls,images,description,owner,tracks.total,tracks.items(track(album(images),artists,duration_ms,name))';
     const requestUrl = apiUrl + playlistId + fields;
+    let response: any = await fetch(requestUrl, {
+        method: 'GET',
+        headers: {
+            Authorization: client.SpotifyAuthorization
+        }
+    });
+    response = await response.json();
+    if (response!.error) reject('Playlist not found. Is it private?');
+    return response;
+}
+
+export async function getSpotifyPlaylistsItemsApiResponse(
+    client: BetterClient,
+    url: string,
+    offset: number,
+    reject: (reason?: any) => void
+): Promise<any> {
+    if (client.SpotifyAuthorization == '' || client.SpotifyAuthorizationTimeout < new Date()) {
+        await getSpotifyAuthorizationToken(client, reject);
+    }
+    const apiUrl = 'https://api.spotify.com/v1/playlists/';
+    const playlistId = url.match(/(?<=playlist\/)([a-zA-Z0-9-_]+)?/)![0];
+    const tracks = '/tracks';
+    const off = offset > 0 ? 'offset=' + String(offset) : '';
+    const fields = '?fields=next, items(track(album(images),artists,duration_ms,name))';
+    const requestUrl = apiUrl + playlistId + tracks + fields + off + '&limit=100';
     let response: any = await fetch(requestUrl, {
         method: 'GET',
         headers: {

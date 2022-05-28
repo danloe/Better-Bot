@@ -8,7 +8,12 @@ import BetterClient from '../client';
 import fetch from 'node-fetch';
 import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { safeDeferReply, safeReply, shuffleArray } from './general';
-import { getSpotifyAlbumsApiResponse, getSpotifyPlaylistsApiResponse, getSpotifyTracksApiResponse } from './spotifyApi';
+import {
+    getSpotifyAlbumsApiResponse,
+    getSpotifyPlaylistsApiResponse,
+    getSpotifyPlaylistsItemsApiResponse,
+    getSpotifyTracksApiResponse
+} from './spotifyApi';
 import { JSDOM } from 'jsdom';
 
 const youTubeThumbnail = 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg';
@@ -311,7 +316,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
             let responseTracks: any[];
 
             if (url.includes('/album/')) {
-                response = await getSpotifyAlbumsApiResponse(client, url, offset, limit, reject);
+                response = await getSpotifyAlbumsApiResponse(client, url, reject);
                 responseTracks = response.tracks.items;
                 playlist = {
                     type: PlaylistType.SpotifyAlbum,
@@ -330,19 +335,31 @@ export function getSpotifyAlbumOrPlaylistTracks(
                     thumbnailUrl: response.images[0]?.url || spotifyThumbnail
                 };
             } else {
-                response = await getSpotifyPlaylistsApiResponse(client, url, offset, limit, reject);
+                response = await getSpotifyPlaylistsApiResponse(client, url, reject);
                 responseTracks = response.tracks.items;
                 playlist = {
                     type: PlaylistType.SpotifyPlaylist,
                     name: JSDOM.fragment(response.name).textContent || 'Unknown',
                     description: JSDOM.fragment(response.description).textContent || 'No desciption available.',
                     url: response.external_urls.spotify,
-                    itemCount: responseTracks.length,
+                    itemCount: response.tracks.total,
                     announce: announce,
                     owner: response.owner.display_name || 'Unknown',
                     publishedAt: 'Unknown',
                     thumbnailUrl: response.images[0]?.url || spotifyThumbnail
                 };
+                let next = responseTracks.length < playlist.itemCount;
+                while (next) {
+                    let res: any = await getSpotifyPlaylistsItemsApiResponse(
+                        client,
+                        url,
+                        responseTracks.length,
+                        reject
+                    );
+                    let trackArr: any[] = res.items;
+                    responseTracks.push(trackArr);
+                    next = responseTracks.length < playlist.itemCount;
+                }
             }
 
             if (offset) {
@@ -497,7 +514,7 @@ function getLoadingMessageEmbed(
             '%`\n' +
             '`Loaded: ' +
             String(loaded) +
-            (failed > 0 ? '`\n`Not found: ' + String(failed) : '`');
+            (failed > 0 ? '`\n`Not found: ' + String(failed) + '`' : '`');
     }
     let embedmsg = new MessageEmbed()
         .setColor('#1DB954')
