@@ -122,7 +122,7 @@ Follow these steps to get the bot up and running.
 [![npm][npm-shield]][npm-url]
 >npm comes with nodejs, update with the following command:
   ```sh
-  npm install npm@latest -g
+  npm i npm@latest -g
   ```
 >install ffmpeg with environment variable[^ffmpeg]
 
@@ -139,7 +139,7 @@ Follow these steps to get the bot up and running.
 2. Install the required npm packages
 >Run the following command in a terminal in the repo folder:
 ```sh
-npm install
+npm i
 ```
 
 3. Create a file named `.env` in the root directory
