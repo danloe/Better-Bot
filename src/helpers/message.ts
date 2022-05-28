@@ -246,10 +246,9 @@ export function getNowPlayingMessage(
     currentTrack: Track,
     queue: Queue,
     audioPlayer: AudioPlayer,
-    durationMs: number,
-    showTrackBar: boolean = false
+    audioResourceDurationMs: number
 ): [message: MessageEmbed, row: MessageActionRow] {
-    let embedmsg = new MessageEmbed().setColor('#403075').setTitle('Queue');
+    let embedmsg = new MessageEmbed().setColor('#403075');
 
     if (currentTrack) {
         embedmsg
@@ -259,12 +258,13 @@ export function getNowPlayingMessage(
             .setDescription('Requested by ' + currentTrack.requestor);
     }
 
-    if (showTrackBar) {
-        if (!isNaN(currentTrack.duration)) {
-            embedmsg.addField('\u200B', '`' + getLoadingMessage(durationMs / 1000, currentTrack.duration, 2) + '`');
-        } else {
-            embedmsg.addField('\u200B', '`Track is running since:' + String(durationMs / 1000) + 'seconds`');
-        }
+    if (!isNaN(currentTrack.duration) && currentTrack.duration > 0) {
+        embedmsg.addField(
+            '\u200B',
+            '`' + getLoadingMessage(audioResourceDurationMs / 1000, currentTrack.duration, 2) + '`'
+        );
+    } else {
+        embedmsg.addField('\u200B', '`Track is running since: ' + String(audioResourceDurationMs / 1000) + ' seconds`');
     }
 
     if (queue.length > 0) {

@@ -449,7 +449,7 @@ export class MusicManager {
                 subscription = new MusicSubscription(undefined, this.getQueue(interaction), this.client.config.defaultVolume);
             }
             this.subscriptions.set(interaction.guildId!, subscription!);
-        } else if ((!subscription.voiceConnection! || !subscription.isVoiceConnectionReady()) && join) {
+        } else if (join && (!subscription.voiceConnection! || !subscription.isVoiceConnectionReady())) {
             if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                 const channel = interaction.member.voice.channel;
                 subscription = new MusicSubscription(

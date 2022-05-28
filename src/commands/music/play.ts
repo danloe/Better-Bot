@@ -1,5 +1,5 @@
 import { Command, Playlist, PlaylistType } from '../../interfaces';
-import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
+import { ButtonInteraction, CommandInteraction, GuildTextBasedChannel, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BotterinoClient from '../../client';
 import {
@@ -194,8 +194,8 @@ export const command: Command = {
                     }
 
                     let subscription = client.musicManager.getSubscription(interaction, false);
-                    if (subscription.lastChannel?.id != interaction.channel.id) {
-                        subscription.lastChannel = interaction.channel;
+                    if (subscription.lastChannel?.id != interaction.channel?.id) {
+                        subscription.lastChannel = <GuildTextBasedChannel>interaction.channel;
                         await safeReply(
                             interaction,
                             createEmbed(

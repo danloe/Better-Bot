@@ -32,18 +32,15 @@ export const command: Command = {
 
                     let message = '';
 
-                    if (input) {
+                    if (input !== null) {
                         subscription.setMessageDisplay(input);
-                        message = '`🔺 The now playing message is now ' + input ? 'on.`' : 'off.`';
-                    } else {
-                        let state = subscription.getMessageDisplay();
-                        message = '`🔺 The now playing message is ' + state ? 'on.`' : 'off.`';
+                        message = '`🔺 Is now turned ' + (input ? 'on.`' : 'off.`');
                     }
 
                     if (channel) {
                         if (channel.type === 'GUILD_TEXT') {
                             subscription.lastChannel = channel;
-                            message += '\n`🔺 The now playing message is now bound to #' + channel.name + '`';
+                            message += (input !== null ? '\n`' : '`') + '🔺 Bound to #' + channel.name + '`';
                         }
                     }
 
@@ -58,9 +55,11 @@ export const command: Command = {
                             embeds: [embedmsg],
                             components: [row]
                         });
-                        await safeReply(interaction, createEmbed('Now Playing Message Set', message, true), true);
+                        if (input !== null || channel)
+                            await safeReply(interaction, createEmbed('Now Playing Message', message, true), true);
                     } else {
-                        await safeReply(interaction, createEmbed('Now Playing Message Set', message, true));
+                        if (input !== null || channel)
+                            await safeReply(interaction, createEmbed('Now Playing Message', message, true));
                     }
 
                     done();

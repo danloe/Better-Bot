@@ -17,8 +17,8 @@ import {
 import { promisify } from 'node:util';
 import { Track } from './Track';
 import { Queue } from './Queue';
-import { MessageEmbed, TextBasedChannel } from 'discord.js';
-import { createEmbed, getAnnouncementString, getNowPlayingMessage } from '../helpers';
+import { GuildTextBasedChannel } from 'discord.js';
+import { getAnnouncementString, getNowPlayingMessage } from '../helpers';
 //import discordTTS from 'discord-tts';
 const discordTTS = require('discord-tts');
 
@@ -31,10 +31,12 @@ export class MusicSubscription {
 
     public currentTrack!: Track | undefined;
     public queue: Queue;
-    public lastChannel!: TextBasedChannel;
+    public lastChannel!: GuildTextBasedChannel;
     public audioResource!: AudioResource<Track>;
     public voiceResource!: AudioResource;
-    
+
+    public volume = 1;
+
     private connectionTimeoutObj!: NodeJS.Timeout;
 
     private queueLock = false;
@@ -42,7 +44,6 @@ export class MusicSubscription {
     private autoplay = true;
     private pausedForVoice = false;
     private announcement = false;
-    private volume = 1;
     private voiceVolumeMultiplier = 1.8;
     private displayMessage = true;
 
@@ -162,7 +163,6 @@ export class MusicSubscription {
                         } else if (this.announcement) {
                             this.announcement = false;
                             this.audioPlayer.play(this.audioResource!);
-                            this.showNowPlayingMessage();
                         }
                     } else if (newState.status === AudioPlayerStatus.Playing) {
                         // If the Playing state has been entered, then a new track has started playback.
@@ -352,9 +352,9 @@ export class MusicSubscription {
                     this.announcement = true;
                 } else {
                     this.audioPlayer.play(this.audioResource);
-                    this.showNowPlayingMessage();
                 }
                 this.currentTrack = nextTrack;
+                this.showNowPlayingMessage();
                 this.queueLock = false;
             } catch (error) {
                 // If an error occurred, try the next item of the queue instead
@@ -367,15 +367,17 @@ export class MusicSubscription {
     }
 
     private async showNowPlayingMessage() {
-        let [msg, row] = getNowPlayingMessage(
-            this.currentTrack,
-            this.queue,
-            this.audioPlayer,
-            this.audioResource.playbackDuration
-        );
-        await this.lastChannel.send({
-            embeds: [msg],
-            components: [row]
-        });
+        if (this.displayMessage) {
+            let [msg, row] = getNowPlayingMessage(
+                this.currentTrack!,
+                this.queue,
+                this.audioPlayer,
+                this.audioResource.playbackDuration
+            );
+            await this.lastChannel.send({
+                embeds: [msg],
+                components: [row]
+            });
+        }
     }
 }
