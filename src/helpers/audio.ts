@@ -13,7 +13,7 @@ import {
     getSpotifyPlaylistsApiResponse,
     getSpotifyPlaylistsItemsApiResponse,
     getSpotifyTracksApiResponse
-} from './spotifyApi';
+} from './spotifyAPI';
 import { JSDOM } from 'jsdom';
 
 const youTubeThumbnail = 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg';
