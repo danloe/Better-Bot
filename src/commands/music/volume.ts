@@ -31,7 +31,7 @@ export const command: Command = {
                         await safeReply(
                             interaction,
                             createEmbed(
-                                'Volume Set',
+                                'Volume',
                                 '`🔺 The audio volume has been set to ' + String(input) + '%`',
                                 true
                             )

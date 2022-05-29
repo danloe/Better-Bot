@@ -33,7 +33,7 @@ export const command: Command = {
                         msg = msg + ' [' + (queue.length - 1) + ' more in queue]`';
                     }
                     await safeReply(interaction, createEmbed('Skipped', msg, true));
-                    
+
                     done();
                 } catch (err) {
                     await safeReply(interaction, createErrorEmbed('🚩 Error skipping track(s): `' + err + '`', true));

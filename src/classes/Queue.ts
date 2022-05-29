@@ -116,15 +116,15 @@ export class Queue extends Array<Track> {
         const row = new MessageActionRow().addComponents([
             new MessageButton()
                 .setCustomId('queue_previous')
-                .setLabel('⬅️')
+                .setEmoji('⬅️')
                 .setStyle('SECONDARY')
                 .setDisabled(this.currentPage <= 1),
-            new MessageButton().setCustomId('queue_skip').setLabel('⏭️ Skip').setStyle('SECONDARY'),
-            new MessageButton().setCustomId('queue_clear').setLabel('🚮 Clear').setStyle('DANGER'),
-            new MessageButton().setCustomId('queue_shuffle').setLabel('🔀 Shuffle').setStyle('SECONDARY'),
+            new MessageButton().setCustomId('queue_skip').setEmoji('⏭️').setStyle('SECONDARY'),
+            new MessageButton().setCustomId('queue_clear').setEmoji('🚮').setStyle('DANGER'),
+            new MessageButton().setCustomId('queue_shuffle').setEmoji('🔀').setStyle('SECONDARY'),
             new MessageButton()
                 .setCustomId('queue_next')
-                .setLabel('➡️')
+                .setEmoji('➡️')
                 .setStyle('SECONDARY')
                 .setDisabled(this.currentPage >= this.totalPages)
         ]);

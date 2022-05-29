@@ -1,6 +1,6 @@
 import { EmbedFooterData, embedLength } from '@discordjs/builders';
 import { ColorResolvable, EmbedFieldData, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
-import { Track, InputType, Queue } from '../classes';
+import { Track, InputType, Queue, MusicSubscription } from '../classes';
 import google from 'googlethis';
 import { AudioPlayer, AudioPlayerStatus } from '@discordjs/voice';
 
@@ -147,6 +147,23 @@ export function secondsToDurationString(seconds: number): string {
     return 'live or unknown';
 }
 
+export function secondsToColonsString(seconds: number): string {
+    var mins = Math.floor(seconds / 60);
+    var secs = seconds - mins * 60;
+    var ms, ss: string;
+    if (mins < 10) {
+        ms = '0' + String(mins);
+    } else {
+        ms = String(mins);
+    }
+    if (secs < 10) {
+        ss = '0' + String(secs);
+    } else {
+        ss = String(secs);
+    }
+    return ms + ':' + ss;
+}
+
 export function checkEmbedString(string: string, limit: number = 300): string {
     try {
         if (string == null || string == undefined || string == '') return 'Unknown';
@@ -212,9 +229,9 @@ export async function getLogoUrlfromUrl(url: string): Promise<string> {
     }
 }
 
-export function getLoadingMessage(actual: number, total: number, style = 0, size = 20): string {
+export function getLoadingString(actual: number, total: number, style = 0, size = 20): string {
     let p = Math.floor((actual / total) * 100);
-    let bars = ['⣀⣄⣤⣦⣶⣷⣿', '▁▂▃▄▅▆▇█', '□▣■'];
+    let bars = ['⣀⣄⣤⣦⣶⣷⣿', '▁▂▃▄▅▆▇█'];
     var full: number,
         m: string,
         middle: number,
@@ -236,58 +253,29 @@ export function getLoadingMessage(actual: number, total: number, style = 0, size
     return bar;
 }
 
-function repeatString(string: string, amount: number) {
+export function getTrackBarString(actual: number, total: number, size = 20) {
+    let percentPlayed = actual / total;
+    let barPercent = Math.floor(percentPlayed * size);
+    //|■■■■■▣□□□□□|
+    //start
+    let barString = '|';
+    //small white squares
+    barString += repeatString('■', barPercent - 1);
+
+    //button
+    barString += '▣';
+
+    //small black squares
+    barString += repeatString('□', size - barPercent - 1);
+
+    //end
+    barString += '|';
+
+    return barString;
+}
+
+function repeatString(string: string, amount: number): string {
     var s = '';
     for (var j = 0; j < amount; j++) s += string;
     return s;
-}
-
-export function getNowPlayingMessage(
-    currentTrack: Track,
-    queue: Queue,
-    audioPlayer: AudioPlayer,
-    audioResourceDurationMs: number
-): [message: MessageEmbed, row: MessageActionRow] {
-    let embedmsg = new MessageEmbed().setColor('#403075');
-
-    if (currentTrack) {
-        embedmsg
-            .setTitle(currentTrack.name)
-            .setURL(currentTrack.displayUrl)
-            .setThumbnail(currentTrack.artworkUrl)
-            .setDescription('Requested by ' + currentTrack.requestor);
-    }
-
-    if (!isNaN(currentTrack.duration) && currentTrack.duration > 0) {
-        embedmsg.addField(
-            '\u200B',
-            '`' + getLoadingMessage(audioResourceDurationMs / 1000, currentTrack.duration, 2) + '`'
-        );
-    } else {
-        embedmsg.addField('\u200B', '`Track is running since: ' + String(audioResourceDurationMs / 1000) + ' seconds`');
-    }
-
-    if (queue.length > 0) {
-        embedmsg.addField('\u200B', '**Next:**');
-
-        for (let i = 0; i < 2; i++) {
-            if (i + 1 > queue.length) break;
-            embedmsg.addField(
-                i + 1 + ': `' + queue[i].name + '`',
-                queue[i].requestor + (queue[i].announce ? ' 📣' : '') + ' | ' + queue[i].displayUrl
-            );
-        }
-    }
-    const row = new MessageActionRow().addComponents([
-        new MessageButton().setCustomId('np_back').setLabel('⏮️').setStyle('SECONDARY'),
-        new MessageButton().setCustomId('np_stop').setLabel('⏹️').setStyle('SECONDARY'),
-        new MessageButton()
-            .setCustomId('np_playresume')
-            .setLabel(audioPlayer.state.status === AudioPlayerStatus.Paused ? '▶️' : '⏸️')
-            .setStyle('SECONDARY'),
-        new MessageButton().setCustomId('np_skip').setLabel('⏭️').setStyle('SECONDARY'),
-        new MessageButton().setCustomId('np_repeat').setLabel('🔂').setStyle('SECONDARY')
-    ]);
-
-    return [embedmsg, row];
 }

@@ -322,6 +322,29 @@ export class MusicManager {
         });
     }
 
+    restart(interaction: CommandInteraction | ButtonInteraction) {
+        return new Promise<void>(async (done, error) => {
+            try {
+                const subscription = this.getSubscription(interaction, true);
+
+                if (!subscription) {
+                    error('Not playing anything.');
+                    return;
+                }
+
+                if (!subscription.currentTrack) {
+                    error('Nothing to restart.');
+                    return;
+                }
+
+                subscription.restart();
+                done();
+            } catch (err) {
+                error(err);
+            }
+        });
+    }
+
     remove(interaction: CommandInteraction | ButtonInteraction, positions: number[]) {
         return new Promise<void>(async (done, error) => {
             try {
@@ -390,6 +413,23 @@ export class MusicManager {
         });
     }
 
+    repeat(interaction: CommandInteraction | ButtonInteraction, enable: boolean | null) {
+        return new Promise<boolean>(async (done, error) => {
+            try {
+                const subscription = this.getSubscription(interaction, false);
+
+                if (enable !== null) {
+                    subscription.setRepeat(enable);
+                    done(enable);
+                } else {
+                    done(subscription.getRepeat());
+                }
+            } catch (err) {
+                error(err);
+            }
+        });
+    }
+
     move(interaction: CommandInteraction | ButtonInteraction, currentPos: number, targetPos: number) {
         return new Promise<void>(async (done, error) => {
             try {
@@ -435,6 +475,7 @@ export class MusicManager {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     const channel = interaction.member.voice.channel;
                     subscription = new MusicSubscription(
+                        this.client,
                         joinVoiceChannel({
                             channelId: channel.id,
                             guildId: channel.guild.id,
@@ -446,13 +487,19 @@ export class MusicManager {
                     subscription.voiceConnection!.on('error', console.warn);
                 }
             } else {
-                subscription = new MusicSubscription(undefined, this.getQueue(interaction), this.client.config.defaultVolume);
+                subscription = new MusicSubscription(
+                    this.client,
+                    undefined,
+                    this.getQueue(interaction),
+                    this.client.config.defaultVolume
+                );
             }
             this.subscriptions.set(interaction.guildId!, subscription!);
         } else if (join && (!subscription.voiceConnection! || !subscription.isVoiceConnectionReady())) {
             if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                 const channel = interaction.member.voice.channel;
                 subscription = new MusicSubscription(
+                    this.client,
                     joinVoiceChannel({
                         channelId: channel.id,
                         guildId: channel.guild.id,

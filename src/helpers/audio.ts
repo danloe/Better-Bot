@@ -2,7 +2,7 @@ import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import { Track, InputType, Queue } from '../classes';
-import { getLoadingMessage, timeStringToDurationString as timeStringToSecondsNumber } from './message';
+import { getLoadingString, timeStringToDurationString as timeStringToSecondsNumber } from './message';
 import { Playlist, PlaylistType } from '../interfaces';
 import BotterinoClient from '../client';
 import fetch from 'node-fetch';
@@ -70,7 +70,7 @@ export function getYouTubeTrack(
                 requestor,
                 announce,
                 info.videoDetails.video_url,
-                timeStringToSecondsNumber(info.videoDetails.lengthSeconds),
+                Number(info.videoDetails.lengthSeconds),
                 info.videoDetails.thumbnails[0].url,
                 String(info.videoDetails.description),
                 '',
@@ -508,7 +508,7 @@ function getLoadingMessageEmbed(
     } else {
         desciptionMsg =
             '`🔺 Playlist is loading...`\n`' +
-            getLoadingMessage(loaded + failed, playlistTracks.length) +
+            getLoadingString(loaded + failed, playlistTracks.length) +
             ' ' +
             String(Math.floor(((loaded + failed) / playlistTracks.length) * 100)) +
             '%`\n' +
