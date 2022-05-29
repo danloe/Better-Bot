@@ -12,7 +12,7 @@ export async function safeReply(
     interaction: CommandInteraction | ButtonInteraction,
     options: string | MessagePayload | InteractionReplyOptions,
     followup = false
-): Promise<APIMessage | Message<boolean>> {
+): Promise<APIMessage | Message<boolean> | undefined> {
     try {
         if (interaction instanceof ButtonInteraction) {
             if (interaction.replied || interaction.deferred) {
@@ -42,6 +42,7 @@ export async function safeReply(
                 );
             }
         }
+        return undefined;
     } catch (err) {
         console.log(err);
     }

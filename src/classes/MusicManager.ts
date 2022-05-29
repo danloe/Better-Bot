@@ -95,6 +95,7 @@ export class MusicManager {
                             announce,
                             reverse,
                             shuffle,
+                            skip || next,
                             offset,
                             limit
                         );
@@ -108,6 +109,7 @@ export class MusicManager {
                             announce,
                             reverse,
                             shuffle,
+                            skip || next,
                             offset,
                             limit
                         );
@@ -314,7 +316,7 @@ export class MusicManager {
                 }
 
                 if (amount > 0) queue.remove(1, amount);
-                subscription.audioPlayer!.stop();
+                subscription.skip();
                 done(queue);
             } catch (err) {
                 error(err);

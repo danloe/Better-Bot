@@ -305,6 +305,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
     announce: boolean,
     reverse: boolean,
     shuffle: boolean,
+    next: boolean,
     offset: number,
     limit: number
 ) {
@@ -348,8 +349,8 @@ export function getSpotifyAlbumOrPlaylistTracks(
                     publishedAt: 'Unknown',
                     thumbnailUrl: response.images[0]?.url || spotifyThumbnail
                 };
-                let next = responseTracks.length < playlist.itemCount;
-                while (next) {
+                let nextPage = responseTracks.length < playlist.itemCount;
+                while (nextPage) {
                     let res: any = await getSpotifyPlaylistsItemsApiResponse(
                         client,
                         url,
@@ -358,7 +359,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
                     );
                     let trackArr: any[] = res.items;
                     responseTracks.push(trackArr);
-                    next = responseTracks.length < playlist.itemCount;
+                    nextPage = responseTracks.length < playlist.itemCount;
                 }
             }
 
@@ -406,7 +407,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
 
             // Load other tracks in background
             const queue = client.musicManager.getQueue(interaction);
-            loadAndQueueAsync(interaction, playlist, queue, responseTracks, announce);
+            loadAndQueueAsync(interaction, playlist, queue, responseTracks, announce, next);
 
             resolve([playlist, tracks]);
         } catch (error) {
@@ -420,7 +421,8 @@ function loadAndQueueAsync(
     playlist: Playlist,
     queue: Queue,
     responseTracks: any[],
-    announce: boolean
+    announce: boolean,
+    next: boolean
 ) {
     return new Promise<void>(async (resolve, reject) => {
         let stopLoop = false;
@@ -460,23 +462,29 @@ function loadAndQueueAsync(
         for (const track of responseTracks) {
             try {
                 if (playlist.type === PlaylistType.SpotifyAlbum) {
-                    queue.queue(
-                        await getYouTubeTrack(
-                            track.artists[0].name + ' ' + track.name,
-                            interaction.user.username,
-                            announce,
-                            InputType.SpotifyPlaylist
-                        )
-                    );
+                    let t = await getYouTubeTrack(
+                        track.artists[0].name + ' ' + track.name,
+                        interaction.user.username,
+                        announce,
+                        InputType.SpotifyPlaylist
+                    )
+                    if (next) {
+                        queue.next(t);
+                    }else {
+                        queue.queue(t);
+                    }
                 } else {
-                    queue.queue(
-                        await getYouTubeTrack(
-                            track.track.artists[0].name + ' ' + track.track.name,
-                            interaction.user.username,
-                            announce,
-                            InputType.SpotifyAlbum
-                        )
-                    );
+                    let t = await getYouTubeTrack(
+                        track.track.artists[0].name + ' ' + track.track.name,
+                        interaction.user.username,
+                        announce,
+                        InputType.SpotifyAlbum
+                    )
+                    if (next) {
+                        queue.next(t);
+                    }else {
+                        queue.queue(t);
+                    }
                 }
                 loaded += 1;
                 if (stopLoop) {

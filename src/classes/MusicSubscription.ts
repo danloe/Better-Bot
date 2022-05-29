@@ -21,6 +21,7 @@ import { GuildTextBasedChannel, Message } from 'discord.js';
 import { getAnnouncementString } from '../helpers';
 import { getNowPlayingMessage, startNowPlayingCollector } from '../commands/music/np';
 import BotterinoClient from '../client';
+import { APIMessage } from 'discord-api-types/v10';
 //import discordTTS from 'discord-tts';
 const discordTTS = require('discord-tts');
 
@@ -142,7 +143,7 @@ export class MusicSubscription {
                         // Start connection timeout check
                         this.startConnectionTimeout();
                         if (this.autoplay && (this.repeat || this.restartTrack)) {
-                            this.audioResource = await this.currentTrack.createAudioResource();
+                            this.audioResource = await this.currentTrack!.createAudioResource();
                             this.audioPlayer.play(this.audioResource);
                         } else if (this.autoplay) {
                             this.processQueue();
@@ -246,6 +247,9 @@ export class MusicSubscription {
     public skip() {
         if (this.isIdle()) {
             this.play();
+        } else if (this.isPaused()) {
+            this.audioPlayer.unpause();
+            this.audioPlayer.stop();
         } else {
             this.audioPlayer.stop();
         }

@@ -28,6 +28,7 @@ import { command as repeat } from './repeat';
 import { command as queueCommand } from './queue';
 import { MusicSubscription } from '../../classes';
 import { AudioPlayerStatus } from '@discordjs/voice';
+import { APIMessage } from 'discord-api-types/v10';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -164,7 +165,7 @@ export async function startNowPlayingCollector(
 
     const [msgembed, row] = getNowPlayingMessage(subscription);
 
-    let lastMessage = null;
+    let lastMessage!: Message | APIMessage;
 
     if (message instanceof Message) {
         let msg = await message?.channel?.messages?.fetch(message.id).catch((_) => {
@@ -184,7 +185,7 @@ export async function startNowPlayingCollector(
         if (msg !== null) {
             if (msg?.deletable) await msg.delete();
         }
-        lastMessage = await safeReply(message, {
+        lastMessage = <Message>await safeReply(message, {
             embeds: [msgembed],
             components: [row]
         });
