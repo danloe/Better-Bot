@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { GameType } from './GameManager';
 import EventEmitter from 'node:events';
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 
 export class GameLobby extends EventEmitter {
     public game: GameType;
@@ -25,7 +25,7 @@ export class GameLobby extends EventEmitter {
     public thumbnail = '';
 
     public constructor(
-        client: BetterClient,
+        client: BotterinoClient,
         game: GameType,
         host: User,
         channel: TextBasedChannel,

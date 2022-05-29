@@ -1,7 +1,7 @@
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 import fetch from 'node-fetch';
 
-export async function getSpotifyAuthorizationToken(client: BetterClient, reject: (reason?: any) => void) {
+export async function getSpotifyAuthorizationToken(client: BotterinoClient, reject: (reason?: any) => void) {
     await fetch('https://accounts.spotify.com/api/token?grant_type=client_credentials', {
         method: 'POST',
         headers: {
@@ -23,7 +23,7 @@ export async function getSpotifyAuthorizationToken(client: BetterClient, reject:
 }
 
 export async function getSpotifyTracksApiResponse(
-    client: BetterClient,
+    client: BotterinoClient,
     url: string,
     reject: (reason?: any) => void
 ): Promise<any> {
@@ -45,7 +45,7 @@ export async function getSpotifyTracksApiResponse(
 }
 
 export async function getSpotifyAlbumsApiResponse(
-    client: BetterClient,
+    client: BotterinoClient,
     url: string,
     reject: (reason?: any) => void
 ): Promise<any> {
@@ -67,7 +67,7 @@ export async function getSpotifyAlbumsApiResponse(
 }
 
 export async function getSpotifyPlaylistsApiResponse(
-    client: BetterClient,
+    client: BotterinoClient,
     url: string,
     reject: (reason?: any) => void
 ): Promise<any> {
@@ -91,7 +91,7 @@ export async function getSpotifyPlaylistsApiResponse(
 }
 
 export async function getSpotifyPlaylistsItemsApiResponse(
-    client: BetterClient,
+    client: BotterinoClient,
     url: string,
     offset: number,
     reject: (reason?: any) => void

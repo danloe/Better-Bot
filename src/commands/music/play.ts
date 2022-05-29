@@ -1,7 +1,7 @@
 import { Command, Playlist, PlaylistType } from '../../interfaces';
-import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
+import { ButtonInteraction, CommandInteraction, GuildTextBasedChannel, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 import {
     checkEmbedString as getPrettyEmbedString,
     createEmbed,
@@ -52,7 +52,7 @@ export const command: Command = {
             option.setName('limit').setDescription('Playlists only: How many tracks?').setMinValue(1).setRequired(false)
         ),
     run: (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
@@ -192,6 +192,21 @@ export const command: Command = {
                             )
                         );
                     }
+
+                    let subscription = client.musicManager.getSubscription(interaction, false);
+                    if (subscription.lastChannel?.id != interaction.channel?.id) {
+                        subscription.lastChannel = <GuildTextBasedChannel>interaction.channel;
+                        await safeReply(
+                            interaction,
+                            createEmbed(
+                                'Now Playing Message',
+                                '`🔺 The now playing message is now bound to #' + subscription.lastChannel.name + '`',
+                                true
+                            ),
+                            true
+                        );
+                    }
+
                     done();
                 } catch (err) {
                     await safeReply(interaction, createErrorEmbed('🚩 Error adding track(s): `' + err + '`', true));

@@ -2,12 +2,12 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { createEmbed, createErrorEmbed } from '../../helpers';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('about').setDescription('Information about this bot.'),
     run: async (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]

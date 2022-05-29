@@ -1,7 +1,7 @@
 import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 import { getGames } from 'epic-free-games';
 
@@ -10,7 +10,7 @@ export const command: Command = {
         .setName('epicfree')
         .setDescription('Shows this weeks free games available in the epic store.'),
     run: (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
@@ -56,7 +56,7 @@ export const command: Command = {
                                         .setColor('#0078F2')
                                         .setTitle("This week's free games")
                                         .setDescription(
-                                            '`The following games are available for free this week in the Epic Games store.`'
+                                            '`🔺 The following games are available for free this week in the Epic Games store.`'
                                         )
                                         .setURL('https://store.epicgames.com/de/free-games')
                                 ]

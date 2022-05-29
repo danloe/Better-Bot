@@ -1,13 +1,13 @@
 import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('resume').setDescription('Resume a paused track.'),
     run: (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
@@ -16,7 +16,8 @@ export const command: Command = {
             if (interaction) {
                 try {
                     await client.musicManager.resume(interaction);
-                    await safeReply(interaction, createEmbed('Resumed', '`✅ The audio has been resumed.`', true));
+                    await safeReply(interaction, createEmbed('Resumed', '`🔺 The audio has been resumed.`', true));
+                    
                     done();
                 } catch (err) {
                     await safeReply(interaction, createErrorEmbed('🚩 Error resuming the track: `' + err + '`', true));

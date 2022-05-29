@@ -1,12 +1,12 @@
 import { Command, Event } from '../interfaces';
 import { Message } from 'discord.js';
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 import { readdirSync } from 'fs';
 import path from 'path';
 
 export const event: Event = {
     name: 'messageCreate',
-    run: async (client: BetterClient, message: Message) => {
+    run: async (client: BotterinoClient, message: Message) => {
         if (message.author.bot || !message.content.startsWith(client.config.prefix)) return;
 
         const args = message.content.slice(client.config.prefix.length).trim().split(/ +/g);
@@ -49,14 +49,14 @@ async function setCommands(message: Message) {
         }
     });
     if (passed) {
-        await message.reply('Commands deployed to guild.');
+        await message.reply('`🔺 Commands deployed to guild.`');
     } else {
-        await message.reply('Some commands failed the regex check. Commands may not be deployed.');
+        await message.reply('`🔺 Some commands failed the regex check. Commands may not be deployed.`');
     }
     await message.guild!.commands.set(commands);
 }
 
 async function clearCommands(message: Message) {
     await message.guild!.commands.set([]);
-    await message.reply('Commands cleared from guild.');
+    await message.reply('`🔺 Commands cleared from guild.`');
 }

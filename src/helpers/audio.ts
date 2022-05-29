@@ -2,9 +2,9 @@ import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import { Track, InputType, Queue } from '../classes';
-import { getLoadingMessage, timeStringToDurationString as timeStringToSecondsNumber } from './message';
+import { getLoadingString, timeStringToDurationString as timeStringToSecondsNumber } from './message';
 import { Playlist, PlaylistType } from '../interfaces';
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 import fetch from 'node-fetch';
 import { ButtonInteraction, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { safeDeferReply, safeReply, shuffleArray } from './general';
@@ -70,7 +70,7 @@ export function getYouTubeTrack(
                 requestor,
                 announce,
                 info.videoDetails.video_url,
-                timeStringToSecondsNumber(info.videoDetails.lengthSeconds),
+                Number(info.videoDetails.lengthSeconds),
                 info.videoDetails.thumbnails[0].url,
                 String(info.videoDetails.description),
                 '',
@@ -281,7 +281,7 @@ export function getNewgroundsTrack(url: string, requestor: string, announce: boo
     });
 }
 
-export function getSpotifyTrack(url: string, client: BetterClient, requestor: string, announce: boolean) {
+export function getSpotifyTrack(url: string, client: BotterinoClient, requestor: string, announce: boolean) {
     return new Promise<Track>(async (resolve, reject) => {
         try {
             let response = await getSpotifyTracksApiResponse(client, url, reject);
@@ -300,7 +300,7 @@ export function getSpotifyTrack(url: string, client: BetterClient, requestor: st
 
 export function getSpotifyAlbumOrPlaylistTracks(
     url: string,
-    client: BetterClient,
+    client: BotterinoClient,
     interaction: CommandInteraction | ButtonInteraction,
     announce: boolean,
     reverse: boolean,
@@ -508,7 +508,7 @@ function getLoadingMessageEmbed(
     } else {
         desciptionMsg =
             '`🔺 Playlist is loading...`\n`' +
-            getLoadingMessage(loaded + failed, playlistTracks.length) +
+            getLoadingString(loaded + failed, playlistTracks.length) +
             ' ' +
             String(Math.floor(((loaded + failed) / playlistTracks.length) * 100)) +
             '%`\n' +

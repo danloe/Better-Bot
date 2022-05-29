@@ -1,7 +1,8 @@
-import { EmbedFooterData } from '@discordjs/builders';
-import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
-import { Track, InputType } from '../classes';
+import { EmbedFooterData, embedLength } from '@discordjs/builders';
+import { ColorResolvable, EmbedFieldData, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { Track, InputType, Queue, MusicSubscription } from '../classes';
 import google from 'googlethis';
+import { AudioPlayer, AudioPlayerStatus } from '@discordjs/voice';
 
 export function createEmbed(
     title: string,
@@ -146,6 +147,23 @@ export function secondsToDurationString(seconds: number): string {
     return 'live or unknown';
 }
 
+export function secondsToColonsString(seconds: number): string {
+    var mins = Math.floor(seconds / 60);
+    var secs = seconds - mins * 60;
+    var ms, ss: string;
+    if (mins < 10) {
+        ms = '0' + String(mins);
+    } else {
+        ms = String(mins);
+    }
+    if (secs < 10) {
+        ss = '0' + String(secs);
+    } else {
+        ss = String(secs);
+    }
+    return ms + ':' + ss;
+}
+
 export function checkEmbedString(string: string, limit: number = 300): string {
     try {
         if (string == null || string == undefined || string == '') return 'Unknown';
@@ -211,16 +229,16 @@ export async function getLogoUrlfromUrl(url: string): Promise<string> {
     }
 }
 
-export function getLoadingMessage(actual: number, total: number, size = 16): string {
+export function getLoadingString(actual: number, total: number, style = 0, size = 20): string {
     let p = Math.floor((actual / total) * 100);
-    let style = '⣀⣄⣤⣦⣶⣷⣿'; // '⣀⣄⣤⣦⣶⣷⣿' '▁▂▃▄▅▆▇█'
+    let bars = ['⣀⣄⣤⣦⣶⣷⣿', '▁▂▃▄▅▆▇█'];
     var full: number,
         m: string,
         middle: number,
         rest: number,
         x: number,
-        full_symbol = style[style.length - 1],
-        barStyleIndex = style.length - 1,
+        full_symbol = bars[style][bars.length - 1],
+        barStyleIndex = bars[style].length - 1,
         bar: string = '';
     if (p == 100) return repeatString(full_symbol, size);
     p = p / 100;
@@ -229,13 +247,34 @@ export function getLoadingMessage(actual: number, total: number, size = 16): str
 
     rest = x - full;
     middle = Math.floor(rest * barStyleIndex);
-    m = style[middle];
+    m = bars[style][middle];
 
-    bar = repeatString(full_symbol, full) + m + repeatString(style[0], size - full - 1);
+    bar = repeatString(full_symbol, full) + m + repeatString(bars[style][0], size - full - 1);
     return bar;
 }
 
-function repeatString(string: string, amount: number) {
+export function getTrackBarString(actual: number, total: number, size = 20) {
+    let percentPlayed = actual / total;
+    let barPercent = Math.floor(percentPlayed * size);
+    //|■■■■■▣□□□□□|
+    //start
+    let barString = '|';
+    //small white squares
+    barString += repeatString('■', barPercent - 1);
+
+    //button
+    barString += '▣';
+
+    //small black squares
+    barString += repeatString('□', size - barPercent - 1);
+
+    //end
+    barString += '|';
+
+    return barString;
+}
+
+function repeatString(string: string, amount: number): string {
     var s = '';
     for (var j = 0; j < amount; j++) s += string;
     return s;

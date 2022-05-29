@@ -1,10 +1,10 @@
 import { Command, Event } from '../interfaces';
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 import { getYouTubeSuggestions, youTubeGeneratedLists } from '../helpers/autocomplete';
 
 export const event: Event = {
     name: 'interactionCreate',
-    run: async (client: BetterClient, interaction: any) => {
+    run: async (client: BotterinoClient, interaction: any) => {
         // COMMAND
         if (interaction.isCommand()) {
             console.log(`${interaction.user.tag} triggered an interaction [${interaction.commandName}]`);

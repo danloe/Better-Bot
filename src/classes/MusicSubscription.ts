@@ -17,34 +17,49 @@ import {
 import { promisify } from 'node:util';
 import { Track } from './Track';
 import { Queue } from './Queue';
-import { TextBasedChannel } from 'discord.js';
+import { GuildTextBasedChannel, Message } from 'discord.js';
 import { getAnnouncementString } from '../helpers';
+import { getNowPlayingMessage, startNowPlayingCollector } from '../commands/music/np';
+import BotterinoClient from '../client';
 //import discordTTS from 'discord-tts';
 const discordTTS = require('discord-tts');
 
 const wait = promisify(setTimeout);
 
 export class MusicSubscription {
+    public readonly client: BotterinoClient;
     public readonly voiceConnection!: VoiceConnection;
     public readonly audioPlayer!: AudioPlayer;
     public readonly voicePlayer!: AudioPlayer;
 
-    public queue: Queue;
     public currentTrack!: Track | undefined;
-    public lastChannel!: TextBasedChannel;
-    public queueLock = false;
-    public readyLock = false;
-    public autoplay = true;
-    public pausedForVoice = false;
-    public announcement = false;
-    public volume = 1;
-    public voiceVolumeMultiplier = 1.8;
+    public queue: Queue;
+    public lastChannel!: GuildTextBasedChannel;
+    public lastNowPlayingMessage!: Message;
+    public audioResource!: AudioResource<Track>;
+    public voiceResource!: AudioResource;
 
-    private audioResource!: AudioResource<Track>;
-    private voiceResource!: AudioResource;
+    public volume = 1;
+
     private connectionTimeoutObj!: NodeJS.Timeout;
 
-    public constructor(voiceConnection: VoiceConnection | undefined, queue: Queue, volume: number) {
+    private queueLock = false;
+    private readyLock = false;
+    private autoplay = true;
+    private pausedForVoice = false;
+    private restartTrack = false;
+    private announcement = false;
+    private voiceVolumeMultiplier = 1.8;
+    private displayNowPlayingMessage = true;
+    private repeat = false;
+
+    public constructor(
+        client: BotterinoClient,
+        voiceConnection: VoiceConnection | undefined,
+        queue: Queue,
+        volume: number
+    ) {
+        this.client = client;
         this.queue = queue;
         this.volume = volume;
 
@@ -119,19 +134,24 @@ export class MusicSubscription {
             // Configure audio player
             this.audioPlayer.on<'stateChange'>(
                 'stateChange',
-                (oldState: AudioPlayerState, newState: AudioPlayerState) => {
+                async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
                     if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
                         // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
                         // The queue is then processed to start playing the next track, if one is available.
 
                         // Start connection timeout check
                         this.startConnectionTimeout();
-
-                        if (this.autoplay) this.processQueue();
+                        if (this.autoplay && (this.repeat || this.restartTrack)) {
+                            this.audioResource = await this.currentTrack.createAudioResource();
+                            this.audioPlayer.play(this.audioResource);
+                        } else if (this.autoplay) {
+                            this.processQueue();
+                        }
                     } else if (newState.status === AudioPlayerStatus.Playing) {
                         // If the Playing state has been entered, then a new track has started playback.
                         // Stop connection timeout check
                         this.stopConnectionTimeout();
+                        this.restartTrack = false;
                     } else if (newState.status === AudioPlayerStatus.Paused) {
                         // If the Playing state has been entered, then the player was paused.
                         if (this.pausedForVoice) {
@@ -244,6 +264,14 @@ export class MusicSubscription {
     }
 
     /**
+     * Restarts audio.
+     */
+    public restart() {
+        this.restartTrack = true;
+        this.audioPlayer.stop();
+    }
+
+    /**
      * Sets the audio volume.
      */
     public setVolume(value: number) {
@@ -257,6 +285,34 @@ export class MusicSubscription {
      */
     public getVolume(): number {
         return this.volume;
+    }
+
+    /**
+     * Sets the repeat option.
+     */
+    public setRepeat(value: boolean) {
+        this.repeat = value;
+    }
+
+    /**
+     * Gets the repeat option.
+     */
+    public getRepeat(): boolean {
+        return this.repeat;
+    }
+
+    /**
+     * Sets the display now playing message setting value.
+     */
+    public setMessageDisplay(value: boolean) {
+        this.displayNowPlayingMessage = value;
+    }
+
+    /**
+     * Gets the display now playing message setting value.
+     */
+    public getMessageDisplay() {
+        return this.displayNowPlayingMessage;
     }
 
     /**
@@ -274,14 +330,23 @@ export class MusicSubscription {
         }
     }
 
+    /**
+     * Tells if the audioplayer is paused.
+     */
     public isPaused(): boolean {
         return this.audioPlayer.state.status == AudioPlayerStatus.Paused;
     }
 
+    /**
+     * Tells if the audioplayer is idling.
+     */
     public isIdle(): boolean {
         return this.audioPlayer.state.status == AudioPlayerStatus.Idle;
     }
 
+    /**
+     * Tells if the audioplayer is playing.
+     */
     public isPlaying(): boolean {
         return this.audioPlayer.state.status == AudioPlayerStatus.Playing;
     }
@@ -328,6 +393,7 @@ export class MusicSubscription {
                     this.audioPlayer.play(this.audioResource);
                 }
                 this.currentTrack = nextTrack;
+                this.showNowPlayingMessage();
                 this.queueLock = false;
             } catch (error) {
                 // If an error occurred, try the next item of the queue instead
@@ -336,6 +402,19 @@ export class MusicSubscription {
             }
         } catch (err) {
             console.log(err);
+        }
+    }
+
+    private async showNowPlayingMessage() {
+        if (this.displayNowPlayingMessage) {
+            if (!this.lastNowPlayingMessage) {
+                const [msgembed, row] = getNowPlayingMessage(this);
+                this.lastNowPlayingMessage = await this.lastChannel.send({
+                    embeds: [msgembed],
+                    components: [row]
+                });
+            }
+            startNowPlayingCollector(this.lastNowPlayingMessage, this);
         }
     }
 }

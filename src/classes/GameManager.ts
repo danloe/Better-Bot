@@ -1,5 +1,5 @@
 import { CommandInteraction, Snowflake, User } from 'discord.js';
-import BetterClient from '../client';
+import BotterinoClient from '../client';
 import { GameLobby } from './GameLobby';
 import { TTTGame } from './TTTGame';
 import { FourWinsGame } from './FourWinsGame';
@@ -7,10 +7,10 @@ import { TriviaGame } from './TriviaGame';
 import { FindTheEmojiGame } from './FindTheEmojiGame';
 
 export class GameManager {
-    client: BetterClient;
+    client: BotterinoClient;
     games: Map<Snowflake, GameLobby> = new Map<Snowflake, GameLobby>();
 
-    constructor(client: BetterClient) {
+    constructor(client: BotterinoClient) {
         this.client = client;
     }
 

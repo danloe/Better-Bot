@@ -8,7 +8,7 @@ import {
     MessageEmbed
 } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 import { TTTGame, GameType, GameState } from '../../classes';
 
@@ -20,7 +20,7 @@ export const command: Command = {
             option.setName('opponent').setDescription('Do you want to challenge a specific user?').setRequired(false)
         ),
     run: (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]

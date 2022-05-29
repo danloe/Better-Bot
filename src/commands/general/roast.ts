@@ -1,7 +1,7 @@
 import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 import { createErrorEmbed } from '../../helpers';
 
 export const command: Command = {
@@ -10,7 +10,7 @@ export const command: Command = {
         .setDescription('Roast yourself or someone else.')
         .addUserOption((option) => option.setName('user').setDescription('The user to roast').setRequired(true)),
     run: async (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]

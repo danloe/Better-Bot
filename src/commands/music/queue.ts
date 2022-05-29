@@ -1,7 +1,7 @@
 import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 import { command as skip } from './skip';
 import { command as clear } from './clear';
@@ -11,7 +11,7 @@ import { MusicSubscription, Queue } from '../../classes';
 export const command: Command = {
     data: new SlashCommandBuilder().setName('queue').setDescription('Show the Queue.'),
     run: (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
@@ -21,7 +21,8 @@ export const command: Command = {
                 try {
                     const queue = client.musicManager.getQueue(interaction);
                     const subscription = client.musicManager.subscriptions.get(interaction.guildId!)!;
-                    startCollector(client, interaction, subscription, queue);
+                    startCollector(interaction, subscription);
+
                     done();
                 } catch (err) {
                     await safeReply(interaction, createErrorEmbed('🚩 Error showing the queue: `' + err + '`', true));
@@ -31,12 +32,7 @@ export const command: Command = {
         })
 };
 
-async function startCollector(
-    client: BetterClient,
-    interaction: CommandInteraction | ButtonInteraction,
-    subscription: MusicSubscription,
-    queue: Queue
-) {
+async function startCollector(interaction: CommandInteraction | ButtonInteraction, subscription: MusicSubscription) {
     const collector = interaction.channel!.createMessageComponentCollector({
         componentType: 'BUTTON',
         time: 60000
@@ -47,27 +43,27 @@ async function startCollector(
             await safeDeferReply(button);
             switch (button.customId) {
                 case 'queue_previous':
-                    if (queue.currentPage > 1) {
-                        queue.currentPage--;
+                    if (subscription.queue.currentPage > 1) {
+                        subscription.queue.currentPage--;
                     }
                     break;
                 case 'queue_skip':
-                    await skip.run(client, button);
+                    await skip.run(subscription.client, button);
                     break;
                 case 'queue_clear':
-                    await clear.run(client, button);
+                    await clear.run(subscription.client, button);
                     break;
                 case 'queue_shuffle':
-                    await shuffle.run(client, button);
+                    await shuffle.run(subscription.client, button);
                     break;
                 case 'queue_next':
-                    if (queue.currentPage < queue.totalPages) {
-                        queue.currentPage++;
+                    if (subscription.queue.currentPage < subscription.queue.totalPages) {
+                        subscription.queue.currentPage++;
                     }
                     break;
             }
             collector.stop();
-            startCollector(client, interaction, subscription, queue);
+            startCollector(interaction, subscription);
         } catch (err) {
             console.log(err);
         }
@@ -77,7 +73,7 @@ async function startCollector(
         if (reason === 'time') {
             try {
                 await safeReply(interaction, {
-                    embeds: [queue.getQueueMessageEmbed(subscription)],
+                    embeds: [subscription.queue.getQueueMessageEmbed(subscription)],
                     components: []
                 });
             } catch (err) {
@@ -87,7 +83,7 @@ async function startCollector(
     });
 
     await safeReply(interaction, {
-        embeds: [queue.getQueueMessageEmbed(subscription)],
-        components: [queue.getQueueMessageRow()]
+        embeds: [subscription.queue.getQueueMessageEmbed(subscription)],
+        components: [subscription.queue.getQueueMessageRow()]
     });
 }

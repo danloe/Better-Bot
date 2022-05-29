@@ -1,7 +1,7 @@
 import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import BetterClient from '../../client';
+import BotterinoClient from '../../client';
 import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
 
 export const command: Command = {
@@ -12,7 +12,7 @@ export const command: Command = {
             option.setName('set').setDescription('What percentage?').setMinValue(1).setMaxValue(300).setRequired(false)
         ),
     run: (
-        client: BetterClient,
+        client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
         message?: Message,
         args?: string[]
@@ -31,8 +31,8 @@ export const command: Command = {
                         await safeReply(
                             interaction,
                             createEmbed(
-                                'Volume Set',
-                                '`✅ The audio volume has been set to ' + String(input) + '%`',
+                                'Volume',
+                                '`🔺 The audio volume has been set to ' + String(input) + '%`',
                                 true
                             )
                         );

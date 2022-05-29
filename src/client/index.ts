@@ -3,11 +3,10 @@ import path from 'path';
 import { readdirSync } from 'fs';
 import { Command, Config, Event } from '../interfaces';
 import ConfigJson from '../config.json';
-import discordModals from 'discord-modals';
 import { MusicManager } from '../classes/MusicManager';
 import { GameManager } from '../classes/GameManager';
 
-class BetterClient extends Client {
+class BotterinoClient extends Client {
     public commands: Collection<string, Command> = new Collection();
     public events: Collection<string, Event> = new Collection();
     public config: Config = ConfigJson;
@@ -17,7 +16,6 @@ class BetterClient extends Client {
     public SpotifyAuthorizationTimeout: Date = new Date();
 
     public async init() {
-        discordModals(this);
         this.login(process.env.BOT_TOKEN);
         //connect(process.env.MONGODB_URI);
 
@@ -42,4 +40,4 @@ class BetterClient extends Client {
     }
 }
 
-export default BetterClient;
+export default BotterinoClient;
