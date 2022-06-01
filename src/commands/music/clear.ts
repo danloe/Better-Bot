@@ -16,11 +16,11 @@ export const command: Command = {
             if (interaction) {
                 try {
                     await client.musicManager.clear(interaction);
-                    await safeReply(interaction, createEmbed('Cleared', '`🔺 The Queue is now empty.`', true));
+                    await safeReply(client, interaction, createEmbed('Cleared', '`🔺 The Queue is now empty.`', true));
                     
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error clearing queue: `' + err + '`', true));
+                    await safeReply(client, interaction, createErrorEmbed('🚩 Error clearing queue: `' + err + '`', true));
                     error(err);
                 }
             }

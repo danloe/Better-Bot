@@ -7,8 +7,10 @@ import {
     MessagePayload,
     WebhookEditMessageOptions
 } from 'discord.js';
+import BotterinoClient from '../client';
 
 export async function safeReply(
+    client: BotterinoClient,
     interaction: CommandInteraction | ButtonInteraction,
     options: string | MessagePayload | InteractionReplyOptions,
     followup = false
@@ -42,13 +44,16 @@ export async function safeReply(
                 );
             }
         }
-        return undefined;
-    } catch (err) {
-        console.log(err);
+    } catch (err: any) {
+        client.logger.error(err);
     }
 }
 
-export async function safeDeferReply(interaction: CommandInteraction | ButtonInteraction, ephemeral: boolean = false) {
+export async function safeDeferReply(
+    client: BotterinoClient,
+    interaction: CommandInteraction | ButtonInteraction,
+    ephemeral: boolean = false
+) {
     try {
         if (interaction instanceof ButtonInteraction) {
             if (!interaction.deferred && !interaction.replied) {
@@ -59,8 +64,8 @@ export async function safeDeferReply(interaction: CommandInteraction | ButtonInt
                 await interaction.deferReply({ ephemeral: ephemeral });
             }
         }
-    } catch (err) {
-        console.log(err);
+    } catch (err: any) {
+        client.logger.error(err);
     }
 }
 

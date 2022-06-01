@@ -37,6 +37,7 @@ export class GameManager {
                         break;
                 }
                 this.games.set(host.id, lobby!);
+                this.client.logger.info(`[${lobby!.name}: ${host.username}] lobby created`);
                 done(lobby!);
             } catch (err) {
                 error(err);
@@ -45,6 +46,8 @@ export class GameManager {
     }
 
     destroyLobby(host: User) {
+        let lobby = this.games.get(host.id);
+        this.client.logger.info(`[${lobby!.name}: ${host.username}] lobby destroyed`);
         this.games.delete(host.id);
     }
 }

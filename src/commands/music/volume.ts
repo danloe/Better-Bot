@@ -29,17 +29,15 @@ export const command: Command = {
                         let vol = input / 100;
                         subscription.setVolume(vol);
                         await safeReply(
+                            client,
                             interaction,
-                            createEmbed(
-                                'Volume',
-                                '`🔺 The audio volume has been set to ' + String(input) + '%`',
-                                true
-                            )
+                            createEmbed('Volume', '`🔺 The audio volume has been set to ' + String(input) + '%`', true)
                         );
                     } else {
                         let vol = subscription.getVolume();
                         vol = Math.floor(vol * 100);
                         await safeReply(
+                            client,
                             interaction,
                             createEmbed('Volume', '`🔉 The audio volume is at ' + String(vol) + '%`', true)
                         );
@@ -47,7 +45,11 @@ export const command: Command = {
 
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error setting the volume: `' + err + '`', true));
+                    await safeReply(
+                        client,
+                        interaction,
+                        createErrorEmbed('🚩 Error setting the volume: `' + err + '`', true)
+                    );
                     error(err);
                 }
             }

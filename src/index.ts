@@ -15,10 +15,6 @@ try {
     });
 
     client.init();
-
-    process.on('unhandledRejection', (reason, p) => {
-        console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
-    });
 } catch (error) {
-    console.log(error);
+    console.error(error);
 }

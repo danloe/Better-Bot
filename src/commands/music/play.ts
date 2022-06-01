@@ -119,9 +119,10 @@ export const command: Command = {
                                 ' in queue]`';
                         }
                         await safeReply(
+                            client,
                             interaction,
                             createEmbed(
-                                result.name,
+                                result.title,
                                 addedText,
                                 false,
                                 getTrackTypeColor(result.inputType),
@@ -159,6 +160,7 @@ export const command: Command = {
                                 ' in queue]`';
                         }
                         await safeReply(
+                            client,
                             interaction,
                             createEmbed(
                                 result.name,
@@ -197,6 +199,7 @@ export const command: Command = {
                     if (subscription.lastChannel?.id != interaction.channel?.id) {
                         subscription.lastChannel = <GuildTextBasedChannel>interaction.channel;
                         await safeReply(
+                            client,
                             interaction,
                             createEmbed(
                                 'Now Playing Message',
@@ -209,7 +212,11 @@ export const command: Command = {
 
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error adding track(s): `' + err + '`', true));
+                    await safeReply(
+                        client,
+                        interaction,
+                        createErrorEmbed('🚩 Error adding track(s): `' + err + '`', true)
+                    );
                     error(err);
                 }
             }

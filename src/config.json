@@ -1,5 +1,7 @@
 {
     "hostUserId": "98468190362828800",
+    "debug": true,
+    "verbose": true,
     "prefix": ">",
     "activityName": "🦄",
     "activityType": "WATCHING",

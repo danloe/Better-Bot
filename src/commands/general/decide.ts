@@ -32,6 +32,7 @@ export const command: Command = {
                     if (splitInput.length == 1) {
                         let i = Math.floor(Math.random() * answers.length);
                         await safeReply(
+                            client,
                             interaction,
                             createEmbed(
                                 'Decision',
@@ -49,12 +50,12 @@ export const command: Command = {
                         for (let i = 0; i < splitInput.length; i++) {
                             embedmsg.addField(splitInput[i], i == iDecision ? '🔺' : '❌', true);
                         }
-                        await safeReply(interaction, { embeds: [embedmsg] });
+                        await safeReply(client, interaction, { embeds: [embedmsg] });
                         done();
                         return;
                     }
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error deciding: `' + err + '`', true));
+                    await safeReply(client, interaction, createErrorEmbed('🚩 Error deciding: `' + err + '`', true));
                     error(err);
                 }
             }

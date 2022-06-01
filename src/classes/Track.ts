@@ -6,7 +6,7 @@ export class Track {
     inputType: InputType;
     audiotype: InputType;
     url: string;
-    name: string;
+    title: string;
     requestor: string;
     announce: boolean;
     displayUrl: string;
@@ -20,7 +20,7 @@ export class Track {
         inputType: InputType,
         audiotype: InputType,
         url: string,
-        name: string,
+        title: string,
         requestor: string,
         announce: boolean,
         displayUrl: string = '',
@@ -33,7 +33,7 @@ export class Track {
         this.inputType = inputType;
         this.audiotype = audiotype;
         this.url = url;
-        this.name = name;
+        this.title = title;
         this.requestor = requestor;
         this.announce = announce;
         this.displayUrl = displayUrl;
@@ -97,7 +97,6 @@ export class Track {
                 });
                 resolve(resource);
             } catch (error) {
-                console.log(error);
                 reject(error);
             }
         });

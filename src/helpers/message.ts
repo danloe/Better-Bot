@@ -3,6 +3,7 @@ import { ColorResolvable, EmbedFieldData, MessageActionRow, MessageButton, Messa
 import { Track, InputType, Queue, MusicSubscription } from '../classes';
 import google from 'googlethis';
 import { AudioPlayer, AudioPlayerStatus } from '@discordjs/voice';
+import BotterinoClient from '../client';
 
 export function createEmbed(
     title: string,
@@ -218,13 +219,13 @@ export function getAnnouncementString(trackName: string): string {
     }
 }
 
-export async function getLogoUrlfromUrl(url: string): Promise<string> {
+export async function getLogoUrlfromUrl(client: BotterinoClient, url: string): Promise<string> {
     try {
         let domainName = url.match(/\w+(?=\.\w+\/)/gi)![0];
         let images = await google.image(domainName + ' logo | icon', { safe: false });
         return images[0].url;
-    } catch (error) {
-        console.log(error);
+    } catch (err: any) {
+        client.logger.debug(err);
         return '';
     }
 }

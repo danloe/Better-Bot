@@ -19,14 +19,19 @@ export const command: Command = {
 
                     if (interaction instanceof CommandInteraction) {
                         await safeReply(
+                            client,
                             interaction,
                             createEmbed('Shuffled', '`🔺 The Queue is no longer in OOOORDER.`', true)
                         );
                     }
-                    
+
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error shuffling the queue: `' + err + '`', true));
+                    await safeReply(
+                        client,
+                        interaction,
+                        createErrorEmbed('🚩 Error shuffling the queue: `' + err + '`', true)
+                    );
                     error(err);
                 }
             }

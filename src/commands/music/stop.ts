@@ -16,11 +16,19 @@ export const command: Command = {
             if (interaction) {
                 try {
                     await client.musicManager.stop(interaction);
-                    await safeReply(interaction, createEmbed('Stopped', '`🔺 The audio playback has stopped.`', true));
-                    
+                    await safeReply(
+                        client,
+                        interaction,
+                        createEmbed('Stopped', '`🔺 The audio playback has stopped.`', true)
+                    );
+
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error stopping the track: `' + err + '`', true));
+                    await safeReply(
+                        client,
+                        interaction,
+                        createErrorEmbed('🚩 Error stopping the track: `' + err + '`', true)
+                    );
                     error(err);
                 }
             }

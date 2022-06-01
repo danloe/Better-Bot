@@ -82,7 +82,7 @@ export class Queue extends Array<Track> {
                     .addField(
                         'Now playing:',
                         '`' +
-                            subscription.currentTrack.name +
+                            subscription.currentTrack.title +
                             '`\n' +
                             subscription.currentTrack.requestor +
                             ' | ' +
@@ -98,7 +98,7 @@ export class Queue extends Array<Track> {
             for (let i = this.currentPage * 10 - 10; i < this.currentPage * 10; i++) {
                 if (i == this.length) break;
                 embedmsg.addField(
-                    i + 1 + ': `' + this[i].name + '`',
+                    i + 1 + ': `' + this[i].title + '`',
                     this[i].requestor + (this[i].announce ? ' 📣' : '') + ' | ' + this[i].displayUrl
                 );
             }

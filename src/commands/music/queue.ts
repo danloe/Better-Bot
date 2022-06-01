@@ -21,18 +21,26 @@ export const command: Command = {
                 try {
                     const queue = client.musicManager.getQueue(interaction);
                     const subscription = client.musicManager.subscriptions.get(interaction.guildId!)!;
-                    startCollector(interaction, subscription);
+                    startCollector(client, interaction, subscription);
 
                     done();
-                } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error showing the queue: `' + err + '`', true));
+                } catch (err: any) {
+                    await safeReply(
+                        client,
+                        interaction,
+                        createErrorEmbed('🚩 Error showing the queue: `' + err + '`', true)
+                    );
                     error(err);
                 }
             }
         })
 };
 
-async function startCollector(interaction: CommandInteraction | ButtonInteraction, subscription: MusicSubscription) {
+async function startCollector(
+    client: BotterinoClient,
+    interaction: CommandInteraction | ButtonInteraction,
+    subscription: MusicSubscription
+) {
     const collector = interaction.channel!.createMessageComponentCollector({
         componentType: 'BUTTON',
         time: 60000
@@ -40,7 +48,7 @@ async function startCollector(interaction: CommandInteraction | ButtonInteractio
 
     collector.on('collect', async (button) => {
         try {
-            await safeDeferReply(button);
+            await safeDeferReply(client, button);
             switch (button.customId) {
                 case 'queue_previous':
                     if (subscription.queue.currentPage > 1) {
@@ -63,26 +71,26 @@ async function startCollector(interaction: CommandInteraction | ButtonInteractio
                     break;
             }
             collector.stop();
-            startCollector(interaction, subscription);
-        } catch (err) {
-            console.log(err);
+            startCollector(client, interaction, subscription);
+        } catch (err: any) {
+            client.logger.debug(err);
         }
     });
 
     collector.on('end', async (_, reason) => {
         if (reason === 'time') {
             try {
-                await safeReply(interaction, {
+                await safeReply(client, interaction, {
                     embeds: [subscription.queue.getQueueMessageEmbed(subscription)],
                     components: []
                 });
-            } catch (err) {
-                console.log(err);
+            } catch (err: any) {
+                client.logger.debug(err);
             }
         }
     });
 
-    await safeReply(interaction, {
+    await safeReply(client, interaction, {
         embeds: [subscription.queue.getQueueMessageEmbed(subscription)],
         components: [subscription.queue.getQueueMessageRow()]
     });

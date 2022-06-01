@@ -20,7 +20,7 @@ export const command: Command = {
                 try {
                     if (interaction instanceof ButtonInteraction) return;
 
-                    await safeDeferReply(interaction);
+                    await safeDeferReply(client, interaction);
 
                     const games: any = await getGames('DE', true);
                     if (games) {
@@ -66,6 +66,7 @@ export const command: Command = {
                     done();
                 } catch (err) {
                     await safeReply(
+                        client,
                         interaction,
                         createErrorEmbed('🚩 Error showing Epic Games Free Games: `' + err + '`', true)
                     );

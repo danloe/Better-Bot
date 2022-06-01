@@ -7,13 +7,13 @@ export const event: Event = {
     run: async (client: BotterinoClient, interaction: any) => {
         // COMMAND
         if (interaction.isCommand()) {
-            console.log(`${interaction.user.tag} triggered an interaction [${interaction.commandName}]`);
+            client.logger.info(`${interaction.user.tag} triggered an interaction [${interaction.commandName}]`);
 
             const command = client.commands.get(interaction.commandName);
             if (!command) return;
             try {
                 await (command as Command).run(client, interaction);
-            } catch (error) {
+            } catch (error: any) {
                 console.error(error);
             }
 
@@ -28,7 +28,7 @@ export const event: Event = {
                             !(String(focusedOption.value).trim() === '') &&
                             !String(focusedOption.value).startsWith('http')
                         ) {
-                            console.log(
+                            client.logger.info(
                                 `${interaction.user.tag} triggered an autocomplete [${interaction.commandName}: ${focusedOption.value}]`
                             );
                             let choices: any;
@@ -48,26 +48,24 @@ export const event: Event = {
                         }
                     }
                 }
-            } catch (error) {
-                console.log(error);
+            } catch (error: any) {
+                client.logger.error(error);
             }
         }
 
         // BUTTON
         else if (interaction.isButton()) {
             try {
-                // TODO
-            } catch (error) {
-                console.error(error);
+            } catch (error: any) {
+                client.logger.error(error);
             }
         }
 
         // SELECT MENU
         else if (interaction.isSelectMenu()) {
             try {
-                // TODO
-            } catch (error) {
-                console.error(error);
+            } catch (error: any) {
+                client.logger.error(error);
             }
         } else {
             return;

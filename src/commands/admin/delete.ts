@@ -50,6 +50,7 @@ export const command: Command = {
                             );
                             const bulk = await channel.bulkDelete(userMessages, true);
                             await safeReply(
+                                client,
                                 interaction,
                                 createEmbed(
                                     ' ',
@@ -67,6 +68,7 @@ export const command: Command = {
                             // No User given
                             const bulk = await channel.bulkDelete(amount!, true);
                             await safeReply(
+                                client,
                                 interaction,
                                 createEmbed(
                                     ' ',
@@ -83,13 +85,18 @@ export const command: Command = {
                     } else {
                         // No permission
                         await safeReply(
+                            client,
                             interaction,
                             createEmbed(' ', '`⛔ You do not have access permission for this command!`', true)
                         );
                     }
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error deleting messages: `' + err + '`', true));
+                    await safeReply(
+                        client,
+                        interaction,
+                        createErrorEmbed('🚩 Error deleting messages: `' + err + '`', true)
+                    );
                     error(err);
                 }
             }

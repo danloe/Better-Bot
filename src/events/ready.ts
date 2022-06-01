@@ -17,10 +17,10 @@ export const event: Event = {
             status: <ClientPresenceStatus>client.config.status
         });
 
-        console.log(chalk.green(`${client.user!.tag} is ready.`));
+        client.logger.log(chalk.green(`${client.user!.tag} is ready.`));
 
         if (!process.env.GOOGLE_API_KEY || process.env.GOOGLE_API_KEY!.length < 30) {
-            console.log(
+            client.logger.warn(
                 chalk.yellow(
                     `Google API Key seems to be missing! Functionalities limited. Add GOOGLE_API_KEY="YOURKEY" to .env file.`
                 )
@@ -32,7 +32,7 @@ export const event: Event = {
             !process.env.SPOTIFY_CLIENT_SECRET ||
             process.env.SPOTIFY_CLIENT_SECRET!.length < 30
         ) {
-            console.log(
+            client.logger.warn(
                 chalk.yellow(
                     `Spotify Credentials seem to be missing! Functionalities limited. Add SPOTIFY_CLIENT_ID="YOURCLIENTID" & SPOTIFY_CLIENT_SECRET="YOURCLIENTSECRET" to .env file.`
                 )

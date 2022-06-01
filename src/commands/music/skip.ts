@@ -32,11 +32,15 @@ export const command: Command = {
                         if (input == 0) msg = '`🔺 Skipped to the next track';
                         msg = msg + ' [' + (queue.length - 1) + ' more in queue]`';
                     }
-                    await safeReply(interaction, createEmbed('Skipped', msg, true));
+                    await safeReply(client, interaction, createEmbed('Skipped', msg, true));
 
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error skipping track(s): `' + err + '`', true));
+                    await safeReply(
+                        client,
+                        interaction,
+                        createErrorEmbed('🚩 Error skipping track(s): `' + err + '`', true)
+                    );
                     error(err);
                 }
             }

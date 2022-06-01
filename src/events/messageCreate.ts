@@ -26,7 +26,7 @@ export const event: Event = {
 
         const command = client.commands.get(cmd);
         if (command) {
-            console.log(`${message.author.username} triggered an interaction. [${command.data.name}]`);
+            client.logger.info(`${message.author.username} triggered an interaction. [${command.data.name}]`);
             (command as Command).run(client, undefined, message, args);
         }
     }
@@ -42,7 +42,7 @@ async function setCommands(message: Message) {
         for (const file of dirs) {
             const { command } = require(`${commandPath}\\${dir}\\${file}`);
             // if (!regex.test(command.data.name)) {
-            //     console.log(command.data.name + ' failed the regex check.');
+            //     client.logger.info(command.data.name + ' failed the regex check.');
             //     passed = false;
             // }
             commands.push(command.data.toJSON());

@@ -71,14 +71,18 @@ export const command: Command = {
                     }
 
                     if (input !== null || channel) {
-                        await safeReply(interaction, createEmbed('Now Playing Message', msgText, true), true);
+                        await safeReply(client, interaction, createEmbed('Now Playing Message', msgText, true), true);
                     } else {
-                        startNowPlayingCollector(interaction, subscription);
+                        startNowPlayingCollector(client, interaction, subscription);
                     }
 
                     done();
-                } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error setting the volume: `' + err + '`', true));
+                } catch (err: any) {
+                    await safeReply(
+                        client,
+                        interaction,
+                        createErrorEmbed('🚩 Error setting the volume: `' + err + '`', true)
+                    );
                     error(err);
                 }
             }
@@ -86,6 +90,7 @@ export const command: Command = {
 };
 
 export async function startNowPlayingCollector(
+    client: BotterinoClient,
     message: Message | CommandInteraction | ButtonInteraction,
     subscription: MusicSubscription
 ) {
@@ -96,16 +101,16 @@ export async function startNowPlayingCollector(
 
     collector.on('collect', async (button) => {
         try {
-            await safeDeferReply(button);
+            await safeDeferReply(client, button);
             collector.stop();
             switch (button.customId) {
                 case 'np_restart':
                     await restart.run(subscription.client, button);
-                    startNowPlayingCollector(subscription.lastNowPlayingMessage, subscription);
+                    startNowPlayingCollector(client, subscription.lastNowPlayingMessage, subscription);
                     break;
                 case 'np_stop':
                     await stop.run(subscription.client, button);
-                    startNowPlayingCollector(subscription.lastNowPlayingMessage, subscription);
+                    startNowPlayingCollector(client, subscription.lastNowPlayingMessage, subscription);
                     break;
                 case 'np_pauseresume':
                     if (subscription.isPaused()) {
@@ -113,22 +118,22 @@ export async function startNowPlayingCollector(
                     } else {
                         await pause.run(subscription.client, button);
                     }
-                    startNowPlayingCollector(subscription.lastNowPlayingMessage, subscription);
+                    startNowPlayingCollector(client, subscription.lastNowPlayingMessage, subscription);
                     break;
                 case 'np_skip':
                     await skip.run(subscription.client, button);
                     break;
                 case 'np_repeat':
                     await repeat.run(subscription.client, button);
-                    startNowPlayingCollector(subscription.lastNowPlayingMessage, subscription);
+                    startNowPlayingCollector(client, subscription.lastNowPlayingMessage, subscription);
                     break;
                 case 'np_queue':
                     await queueCommand.run(subscription.client, button);
-                    startNowPlayingCollector(subscription.lastNowPlayingMessage, subscription);
+                    startNowPlayingCollector(client, subscription.lastNowPlayingMessage, subscription);
                     break;
             }
-        } catch (err) {
-            console.log(err);
+        } catch (err: any) {
+            client.logger.debug(err);
         }
     });
 
@@ -151,14 +156,14 @@ export async function startNowPlayingCollector(
                         return null;
                     });
                     if (msg !== null) {
-                        safeReply(message, {
+                        safeReply(client, message, {
                             embeds: [msgembed],
                             components: []
                         });
                     }
                 }
-            } catch (err) {
-                console.log(err);
+            } catch (err: any) {
+                client.logger.debug(err);
             }
         }
     });
@@ -185,7 +190,7 @@ export async function startNowPlayingCollector(
         if (msg !== null) {
             if (msg?.deletable) await msg.delete();
         }
-        lastMessage = <Message>await safeReply(message, {
+        lastMessage = <Message>await safeReply(client, message, {
             embeds: [msgembed],
             components: [row]
         });
@@ -198,7 +203,7 @@ export function getNowPlayingMessage(subscription: MusicSubscription): [message:
 
     if (subscription.currentTrack) {
         embedmsg
-            .setTitle(subscription.currentTrack.name)
+            .setTitle(subscription.currentTrack.title)
             .setURL(subscription.currentTrack.displayUrl)
             .setThumbnail(subscription.currentTrack.artworkUrl)
             .setDescription('`is now playing, requested by ' + subscription.currentTrack.requestor + '`');
@@ -232,7 +237,7 @@ export function getNowPlayingMessage(subscription: MusicSubscription): [message:
         for (let i = 0; i < 2; i++) {
             if (i + 1 > subscription.queue.length) break;
             embedmsg.addField(
-                i + 1 + ': `' + subscription.queue[i].name + '`',
+                i + 1 + ': `' + subscription.queue[i].title + '`',
                 subscription.queue[i].requestor +
                     (subscription.queue[i].announce ? ' 📣' : '') +
                     ' | ' +

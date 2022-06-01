@@ -51,7 +51,7 @@ export class MusicManager {
     ) {
         return new Promise<Track | Playlist>(async (resolve, reject) => {
             try {
-                await safeDeferReply(interaction);
+                await safeDeferReply(this.client, interaction);
                 let track: Track;
                 let tracks: Track[] = [];
                 let playlist: Playlist | null = null;
@@ -59,12 +59,13 @@ export class MusicManager {
 
                 switch (inputType) {
                     case InputType.YouTube:
-                        track = await getYouTubeTrack(input, interaction.user.username, announce);
+                        track = await getYouTubeTrack(this.client, input, interaction.user.username, announce);
                         break;
 
                     case InputType.YouTubePlaylist:
                         playlist = await getYoutubePlaylist(input, announce);
                         tracks = await getYoutubePlaylistTracks(
+                            this.client,
                             input,
                             offset,
                             limit,
@@ -116,7 +117,7 @@ export class MusicManager {
                         break;
 
                     case InputType.DirectFile:
-                        const imageUrl = await getLogoUrlfromUrl(input);
+                        const imageUrl = await getLogoUrlfromUrl(this.client, input);
 
                         track = new Track(
                             InputType.DirectFile,
@@ -157,6 +158,7 @@ export class MusicManager {
 
                 if (!subscription) {
                     await safeReply(
+                        this.client,
                         interaction,
                         createErrorEmbed(
                             '🚩 Could not join a voice channel: `You must first join a voice channel for me to follow you. ➡️ Then try the resume command.`'
@@ -171,6 +173,7 @@ export class MusicManager {
                 }
 
                 await entersState(subscription.voiceConnection!, VoiceConnectionStatus.Ready, 20e3).catch((_) => {
+                    this.client.logger.warn("Could not enter voice connection state 'ready'.");
                     reject('Failed to join voice channel within 20 seconds, please try again later!');
                     return;
                 });
@@ -182,8 +185,10 @@ export class MusicManager {
                 }
 
                 if (playlist) {
+                    this.client.logger.info(`Playlist ${playlist.name} queued.`);
                     resolve(playlist!);
                 } else {
+                    this.client.logger.info(`Track ${track!.title} queued.`);
                     resolve(track!);
                 }
             } catch (err) {
@@ -195,7 +200,7 @@ export class MusicManager {
     say(interaction: CommandInteraction | ButtonInteraction, phrase: string, lang: string = 'en') {
         return new Promise<void>(async (done, error) => {
             try {
-                await safeDeferReply(interaction, true);
+                await safeDeferReply(this.client, interaction, true);
                 const subscription = this.getSubscription(interaction, true);
 
                 if (!subscription) {
@@ -208,7 +213,7 @@ export class MusicManager {
                 try {
                     await entersState(subscription.voiceConnection!, VoiceConnectionStatus.Ready, 20e3);
                 } catch (err) {
-                    console.warn(err);
+                    this.client.logger.warn("Could not enter voice connection state 'ready'.");
                     error('Failed to join voice channel within 20 seconds, please try again later!');
                     return;
                 }
@@ -269,7 +274,7 @@ export class MusicManager {
     resume(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                await safeDeferReply(interaction);
+                await safeDeferReply(this.client, interaction);
                 const queue = this.getQueue(interaction);
                 const subscription = this.getSubscription(interaction, true);
 
@@ -281,7 +286,7 @@ export class MusicManager {
                 try {
                     await entersState(subscription.voiceConnection!, VoiceConnectionStatus.Ready, 20e3);
                 } catch (err) {
-                    console.warn(err);
+                    this.client.logger.warn("Could not enter voice connection state 'ready'.");
                     error('Failed to join voice channel within 20 seconds, please try again later!');
                     return;
                 }
@@ -350,7 +355,7 @@ export class MusicManager {
     remove(interaction: CommandInteraction | ButtonInteraction, positions: number[]) {
         return new Promise<void>(async (done, error) => {
             try {
-                await safeDeferReply(interaction);
+                await safeDeferReply(this.client, interaction);
                 const queue = this.getQueue(interaction);
 
                 if (queue.length <= 1) {
@@ -376,7 +381,7 @@ export class MusicManager {
     clear(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                await safeDeferReply(interaction);
+                await safeDeferReply(this.client, interaction);
                 const queue = this.getQueue(interaction);
 
                 if (queue.length < 1) {

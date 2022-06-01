@@ -34,11 +34,15 @@ export const command: Command = {
                         message = '`🔺 Is turned ' + (status ? 'on`' : 'off`');
                     }
 
-                    await safeReply(interaction, createEmbed('Repeat', message, true));
+                    await safeReply(client, interaction, createEmbed('Repeat', message, true));
 
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error setting repeat: `' + err + '`', true));
+                    await safeReply(
+                        client,
+                        interaction,
+                        createErrorEmbed('🚩 Error setting repeat: `' + err + '`', true)
+                    );
                     error(err);
                 }
             }

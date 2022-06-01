@@ -5,9 +5,7 @@ import BotterinoClient from '../../client';
 import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
 
 export const command: Command = {
-    data: new SlashCommandBuilder()
-        .setName('restart')
-        .setDescription('Restart the current track.'),
+    data: new SlashCommandBuilder().setName('restart').setDescription('Restart the current track.'),
     run: (
         client: BotterinoClient,
         interaction?: CommandInteraction | ButtonInteraction,
@@ -19,11 +17,19 @@ export const command: Command = {
                 try {
                     await client.musicManager.restart(interaction);
 
-                    await safeReply(interaction, createEmbed('Restarted', '`🔺 The current track is now playing again.`', true));
-                    
+                    await safeReply(
+                        client,
+                        interaction,
+                        createEmbed('Restarted', '`🔺 The current track is now playing again.`', true)
+                    );
+
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error restarting track: `' + err + '`', true));
+                    await safeReply(
+                        client,
+                        interaction,
+                        createErrorEmbed('🚩 Error restarting track: `' + err + '`', true)
+                    );
                     error(err);
                 }
             }

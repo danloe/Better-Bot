@@ -36,10 +36,10 @@ export const command: Command = {
                     let lang = interaction instanceof CommandInteraction ? interaction.options.getString('lang') : 'en';
                     if (!lang) lang = 'en';
                     await client.musicManager.say(interaction, input!, lang!);
-                    await safeReply(interaction, '`🗨️' + getLanguageEmoji(lang) + ' ' + input + '`');
+                    await safeReply(client, interaction, '`🗨️' + getLanguageEmoji(lang) + ' ' + input + '`');
                     done();
                 } catch (err) {
-                    await safeReply(interaction, createErrorEmbed('🚩 Error saying something: `' + err + '`'));
+                    await safeReply(client, interaction, createErrorEmbed('🚩 Error saying something: `' + err + '`'));
                     error(err);
                 }
             }

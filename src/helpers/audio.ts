@@ -42,6 +42,7 @@ export function determineInputType(args: string): InputType {
 }
 
 export function getYouTubeTrack(
+    client: BotterinoClient,
     query: string,
     requestor: string,
     announce: boolean,
@@ -78,8 +79,8 @@ export function getYouTubeTrack(
             );
 
             resolve(track);
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            client.logger.error(error);
             reject('Could not load video. Check URL and privacy status or try again later.');
         }
     });
@@ -124,13 +125,14 @@ export function getYoutubePlaylist(url: string, announce: boolean) {
                 announce: announce
             };
             resolve(playlist);
-        } catch (error) {
+        } catch (error: any) {
             reject('Could not load playlist. Check URL and privacy status or try again later.');
         }
     });
 }
 
 export function getYoutubePlaylistTracks(
+    client: BotterinoClient,
     url: string,
     offset: number,
     limit: number,
@@ -160,7 +162,7 @@ export function getYoutubePlaylistTracks(
                         reject('Google ' + response!.error!.message);
                         return;
                     }
-                    console.log(response!.error);
+                    client.logger.error(response!.error);
                     reject('Playlist Tracks not found. Are they private?');
                     return;
                 }
@@ -214,7 +216,7 @@ export function getYoutubePlaylistTracks(
             }
 
             resolve(tracks);
-        } catch (error) {
+        } catch (error: any) {
             reject(error);
         }
     });
@@ -240,7 +242,7 @@ export function getSoundCloudTrack(url: string, requestor: string, announce: boo
             );
 
             resolve(track);
-        } catch (error) {
+        } catch (error: any) {
             reject(error);
         }
     });
@@ -275,7 +277,7 @@ export function getNewgroundsTrack(url: string, requestor: string, announce: boo
             );
 
             resolve(track);
-        } catch (error) {
+        } catch (error: any) {
             reject(error);
         }
     });
@@ -286,13 +288,14 @@ export function getSpotifyTrack(url: string, client: BotterinoClient, requestor:
         try {
             let response = await getSpotifyTracksApiResponse(client, url, reject);
             const track = await getYouTubeTrack(
+                client,
                 response.artists[0].name + ' ' + response.name,
                 requestor,
                 announce,
                 InputType.SpotifyTrack
             );
             resolve(track);
-        } catch (error) {
+        } catch (error: any) {
             reject(error);
         }
     });
@@ -385,6 +388,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
             if (playlist.type === PlaylistType.SpotifyAlbum) {
                 tracks.push(
                     await getYouTubeTrack(
+                        client,
                         responseTracks[0].artists[0].name + ' ' + responseTracks[0].name,
                         interaction.user.username,
                         announce,
@@ -394,6 +398,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
             } else {
                 tracks.push(
                     await getYouTubeTrack(
+                        client,
                         responseTracks[0].track.artists[0].name + ' ' + responseTracks[0].track.name,
                         interaction.user.username,
                         announce,
@@ -407,16 +412,17 @@ export function getSpotifyAlbumOrPlaylistTracks(
 
             // Load other tracks in background
             const queue = client.musicManager.getQueue(interaction);
-            loadAndQueueAsync(interaction, playlist, queue, responseTracks, announce, next);
+            loadAndQueueAsync(client, interaction, playlist, queue, responseTracks, announce, next);
 
             resolve([playlist, tracks]);
-        } catch (error) {
+        } catch (error: any) {
             reject(error);
         }
     });
 }
 
 function loadAndQueueAsync(
+    client: BotterinoClient,
     interaction: CommandInteraction | ButtonInteraction,
     playlist: Playlist,
     queue: Queue,
@@ -445,17 +451,17 @@ function loadAndQueueAsync(
             collector.on('collect', async (button) => {
                 try {
                     clearInterval(messageTrigger);
-                    await safeDeferReply(button);
+                    await safeDeferReply(client, button);
                     if (button.customId === 'loading_stop') {
                         stopLoop = true;
                     }
-                    await safeReply(interaction, { embeds: [embedmsg], components: [] });
-                } catch (err) {
-                    console.log(err);
+                    await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
+                } catch (err: any) {
+                    client.logger.error(err);
                 }
             });
 
-            await safeReply(interaction, { embeds: [embedmsg], components: [row] });
+            await safeReply(client, interaction, { embeds: [embedmsg], components: [row] });
         }, 3_000);
 
         // Get tracks
@@ -463,26 +469,28 @@ function loadAndQueueAsync(
             try {
                 if (playlist.type === PlaylistType.SpotifyAlbum) {
                     let t = await getYouTubeTrack(
+                        client,
                         track.artists[0].name + ' ' + track.name,
                         interaction.user.username,
                         announce,
                         InputType.SpotifyPlaylist
-                    )
+                    );
                     if (next) {
                         queue.next(t);
-                    }else {
+                    } else {
                         queue.queue(t);
                     }
                 } else {
                     let t = await getYouTubeTrack(
+                        client,
                         track.track.artists[0].name + ' ' + track.track.name,
                         interaction.user.username,
                         announce,
                         InputType.SpotifyAlbum
-                    )
+                    );
                     if (next) {
                         queue.next(t);
-                    }else {
+                    } else {
                         queue.queue(t);
                     }
                 }
@@ -490,14 +498,14 @@ function loadAndQueueAsync(
                 if (stopLoop) {
                     break;
                 }
-            } catch (error) {
+            } catch (error: any) {
                 failed += 1;
                 continue;
             }
         }
         clearInterval(messageTrigger);
         embedmsg = getLoadingMessageEmbed(interaction, playlist, responseTracks, loaded, failed, true);
-        await safeReply(interaction, { embeds: [embedmsg], components: [] });
+        await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
         resolve();
     });
 }

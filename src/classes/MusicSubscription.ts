@@ -21,7 +21,6 @@ import { GuildTextBasedChannel, Message } from 'discord.js';
 import { getAnnouncementString } from '../helpers';
 import { getNowPlayingMessage, startNowPlayingCollector } from '../commands/music/np';
 import BotterinoClient from '../client';
-import { APIMessage } from 'discord-api-types/v10';
 //import discordTTS from 'discord-tts';
 const discordTTS = require('discord-tts');
 
@@ -192,11 +191,11 @@ export class MusicSubscription {
             );
 
             this.audioPlayer.on('error', (error: { resource: any }) => {
-                console.log(error);
+                client.logger.error(error.resource);
                 this.processQueue();
             });
 
-            this.voicePlayer.on('error', (error: { resource: any }) => console.log(error));
+            this.voicePlayer.on('error', (error: { resource: any }) => client.logger.error(error.resource));
 
             voiceConnection.subscribe(this.audioPlayer!);
         }
@@ -380,7 +379,7 @@ export class MusicSubscription {
                 this.audioResource = await nextTrack.createAudioResource();
                 this.audioResource.volume?.setVolume(this.volume);
                 if (nextTrack.announce) {
-                    const stream = discordTTS.getVoiceStream(getAnnouncementString(nextTrack.name), {
+                    const stream = discordTTS.getVoiceStream(getAnnouncementString(nextTrack.title), {
                         lang: 'en',
                         slow: false
                     });
@@ -404,8 +403,8 @@ export class MusicSubscription {
                 this.queueLock = false;
                 return this.processQueue();
             }
-        } catch (err) {
-            console.log(err);
+        } catch (err: any) {
+            this.client.logger.debug(err);
         }
     }
 
@@ -418,7 +417,7 @@ export class MusicSubscription {
                     components: [row]
                 });
             }
-            startNowPlayingCollector(this.lastNowPlayingMessage, this);
+            startNowPlayingCollector(this.client, this.lastNowPlayingMessage, this);
         }
     }
 }

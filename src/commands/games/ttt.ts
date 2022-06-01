@@ -28,7 +28,7 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction instanceof CommandInteraction) {
                 try {
-                    await safeDeferReply(interaction);
+                    await safeDeferReply(client, interaction);
 
                     let opponent = interaction.options.getUser('opponent');
 
@@ -60,7 +60,7 @@ export const command: Command = {
                                     if (button.customId === 'ttt_join_cancel') {
                                         client.gameManager.destroyLobby(interaction.user);
                                         let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
-                                        await safeReply(interaction, { embeds: [embedmsg], components: [] });
+                                        await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                     } else {
                                         game.join(button.user);
                                     }
@@ -71,14 +71,14 @@ export const command: Command = {
                                         game.join(button.user);
                                         collector.stop();
                                     } else if (button.customId === 'ttt_join_cancel') {
-                                        await safeReply(
+                                        await safeReply(client, 
                                             button,
                                             createErrorEmbed("`⛔ This button isn't for you.`", true)
                                         );
                                     }
                                 }
-                            } catch (err) {
-                                console.log(err);
+                            } catch (err: any) {
+                                client.logger.error(err);
                             }
                         });
 
@@ -90,14 +90,14 @@ export const command: Command = {
                                 ) {
                                     client.gameManager.destroyLobby(interaction.user);
                                     let embedmsg = game.getLobbyMessageEmbed('`The game lobby timed out.`');
-                                    await safeReply(interaction, { embeds: [embedmsg], components: [] });
+                                    await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                 }
-                            } catch (err) {
-                                console.log(err);
+                            } catch (err: any) {
+                                client.logger.error(err);
                             }
                         });
 
-                        await safeReply(interaction, { embeds: [embedmsg], components: [row] });
+                        await safeReply(client, interaction, { embeds: [embedmsg], components: [row] });
                     });
 
                     // GAME READY TO START
@@ -128,7 +128,7 @@ export const command: Command = {
                                     } else if (button.customId === 'ttt_ready_cancel') {
                                         client.gameManager.destroyLobby(interaction.user);
                                         let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
-                                        await safeReply(interaction, { embeds: [embedmsg], components: [] });
+                                        await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                     } else {
                                         game.join(button.user);
                                     }
@@ -140,17 +140,17 @@ export const command: Command = {
                                             game.join(button.user);
                                             collector.stop();
                                         } else {
-                                            await safeReply(
+                                            await safeReply(client, 
                                                 button,
                                                 createErrorEmbed("`⛔ This button isn't for you.`", true)
                                             );
                                         }
-                                    } catch (err) {
-                                        console.log(err);
+                                    } catch (err: any) {
+                                        client.logger.error(err);
                                     }
                                 }
-                            } catch (err) {
-                                console.log(err);
+                            } catch (err: any) {
+                                client.logger.error(err);
                             }
                         });
 
@@ -162,20 +162,20 @@ export const command: Command = {
                                 ) {
                                     client.gameManager.destroyLobby(interaction.user);
                                     let embedmsg = game.getLobbyMessageEmbed('`The game lobby timed out.`');
-                                    await safeReply(interaction, { embeds: [embedmsg], components: [] });
+                                    await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                 }
-                            } catch (err) {
-                                console.log(err);
+                            } catch (err: any) {
+                                client.logger.error(err);
                             }
                         });
 
-                        await safeReply(interaction, { embeds: [embedmsg], components: [row] });
+                        await safeReply(client, interaction, { embeds: [embedmsg], components: [row] });
                     });
 
                     // GAME STARTED
                     lobby.on('start', async (game: TTTGame) => {
                         const gameFieldMessage = game.getGameFieldMessage();
-                        await safeReply(interaction, gameFieldMessage);
+                        await safeReply(client, interaction, gameFieldMessage);
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
@@ -191,22 +191,22 @@ export const command: Command = {
                                 } else {
                                     try {
                                         if (game.players.includes(button.user)) {
-                                            await safeReply(
+                                            await safeReply(client, 
                                                 button,
                                                 createErrorEmbed("`💤 It is the other player's turn.`", true)
                                             );
                                         } else {
-                                            await safeReply(
+                                            await safeReply(client, 
                                                 button,
                                                 createErrorEmbed("`⛔ These buttons aren't for you.`", true)
                                             );
                                         }
-                                    } catch (err) {
-                                        console.log(err);
+                                    } catch (err: any) {
+                                        client.logger.error(err);
                                     }
                                 }
-                            } catch (err) {
-                                console.log(err);
+                            } catch (err: any) {
+                                client.logger.error(err);
                             }
                         });
 
@@ -219,10 +219,10 @@ export const command: Command = {
                                             game.getTurnPlayer().id +
                                             '>` has not executed his move. The game is closed.`'
                                     );
-                                    await safeReply(interaction, { embeds: [embedmsg], components: [] });
+                                    await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                 }
-                            } catch (err) {
-                                console.log(err);
+                            } catch (err: any) {
+                                client.logger.error(err);
                             }
                         });
                     });
@@ -230,7 +230,7 @@ export const command: Command = {
                     // GAME TICK
                     lobby.on('tick', async (game: TTTGame) => {
                         const gameFieldMessage = game.getGameFieldMessage();
-                        await safeReply(interaction, gameFieldMessage);
+                        await safeReply(client, interaction, gameFieldMessage);
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
@@ -246,22 +246,22 @@ export const command: Command = {
                                 } else {
                                     try {
                                         if (game.players.includes(button.user)) {
-                                            await safeReply(
+                                            await safeReply(client, 
                                                 button,
                                                 createErrorEmbed("`💤 It is the other player's turn.`", true)
                                             );
                                         } else {
-                                            await safeReply(
+                                            await safeReply(client, 
                                                 button,
                                                 createErrorEmbed("`⛔ These buttons aren't for you.`", true)
                                             );
                                         }
-                                    } catch (err) {
-                                        console.log(err);
+                                    } catch (err: any) {
+                                        client.logger.error(err);
                                     }
                                 }
-                            } catch (err) {
-                                console.log(err);
+                            } catch (err: any) {
+                                client.logger.error(err);
                             }
                         });
 
@@ -274,10 +274,10 @@ export const command: Command = {
                                             game.getTurnPlayer().id +
                                             '>` has not executed his move. The game is closed.`'
                                     );
-                                    await safeReply(interaction, { embeds: [embedmsg], components: [] });
+                                    await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                 }
-                            } catch (err) {
-                                console.log(err);
+                            } catch (err: any) {
+                                client.logger.error(err);
                             }
                         });
                     });
@@ -285,7 +285,7 @@ export const command: Command = {
                     // GAME OVER
                     lobby.on('end', async (game: TTTGame) => {
                         const gameFieldMessage = game.getGameFieldMessage();
-                        await safeReply(interaction, gameFieldMessage);
+                        await safeReply(client, interaction, gameFieldMessage);
 
                         if (game.winners.length > 0) {
                             let embedmsg = new MessageEmbed()
@@ -307,7 +307,7 @@ export const command: Command = {
 
                     if (opponent) {
                         // Send a challenge message
-                        await safeReply(
+                        await safeReply(client, 
                             interaction,
                             lobby.getChallengeMessage(
                                 opponent,
@@ -332,7 +332,7 @@ export const command: Command = {
                                         await button.deferUpdate();
                                         client.gameManager.destroyLobby(interaction.user);
                                         let embedmsg = lobby.getLobbyMessageEmbed('`The game challenge was declined.`');
-                                        await safeReply(interaction, {
+                                        await safeReply(client, interaction, {
                                             content: ' ',
                                             embeds: [embedmsg],
                                             components: []
@@ -341,16 +341,16 @@ export const command: Command = {
                                     }
                                 } else {
                                     try {
-                                        await safeReply(
+                                        await safeReply(client, 
                                             button,
                                             createErrorEmbed("`⛔ These buttons aren't for you.`", true)
                                         );
-                                    } catch (err) {
-                                        console.log(err);
+                                    } catch (err: any) {
+                                        client.logger.error(err);
                                     }
                                 }
-                            } catch (err) {
-                                console.log(err);
+                            } catch (err: any) {
+                                client.logger.error(err);
                             }
                         });
 
@@ -361,10 +361,10 @@ export const command: Command = {
                                     let embedmsg = lobby.getLobbyMessageEmbed(
                                         '<@' + opponent!.id + '> `has not accepted the challenge. The game is closed.`'
                                     );
-                                    await safeReply(interaction, { content: ' ', embeds: [embedmsg], components: [] });
+                                    await safeReply(client, interaction, { content: ' ', embeds: [embedmsg], components: [] });
                                 }
-                            } catch (err) {
-                                console.log(err);
+                            } catch (err: any) {
+                                client.logger.error(err);
                             }
                         });
                     } else {
@@ -372,8 +372,8 @@ export const command: Command = {
                         lobby.open();
                     }
                     done();
-                } catch (err) {
-                    await safeReply(
+                } catch (err: any) {
+                    await safeReply(client, 
                         interaction,
                         createErrorEmbed('🚩 Error creating a Tic Tac Toe game: `' + err + '`', true)
                     );
