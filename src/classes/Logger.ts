@@ -10,14 +10,17 @@ export class Logger {
 
     log(message: string, ...args: any[]) {
         if (this.client.config.debug || this.client.config.verbose) console.log(this.getMessage(message), ...args);
+        this.writeToFile(`[LOG] ${message}`);
     }
 
     error(message: string, ...args: any[]) {
         console.error(`${chalk.bgRed.black('[ERROR]')} ${this.getMessage(message)}`, ...args);
+        this.writeToFile(`[ERROR] ${message}`);
     }
 
     warn(message: string, ...args: any[]) {
         console.warn(`${chalk.bgYellow.black('[WARN]')} ${this.getMessage(message)}`, ...args);
+        this.writeToFile(`[WARN] ${message}`);
     }
 
     info(message: string, ...args: any[]) {

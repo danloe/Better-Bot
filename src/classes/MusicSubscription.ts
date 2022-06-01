@@ -337,21 +337,21 @@ export class MusicSubscription {
      * Tells if the audioplayer is paused.
      */
     public isPaused(): boolean {
-        return this.audioPlayer.state.status == AudioPlayerStatus.Paused;
+        return this.audioPlayer?.state?.status == AudioPlayerStatus.Paused;
     }
 
     /**
      * Tells if the audioplayer is idling.
      */
     public isIdle(): boolean {
-        return this.audioPlayer.state.status == AudioPlayerStatus.Idle;
+        return this.audioPlayer?.state?.status == AudioPlayerStatus.Idle;
     }
 
     /**
      * Tells if the audioplayer is playing.
      */
     public isPlaying(): boolean {
-        return this.audioPlayer.state.status == AudioPlayerStatus.Playing;
+        return this.audioPlayer?.state?.status == AudioPlayerStatus.Playing;
     }
 
     /**

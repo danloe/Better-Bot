@@ -156,7 +156,7 @@ export class MusicManager {
 
                 const subscription = this.getSubscription(interaction, true);
 
-                if (!subscription) {
+                if (!subscription.voiceConnection) {
                     await safeReply(
                         this.client,
                         interaction,
@@ -203,7 +203,7 @@ export class MusicManager {
                 await safeDeferReply(this.client, interaction, true);
                 const subscription = this.getSubscription(interaction, true);
 
-                if (!subscription) {
+                if (!subscription.voiceConnection) {
                     error(
                         'Could not join a voice channel: You must first join a voice channel for me to follow you. ➡️ Then try the say command.'
                     );
@@ -238,9 +238,9 @@ export class MusicManager {
     stop(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                const subscription = this.subscriptions.get(interaction.guildId!);
+                const subscription = this.getSubscription(interaction, false);
 
-                if (!subscription) {
+                if (!subscription.voiceConnection) {
                     error('Not playing anything.');
                     return;
                 }
@@ -256,9 +256,9 @@ export class MusicManager {
     pause(interaction: CommandInteraction | ButtonInteraction) {
         return new Promise<void>(async (done, error) => {
             try {
-                const subscription = this.subscriptions.get(interaction.guildId!);
+                const subscription = this.getSubscription(interaction, false);
 
-                if (!subscription) {
+                if (!subscription.voiceConnection) {
                     error('Not playing anything.');
                     return;
                 }
@@ -276,7 +276,7 @@ export class MusicManager {
             try {
                 await safeDeferReply(this.client, interaction);
                 const queue = this.getQueue(interaction);
-                const subscription = this.getSubscription(interaction, true);
+                const subscription = this.getSubscription(interaction, queue.length > 0);
 
                 if (!queue.hasTracks() && !subscription.isPaused()) {
                     error('Nothing to play.');
@@ -302,10 +302,10 @@ export class MusicManager {
     skip(interaction: CommandInteraction | ButtonInteraction, amount: number) {
         return new Promise<Queue>(async (done, error) => {
             try {
-                const subscription = this.subscriptions.get(interaction.guildId!);
                 const queue = this.getQueue(interaction);
+                const subscription = this.getSubscription(interaction, queue.length > 0);
 
-                if (!subscription) {
+                if (!subscription.voiceConnection) {
                     error('Not playing anything.');
                     return;
                 }
@@ -334,7 +334,7 @@ export class MusicManager {
             try {
                 const subscription = this.getSubscription(interaction, true);
 
-                if (!subscription) {
+                if (!subscription.voiceConnection) {
                     error('Not playing anything.');
                     return;
                 }

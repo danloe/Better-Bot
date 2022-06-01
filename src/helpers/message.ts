@@ -1,8 +1,7 @@
-import { EmbedFooterData, embedLength } from '@discordjs/builders';
-import { ColorResolvable, EmbedFieldData, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
-import { Track, InputType, Queue, MusicSubscription } from '../classes';
+import { EmbedFooterData } from '@discordjs/builders';
+import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
+import { Track, InputType } from '../classes';
 import google from 'googlethis';
-import { AudioPlayer, AudioPlayerStatus } from '@discordjs/voice';
 import BotterinoClient from '../client';
 
 export function createEmbed(
