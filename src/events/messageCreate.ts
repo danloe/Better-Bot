@@ -14,12 +14,12 @@ export const event: Event = {
         const cmd = args.shift()?.toLowerCase();
         if (!cmd) return;
 
-        if (cmd === 'deploy' && message.author.id === '98468190362828800') {
+        if (cmd === 'deploy' && message.author.id === client.config.hostUserId) {
             await setCommands(message);
             return;
         }
 
-        if (cmd === 'clearcommands' && message.author.id === '98468190362828800') {
+        if (cmd === 'clearcommands' && message.author.id === client.config.hostUserId) {
             await clearCommands(message);
             return;
         }

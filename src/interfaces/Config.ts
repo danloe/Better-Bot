@@ -1,4 +1,5 @@
 export interface Config {
+    hostUserId: string,
     prefix: string;
     activityName: string;
     activityType: string;

@@ -7,7 +7,8 @@
   "scripts": {
     "start": "tsc && ts-node ./src/index.ts",
     "dev": "tsc && ts-node-dev ./src/index.ts",
-    "deploy": "tsc && ts-node ./src/deploy/global.ts",
+    "deploy": "tsc && ts-node ./src/deploy/deployApplication.ts",
+    "clear": "tsc && ts-node ./src/deploy/clearApplication.ts",
     "build": "tsc"
   },
   "repository": {

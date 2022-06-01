@@ -1,13 +1,13 @@
 <div id="top"></div>
 
 <div align="center">
-    
+
   <a href="">[![Release][release-shield]][release-url]
   <a href="">[![Issues][issues-shield]][issues-url]
   <a href="">[![Typescript][typescript-shield]][typescript-url]
   <a href="">[![DiscordJS][discordjs-shield]][discordjs-url]
   <a href="">[![MIT License][license-shield]][license-url]
-    
+
 </div>
 
 <div align="center">
@@ -56,35 +56,35 @@
 
 ## Features
 
-* Slash commands
-* Music
-  * YouTube
-      * Search
-      * Video & Playlist URL
-      * YouTube auto generated playlists
-  * SoundCloud
-  * Newgrounds
-  * Spotify Tracks, Albums & Playlists
-  * Direct Link To File
-* Autocomplete
-  * YouTube search suggestions
-* TTS over voice connection
-  * Says any text :gb: :de: :netherlands: :fr: :es:
-  * Announces music tracks
-  * Reads questions in Trivia games
-* Multiplayer Games
-  * Tic Tac Toe
-  * Four Wins
-  * Trivia
-  * Find The Emoji
-* Administrator Role Commands
-  * Delete Messages
-* General & Fun Commands
-  * Epic Free Games
-  * Roast
-  * Decide
-  * Coin Flip
-    
+- Slash commands
+- Music
+  - YouTube
+    - Search
+    - Video & Playlist URL
+    - YouTube auto generated playlists
+  - SoundCloud
+  - Newgrounds
+  - Spotify Tracks, Albums & Playlists
+  - Direct Link To File
+- Autocomplete
+  - YouTube search suggestions
+- TTS over voice connection
+  - Says any text :gb: :de: :netherlands: :fr: :es:
+  - Announces music tracks
+  - Reads questions in Trivia games
+- Multiplayer Games
+  - Tic Tac Toe
+  - Four Wins
+  - Trivia
+  - Find The Emoji
+- Administrator Role Commands
+  - Delete Messages
+- General & Fun Commands
+  - Epic Free Games
+  - Roast
+  - Decide
+  - Coin Flip
+
 <details>
   <summary>Screenshots</summary>
       <table style="width: 250px;"  cellpadding="2">
@@ -120,14 +120,17 @@ Follow these steps to get the bot up and running.
 
 [![NodeJS][node-shield]][node-url]
 [![npm][npm-shield]][npm-url]
->npm comes with nodejs, update with the following command:
-  ```sh
-  npm i -g npm@latest
-  ```
->install ffmpeg and add it to the PATH environment variable[^ffmpeg]
 
-[^ffmpeg]:required for playing unsupported audio sources
-    
+> npm comes with nodejs, update with the following command:
+
+```sh
+npm i -g npm@latest
+```
+
+> install ffmpeg and add it to the PATH environment variable[^ffmpeg]
+
+[^ffmpeg]: required for playing unsupported audio sources
+
 [![ffmpeg][ffmpeg-shield]][ffmpeg-url]
 
 <p align="right"><a href="#top">&uarr;</a></p>
@@ -137,13 +140,15 @@ Follow these steps to get the bot up and running.
 1. Clone or download this repo
 
 2. Install the required npm packages
->Run the following command in a terminal in the repo folder:
+    > Run the following command in a terminal in the repo folder:
+
 ```sh
 npm i
 ```
 
 3. Create a file named `.env` in the root directory
->Add the following lines:
+    > Add the following lines:
+
 ```sh
 BOT_TOKEN="YOURTOKEN"
 GOOGLE_API_KEY="YOURKEY"
@@ -153,20 +158,21 @@ SPOTIFY_CLIENT_SECRET="YOURCLIENTSECRET"
 
 4. Replace `YOURTOKEN` with your [Discord Bot Token](https://discord.com/developers/applications)
 
-5. *(optional)* Replace `YOURKEY` with your [Google API Key for YouTube Data API v3](https://console.cloud.google.com/marketplace/product/google/youtube.googleapis.com)[^googleapi] 
-[^googleapi]:required for playlist search; free for up to 10,000 searches per day
+5. _(optional)_ Replace `YOURKEY` with your [Google API Key for YouTube Data API v3](https://console.cloud.google.com/marketplace/product/google/youtube.googleapis.com)[^googleapi]
+   [^googleapi]:required for playlist search; free for up to 10,000 searches per day
 
-6. *(optional)* Replace `YOURCLIENTID` and `YOURCLIENTSECRET` with your [Spotify API Credentials](https://developer.spotify.com/dashboard/)[^spotifyapi]
-[^spotifyapi]:required to search spotify playlists; free of charge for appropriate, rate limited use    
+6. _(optional)_ Replace `YOURCLIENTID` and `YOURCLIENTSECRET` with your [Spotify API Credentials](https://developer.spotify.com/dashboard/)[^spotifyapi]
+   [^spotifyapi]:required to search spotify playlists; free of charge for appropriate, rate limited use
 
 7. Add the bot to your server via the [OAuth2 > URL Generator](https://discord.com/developers/applications). Select `bot` as scope and insert the permissions integer in the `GENERATED URL`
->Minimum [permissions integer](https://discordapi.com/permissions.html#294242221120):[^permissions]
-```
+    > Minimum [permissions integer](https://discordapi.com/permissions.html#294242221120):[^permissions]
+
+```sh
 294242221120
 ```
 
-[^permissions]:required for full bot functionality
-    
+[^permissions]: required for full bot functionality
+
 <p align="right"><a href="#top">&uarr;</a></p>
 
 ## Usage
@@ -177,11 +183,14 @@ Run the `start.bat` file to start the bot in a terminal
 
 **or**
 
->run the following command in a terminal:
+> run the following command in a terminal:
+
 ```sh
 npm start
 ```
->For development:
+
+> For development:
+
 ```sh
 npm run dev
 ```
@@ -194,12 +203,15 @@ Guild slash commands are only available in the guild in which they were deployed
 
 Send the following messages in a guild text channel.
 
->Deploy slash commands to guild:
-```
+> Deploy slash commands to guild:
+
+```sh
 >deploy
 ```
->Delete slash commands from guild:
-```
+
+> Delete slash commands from guild:
+
+```sh
 >clearcommands
 ```
 
@@ -209,7 +221,8 @@ Send the following messages in a guild text channel.
 
 Application slash commands are available in all guilds. It may take some time until the commands are available.
 
->Run the following command in a terminal:
+> Run the following command in a terminal:
+
 ```sh
 npm run deploy
 ```
@@ -223,6 +236,7 @@ Have a look at the [Project](https://github.com/users/danloe/projects/1).
 <p align="right"><a href="#top">&uarr;</a></p>
 
 ## Contributing
+
 Suggestions for extensions or improvements are very welcome.
 
 Pull requests are also welcome. For major changes, please open an issue first to discuss what you would like to change.

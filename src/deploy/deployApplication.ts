@@ -18,8 +18,7 @@ readdirSync(commandPath).forEach((dir) => {
 const rest = new REST({ version: '9' }).setToken(process.env.BOT_TOKEN as string);
 
 rest.put(Routes.applicationCommands(process.env.CLIENT_ID as string), {
-    //body: commands
-    body: []
+    body: commands
 })
     .then(() => console.log('Successfully registered application commands.'))
     .catch(console.error);
