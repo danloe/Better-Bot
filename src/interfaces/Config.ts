@@ -7,6 +7,7 @@ export interface Config {
     activityType: string;
     status: string;
     defaultVolume: number;
+    voiceVolumeMultiplier: number;
     ticTacToe_thumbnail: string;
     ticTacToe_charField: string;
     ticTacToe_charX: string;

@@ -1,8 +1,8 @@
-import { EmbedFooterData } from '@discordjs/builders';
 import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
 import { Track, InputType } from '../classes';
 import google from 'googlethis';
 import BotterinoClient from '../client';
+import { EmbedFooterData } from '@discordjs/builders';
 
 export function createEmbed(
     title: string,

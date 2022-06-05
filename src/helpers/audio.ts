@@ -1,8 +1,8 @@
 import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
-import { Track, InputType, Queue, Logger } from '../classes';
-import { getLoadingString, timeStringToDurationString as timeStringToSecondsNumber } from './message';
+import { Track, InputType, Queue } from '../classes';
+import { getLoadingString } from './message';
 import { Playlist, PlaylistType } from '../interfaces';
 import BotterinoClient from '../client';
 import fetch from 'node-fetch';

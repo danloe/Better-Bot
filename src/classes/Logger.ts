@@ -5,7 +5,7 @@ export class Logger {
     client!: BotterinoClient;
 
     constructor(client?: BotterinoClient) {
-        this.client = client;
+        if (client) this.client = client;
     }
 
     log(message: string, ...args: any[]) {

@@ -7,6 +7,7 @@
     "activityType": "WATCHING",
     "status": "dnd",
     "defaultVolume": 1.0,
+    "voiceVolumeMultiplier": 2.0,
     "ticTacToe_thumbnail": "https://www.dropbox.com/s/fkqrplz0duuqto9/ttt.png?dl=1",
     "ticTacToe_charField": "🔳",
     "ticTacToe_charX": "❌",

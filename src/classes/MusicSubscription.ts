@@ -49,7 +49,6 @@ export class MusicSubscription {
     private pausedForVoice = false;
     private restartTrack = false;
     private announcement = false;
-    private voiceVolumeMultiplier = 1.8;
     private displayNowPlayingMessage = true;
     private repeat = false;
 
@@ -280,7 +279,7 @@ export class MusicSubscription {
     public setVolume(value: number) {
         this.volume = value;
         if (this.audioResource) this.audioResource.volume?.setVolume(value);
-        if (this.voiceResource) this.voiceResource.volume?.setVolume(value * this.voiceVolumeMultiplier);
+        if (this.voiceResource) this.voiceResource.volume?.setVolume(value * this.client.config.voiceVolumeMultiplier);
     }
 
     /**
@@ -387,7 +386,7 @@ export class MusicSubscription {
                         inputType: StreamType.Arbitrary,
                         inlineVolume: true
                     });
-                    this.voiceResource.volume?.setVolume(this.volume * this.voiceVolumeMultiplier);
+                    this.voiceResource.volume?.setVolume(this.volume * this.client.config.voiceVolumeMultiplier);
 
                     this.voiceConnection.subscribe(this.voicePlayer!);
                     this.voicePlayer.play(this.voiceResource);

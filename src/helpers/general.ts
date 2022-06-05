@@ -4,8 +4,7 @@ import {
     CommandInteraction,
     InteractionReplyOptions,
     Message,
-    MessagePayload,
-    WebhookEditMessageOptions
+    MessagePayload
 } from 'discord.js';
 import BotterinoClient from '../client';
 
