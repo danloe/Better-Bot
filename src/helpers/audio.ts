@@ -504,7 +504,7 @@ function getLoadingMessageEmbed(
 ) {
     let desciptionMsg = '';
     if (done) {
-        desciptionMsg = '`🔺 ' + String(loaded + 1) + ' Playlist Track(s) loaded and added to the queue.`';
+        desciptionMsg = '`🔺 ' + String(loaded + 1) + ' Track(s) fetched and added to the queue.`';
     } else {
         desciptionMsg =
             '`🔺 Fetching tracks from YouTube...`\n`' +
