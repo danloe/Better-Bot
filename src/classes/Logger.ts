@@ -2,14 +2,14 @@ import chalk from 'chalk';
 import BotterinoClient from '../client';
 
 export class Logger {
-    client: BotterinoClient;
+    client!: BotterinoClient;
 
-    constructor(client: BotterinoClient) {
+    constructor(client?: BotterinoClient) {
         this.client = client;
     }
 
     log(message: string, ...args: any[]) {
-        if (this.client.config.debug || this.client.config.verbose) console.log(this.getMessage(message), ...args);
+        console.log(this.getMessage(message), ...args);
         this.writeToFile(`[LOG] ${message}`);
     }
 

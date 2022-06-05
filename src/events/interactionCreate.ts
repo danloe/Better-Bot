@@ -15,6 +15,7 @@ export const event: Event = {
                 await (command as Command).run(client, interaction);
             } catch (error: any) {
                 client.logger.error(error);
+                console.log(error);
             }
 
             // AUTO COMPLETE

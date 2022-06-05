@@ -1,7 +1,7 @@
 import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
-import { Track, InputType, Queue } from '../classes';
+import { Track, InputType, Queue, Logger } from '../classes';
 import { getLoadingString, timeStringToDurationString as timeStringToSecondsNumber } from './message';
 import { Playlist, PlaylistType } from '../interfaces';
 import BotterinoClient from '../client';
@@ -331,11 +331,11 @@ export function getSpotifyAlbumOrPlaylistTracks(
                         (response.copyrights
                             ? '\nCopyright: (' + response.copyrights[0]!.type + ') ' + response.copyrights[0]!.text
                             : ''),
-                    url: response.external_urls.spotify,
+                    url: response.external_urls.spotify || '',
                     itemCount: responseTracks.length,
                     announce: announce,
                     owner: response.artists[0]?.name || 'Unknown',
-                    publishedAt: response.release_date,
+                    publishedAt: response.release_date || 'Unknown',
                     thumbnailUrl: response.images[0]?.url || spotifyThumbnail
                 };
             } else {
@@ -345,14 +345,18 @@ export function getSpotifyAlbumOrPlaylistTracks(
                     type: PlaylistType.SpotifyPlaylist,
                     name: JSDOM.fragment(response.name).textContent || 'Unknown',
                     description: JSDOM.fragment(response.description).textContent || 'No desciption available.',
-                    url: response.external_urls.spotify,
-                    itemCount: response.tracks.total,
+                    url: response.external_urls.spotify || '',
+                    itemCount: response.tracks.total || 0,
                     announce: announce,
                     owner: response.owner.display_name || 'Unknown',
                     publishedAt: 'Unknown',
                     thumbnailUrl: response.images[0]?.url || spotifyThumbnail
                 };
-                let nextPage = responseTracks.length < playlist.itemCount;
+                let nextPage = false;
+                if (responseTracks.length < playlist.itemCount) {
+                    nextPage = true;
+                    responseTracks = [];
+                }
                 while (nextPage) {
                     let res: any = await getSpotifyPlaylistsItemsApiResponse(
                         client,
@@ -361,7 +365,9 @@ export function getSpotifyAlbumOrPlaylistTracks(
                         reject
                     );
                     let trackArr: any[] = res.items;
-                    responseTracks.push(trackArr);
+                    for (const t of trackArr) {
+                        responseTracks.push(t.track);
+                    }
                     nextPage = responseTracks.length < playlist.itemCount;
                 }
             }
@@ -385,30 +391,23 @@ export function getSpotifyAlbumOrPlaylistTracks(
             }
 
             // Get first track
-            if (playlist.type === PlaylistType.SpotifyAlbum) {
-                tracks.push(
-                    await getYouTubeTrack(
-                        client,
-                        responseTracks[0].artists[0].name + ' ' + responseTracks[0].name,
-                        interaction.user.username,
-                        announce,
-                        InputType.SpotifyPlaylist
-                    )
-                );
-            } else {
-                tracks.push(
-                    await getYouTubeTrack(
-                        client,
-                        responseTracks[0].track.artists[0].name + ' ' + responseTracks[0].track.name,
-                        interaction.user.username,
-                        announce,
-                        InputType.SpotifyAlbum
-                    )
-                );
+            while (!responseTracks[0]?.artists || !responseTracks[0]?.name) {
+                responseTracks.shift();
             }
+            if (responseTracks.length == 0) reject('No tracks found.');
+
+            tracks.push(
+                await getYouTubeTrack(
+                    client,
+                    (responseTracks[0]?.artists[0]?.name || '') + ' ' + (responseTracks[0]?.name || ''),
+                    interaction.user.username,
+                    announce,
+                    playlist.type === PlaylistType.SpotifyAlbum ? InputType.SpotifyAlbum : InputType.SpotifyPlaylist
+                )
+            );
 
             // Remove first track
-            responseTracks.splice(0, 1);
+            responseTracks.shift();
 
             // Load other tracks in background
             const queue = client.musicManager.getQueue(interaction);
@@ -467,32 +466,17 @@ function loadAndQueueAsync(
         // Get tracks
         for (const track of responseTracks) {
             try {
-                if (playlist.type === PlaylistType.SpotifyAlbum) {
-                    let t = await getYouTubeTrack(
-                        client,
-                        track.artists[0].name + ' ' + track.name,
-                        interaction.user.username,
-                        announce,
-                        InputType.SpotifyPlaylist
-                    );
-                    if (next) {
-                        queue.next(t);
-                    } else {
-                        queue.queue(t);
-                    }
+                let t = await getYouTubeTrack(
+                    client,
+                    track.artists[0].name + ' ' + track.name,
+                    interaction.user.username,
+                    announce,
+                    playlist.type === PlaylistType.SpotifyPlaylist ? InputType.SpotifyPlaylist : InputType.SpotifyAlbum
+                );
+                if (next) {
+                    queue.next(t);
                 } else {
-                    let t = await getYouTubeTrack(
-                        client,
-                        track.track.artists[0].name + ' ' + track.track.name,
-                        interaction.user.username,
-                        announce,
-                        InputType.SpotifyAlbum
-                    );
-                    if (next) {
-                        queue.next(t);
-                    } else {
-                        queue.queue(t);
-                    }
+                    queue.queue(t);
                 }
                 loaded += 1;
                 if (stopLoop) {
@@ -523,7 +507,7 @@ function getLoadingMessageEmbed(
         desciptionMsg = '`🔺 ' + String(loaded + 1) + ' Playlist Track(s) loaded and added to the queue.`';
     } else {
         desciptionMsg =
-            '`🔺 Playlist is loading...`\n`' +
+            '`🔺 Fetching tracks from YouTube...`\n`' +
             getLoadingString(loaded + failed, playlistTracks.length) +
             ' ' +
             String(Math.floor(((loaded + failed) / playlistTracks.length) * 100)) +

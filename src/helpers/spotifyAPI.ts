@@ -112,8 +112,8 @@ export async function getSpotifyPlaylistsItemsApiResponse(
     const apiUrl = 'https://api.spotify.com/v1/playlists/';
     const playlistId = url.match(/(?<=playlist\/)([a-zA-Z0-9-_]+)?/)![0];
     const tracks = '/tracks';
-    const off = offset > 0 ? 'offset=' + String(offset) : '';
-    const fields = '?fields=next, items(track(album(images),artists,duration_ms,name))';
+    const off = offset > 0 ? '&offset=' + String(offset) : '';
+    const fields = '?fields=next,items(track(album(images),artists,duration_ms,name))';
     const requestUrl = apiUrl + playlistId + tracks + fields + off + '&limit=100';
     let response: any = await fetch(requestUrl, {
         method: 'GET',

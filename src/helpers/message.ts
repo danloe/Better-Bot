@@ -237,7 +237,7 @@ export function getLoadingString(actual: number, total: number, style = 0, size 
         middle: number,
         rest: number,
         x: number,
-        full_symbol = bars[style][bars.length - 1],
+        full_symbol = bars[style][bars[style].length - 1],
         barStyleIndex = bars[style].length - 1,
         bar: string = '';
     if (p == 100) return repeatString(full_symbol, size);
