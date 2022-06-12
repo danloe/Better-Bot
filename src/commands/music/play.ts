@@ -196,7 +196,7 @@ export const command: Command = {
                     }
 
                     let subscription = client.musicManager.getSubscription(interaction, false);
-                    if (subscription.lastChannel?.id != interaction.channel?.id) {
+                    if (!subscription.lastChannel || subscription.lastChannel?.id != interaction.channel?.id) {
                         subscription.lastChannel = <GuildTextBasedChannel>interaction.channel;
                         await safeReply(
                             client,

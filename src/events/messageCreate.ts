@@ -37,10 +37,10 @@ async function setCommands(message: Message) {
     const commandPath = path.join(__dirname, '..', 'commands');
     let passed = true;
     readdirSync(commandPath).forEach((dir) => {
-        const dirs = readdirSync(`${commandPath}\\${dir}`).filter((file) => file.endsWith('.ts'));
+        const dirs = readdirSync(`${commandPath}/${dir}`).filter((file) => file.endsWith('.ts'));
         // const regex = RegExp(/^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$/gu);
         for (const file of dirs) {
-            const { command } = require(`${commandPath}\\${dir}\\${file}`);
+            const { command } = require(`${commandPath}/${dir}/${file}`);
             // if (!regex.test(command.data.name)) {
             //     client.logger.info(command.data.name + ' failed the regex check.');
             //     passed = false;

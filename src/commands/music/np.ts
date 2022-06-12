@@ -73,7 +73,16 @@ export const command: Command = {
                     if (input !== null || channel) {
                         await safeReply(client, interaction, createEmbed('Now Playing Message', msgText, true), true);
                     } else {
-                        startNowPlayingCollector(client, interaction, subscription);
+                        if (!subscription.currentTrack && !subscription.audioResource && !subscription.isPlaying()) {
+                            await safeReply(
+                                client,
+                                interaction,
+                                createEmbed('Now Playing Message', '🔺 There is nothing being played', true),
+                                true
+                            );
+                        } else {
+                            startNowPlayingCollector(client, interaction, subscription);
+                        }
                     }
 
                     done();
@@ -224,7 +233,7 @@ export function getNowPlayingMessage(subscription: MusicSubscription): [message:
                 secondsToColonsString(subscription.currentTrack!.duration!) +
                 '`'
         );
-    } else {
+    } else if (subscription.audioResource?.playbackDuration > 0) {
         embedmsg.addField(
             '\u200B',
             '`Track is running since: ' + String(subscription.audioResource.playbackDuration / 1000) + ' seconds`'

@@ -20,8 +20,13 @@ export const command: Command = {
             if (interaction) {
                 try {
                     const queue = client.musicManager.getQueue(interaction);
-                    const subscription = client.musicManager.subscriptions.get(interaction.guildId!)!;
-                    startCollector(client, interaction, subscription);
+                    const subscription = client.musicManager.getSubscription(interaction, false);
+
+                    if (queue.length === 0) {
+                        await safeReply(client, interaction, createErrorEmbed('🔺 The queue is empty', true));
+                    } else {
+                        startCollector(client, interaction, subscription);
+                    }
 
                     done();
                 } catch (err: any) {
