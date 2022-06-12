@@ -24,7 +24,7 @@ export class Logger {
     }
 
     info(message: string, ...args: any[]) {
-        if (this.client.config.debug || this.client.config.verbose)
+        if (this.client.config.debug || this.client.config.verboseLogging)
             console.info(`${chalk.bgWhite.black('[INFO]')} ${this.getMessage(message)}`, ...args);
     }
 
@@ -43,6 +43,7 @@ export class Logger {
     }
 
     private writeToFile(message: string) {
+        if(this.client.config.disableWriteLog) return;
         return new Promise<void>((resolve, reject) => {
             const fs = require('fs');
             fs.appendFile('logs.txt', `[${new Date().toLocaleString()}] ${message}\n`, (err: any) => {

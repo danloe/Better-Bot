@@ -12,7 +12,7 @@ import {
     secondsToDurationString,
     getTrackTypeString
 } from '../../helpers';
-import { Track, InputType } from '../../classes';
+import { Track, TrackType } from '../../classes';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -168,8 +168,8 @@ export const command: Command = {
                                 false,
                                 getTrackTypeColor(
                                     result.type === PlaylistType.YouTube
-                                        ? InputType.YouTubePlaylist
-                                        : InputType.SpotifyPlaylist
+                                        ? TrackType.YouTubePlaylist
+                                        : TrackType.SpotifyPlaylist
                                 ),
                                 [
                                     { name: 'Description', value: getPrettyEmbedString(result.description) },

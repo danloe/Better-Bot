@@ -1,7 +1,7 @@
 import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
-import { Track, InputType, Queue } from '../classes';
+import { Track, TrackType, Queue } from '../classes';
 import { getLoadingString } from './message';
 import { Playlist, PlaylistType } from '../interfaces';
 import BotterinoClient from '../client';
@@ -19,25 +19,25 @@ import { JSDOM } from 'jsdom';
 const youTubeThumbnail = 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg';
 const spotifyThumbnail = 'https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg';
 
-export function determineInputType(args: string): InputType {
+export function determineInputType(args: string): TrackType {
     if (args.startsWith('http://') || args.startsWith('https://')) {
         // URL, get type
         if (isYouTubeURL(args)) {
             if (args.includes('playlist?list=')) {
-                return InputType.YouTubePlaylist;
+                return TrackType.YouTubePlaylist;
             } else {
-                return InputType.YouTube;
+                return TrackType.YouTube;
             }
         }
-        if (isSoundCloudURL(args)) return InputType.SoundCloud;
-        if (isNewgroundsURL(args)) return InputType.Newgrounds;
-        if (isSpotifyTrackURL(args)) return InputType.SpotifyTrack;
-        if (isSpotifyAlbumURL(args)) return InputType.SpotifyAlbum;
-        if (isSpotifyPlaylistURL(args)) return InputType.SpotifyPlaylist;
-        return InputType.DirectFile;
+        if (isSoundCloudURL(args)) return TrackType.SoundCloud;
+        if (isNewgroundsURL(args)) return TrackType.Newgrounds;
+        if (isSpotifyTrackURL(args)) return TrackType.SpotifyTrack;
+        if (isSpotifyAlbumURL(args)) return TrackType.SpotifyAlbum;
+        if (isSpotifyPlaylistURL(args)) return TrackType.SpotifyPlaylist;
+        return TrackType.DirectFile;
     } else {
         // YouTube search
-        return InputType.YouTube;
+        return TrackType.YouTube;
     }
 }
 
@@ -46,7 +46,7 @@ export function getYouTubeTrack(
     query: string,
     requestor: string,
     announce: boolean,
-    inputType: InputType = InputType.YouTube
+    inputType: TrackType = TrackType.YouTube
 ) {
     return new Promise<Track>(async (resolve, reject) => {
         try {
@@ -65,7 +65,7 @@ export function getYouTubeTrack(
 
             const track = new Track(
                 inputType,
-                InputType.YouTube,
+                TrackType.YouTube,
                 info.videoDetails.video_url,
                 info.videoDetails.title,
                 requestor,
@@ -172,8 +172,8 @@ export function getYoutubePlaylistTracks(
                     let snippet = video.snippet;
                     tracks.push(
                         new Track(
-                            InputType.YouTubePlaylist,
-                            InputType.YouTube,
+                            TrackType.YouTubePlaylist,
+                            TrackType.YouTube,
                             'https://youtu.be/' + snippet.resourceId.videoId,
                             snippet.title,
                             requestor,
@@ -227,8 +227,8 @@ export function getSoundCloudTrack(url: string, requestor: string, announce: boo
         try {
             let info: any = await scdl.getInfo(url);
             const track = new Track(
-                InputType.SoundCloud,
-                InputType.SoundCloud,
+                TrackType.SoundCloud,
+                TrackType.SoundCloud,
                 info.uri,
                 info.title,
                 requestor,
@@ -265,8 +265,8 @@ export function getNewgroundsTrack(url: string, requestor: string, announce: boo
             let info = JSON.parse(m![1]);
 
             const track = new Track(
-                InputType.Newgrounds,
-                InputType.Newgrounds,
+                TrackType.Newgrounds,
+                TrackType.Newgrounds,
                 info.filename,
                 `${info.artist} - ${decodeURIComponent(info.name)}`,
                 requestor,
@@ -292,7 +292,7 @@ export function getSpotifyTrack(url: string, client: BotterinoClient, requestor:
                 response.artists[0].name + ' ' + response.name,
                 requestor,
                 announce,
-                InputType.SpotifyTrack
+                TrackType.SpotifyTrack
             );
             resolve(track);
         } catch (error: any) {
@@ -402,7 +402,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
                     (responseTracks[0]?.artists[0]?.name || '') + ' ' + (responseTracks[0]?.name || ''),
                     interaction.user.username,
                     announce,
-                    playlist.type === PlaylistType.SpotifyAlbum ? InputType.SpotifyAlbum : InputType.SpotifyPlaylist
+                    playlist.type === PlaylistType.SpotifyAlbum ? TrackType.SpotifyAlbum : TrackType.SpotifyPlaylist
                 )
             );
 
@@ -471,7 +471,7 @@ function loadAndQueueAsync(
                     track.artists[0].name + ' ' + track.name,
                     interaction.user.username,
                     announce,
-                    playlist.type === PlaylistType.SpotifyPlaylist ? InputType.SpotifyPlaylist : InputType.SpotifyAlbum
+                    playlist.type === PlaylistType.SpotifyPlaylist ? TrackType.SpotifyPlaylist : TrackType.SpotifyAlbum
                 );
                 if (next) {
                     queue.next(t);

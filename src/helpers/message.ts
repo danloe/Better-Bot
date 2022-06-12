@@ -1,5 +1,5 @@
 import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
-import { Track, InputType } from '../classes';
+import { Track, TrackType } from '../classes';
 import google from 'googlethis';
 import BotterinoClient from '../client';
 import { EmbedFooterData } from '@discordjs/builders';
@@ -36,23 +36,23 @@ export function createErrorEmbed(message: string, ephemeral: boolean = true) {
     };
 }
 
-export function getTrackTypeColor(trackType: InputType): ColorResolvable {
+export function getTrackTypeColor(trackType: TrackType): ColorResolvable {
     switch (trackType) {
-        case InputType.DirectFile:
+        case TrackType.DirectFile:
             return '#999999';
-        case InputType.YouTube:
+        case TrackType.YouTube:
             return '#ff0000';
-        case InputType.YouTubePlaylist:
+        case TrackType.YouTubePlaylist:
             return '#ff0000';
-        case InputType.SoundCloud:
+        case TrackType.SoundCloud:
             return '#ff5500';
-        case InputType.Newgrounds:
+        case TrackType.Newgrounds:
             return '#fda238';
-        case InputType.SpotifyTrack:
+        case TrackType.SpotifyTrack:
             return '#1DB954';
-        case InputType.SpotifyAlbum:
+        case TrackType.SpotifyAlbum:
             return '#1DB954';
-        case InputType.SpotifyPlaylist:
+        case TrackType.SpotifyPlaylist:
             return '#1DB954';
         default:
             return '#ffffff';
@@ -61,19 +61,19 @@ export function getTrackTypeColor(trackType: InputType): ColorResolvable {
 
 export function getTrackSourceString(track: Track): string {
     switch (track.inputType) {
-        case InputType.DirectFile:
+        case TrackType.DirectFile:
             return track.url.match(/\w+(?=\.\w+\/)\.\w+/gi)![0];
-        case InputType.YouTube:
+        case TrackType.YouTube:
             return 'YouTube';
-        case InputType.YouTubePlaylist:
+        case TrackType.YouTubePlaylist:
             return 'YouTube';
-        case InputType.SoundCloud:
+        case TrackType.SoundCloud:
             return 'SoundCloud';
-        case InputType.Newgrounds:
+        case TrackType.Newgrounds:
             return 'Newgrounds';
-        case InputType.SpotifyTrack:
+        case TrackType.SpotifyTrack:
             return 'YouTube';
-        case InputType.SpotifyPlaylist:
+        case TrackType.SpotifyPlaylist:
             return 'YouTube';
         default:
             return 'Unknown';
@@ -82,21 +82,21 @@ export function getTrackSourceString(track: Track): string {
 
 export function getTrackTypeString(track: Track): string {
     switch (track.inputType) {
-        case InputType.DirectFile:
+        case TrackType.DirectFile:
             return track.url.match(/\w+(?=\.\w+\/)\.\w+/gi)![0];
-        case InputType.YouTube:
+        case TrackType.YouTube:
             return 'YouTube';
-        case InputType.YouTubePlaylist:
+        case TrackType.YouTubePlaylist:
             return 'YouTube Playlist';
-        case InputType.SoundCloud:
+        case TrackType.SoundCloud:
             return 'SoundCloud';
-        case InputType.Newgrounds:
+        case TrackType.Newgrounds:
             return 'Newgrounds';
-        case InputType.SpotifyTrack:
+        case TrackType.SpotifyTrack:
             return 'Spotify Track';
-        case InputType.SpotifyAlbum:
+        case TrackType.SpotifyAlbum:
             return 'Spotify Album';
-        case InputType.SpotifyPlaylist:
+        case TrackType.SpotifyPlaylist:
             return 'Spotify Playlist';
         default:
             return 'Unknown';

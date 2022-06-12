@@ -5,11 +5,12 @@
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "start": "tsc && ts-node ./src/index.ts",
+    "start": "ts-node ./src/index.ts",
     "dev": "tsc && ts-node-dev ./src/index.ts",
     "deploy": "tsc && ts-node ./src/deploy/deployApplication.ts",
     "clear": "tsc && ts-node ./src/deploy/clearApplication.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "gcp-build": "tsc -p ."
   },
   "repository": {
     "type": "git",
@@ -37,6 +38,7 @@
     "discord.js": "^13.7.0",
     "dotenv": "^16.0.1",
     "epic-free-games": "^3.1.1",
+    "express": "^4.18.1",
     "googlethis": "^1.2.9",
     "jsdom": "^19.0.0",
     "libsodium-wrappers": "^0.7.10",
@@ -50,6 +52,7 @@
     "ytsr": "^3.8.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.13",
     "@types/jsdom": "^16.2.14",
     "@types/node": "^17.0.35",
     "@types/node-emoji": "^1.8.1",

@@ -24,10 +24,10 @@ class BotterinoClient extends Client {
         // Commands
         const commandPath = path.join(__dirname, '..', 'commands');
         readdirSync(commandPath).forEach((dir) => {
-            const commands = readdirSync(`${commandPath}\\${dir}`).filter((file) => file.endsWith('.ts'));
+            const commands = readdirSync(`${commandPath}/${dir}`).filter((file) => file.endsWith('.ts'));
 
             for (const file of commands) {
-                const { command } = require(`${commandPath}\\${dir}\\${file}`);
+                const { command } = require(`${commandPath}/${dir}/${file}`);
                 this.commands.set(command.data.name, command);
             }
         });

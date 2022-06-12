@@ -16,7 +16,7 @@ import { ButtonInteraction, CommandInteraction, GuildMember, Snowflake } from 'd
 import BotterinoClient from '../client';
 import { MusicSubscription } from './MusicSubscription';
 import { Queue } from './Queue';
-import { Track, InputType } from './Track';
+import { Track, TrackType } from './Track';
 import {
     createAudioResource,
     DiscordGatewayAdapterCreator,
@@ -58,11 +58,11 @@ export class MusicManager {
                 let inputType = determineInputType(input);
 
                 switch (inputType) {
-                    case InputType.YouTube:
+                    case TrackType.YouTube:
                         track = await getYouTubeTrack(this.client, input, interaction.user.username, announce);
                         break;
 
-                    case InputType.YouTubePlaylist:
+                    case TrackType.YouTubePlaylist:
                         playlist = await getYoutubePlaylist(input, announce);
                         tracks = await getYoutubePlaylistTracks(
                             this.client,
@@ -76,19 +76,19 @@ export class MusicManager {
                         );
                         break;
 
-                    case InputType.SoundCloud:
+                    case TrackType.SoundCloud:
                         track = await getSoundCloudTrack(input, interaction.user.username, announce);
                         break;
 
-                    case InputType.Newgrounds:
+                    case TrackType.Newgrounds:
                         track = await getNewgroundsTrack(input, interaction.user.username, announce);
                         break;
 
-                    case InputType.SpotifyTrack:
+                    case TrackType.SpotifyTrack:
                         track = await getSpotifyTrack(input, this.client, interaction.user.username, announce);
                         break;
 
-                    case InputType.SpotifyAlbum:
+                    case TrackType.SpotifyAlbum:
                         [playlist, tracks] = await getSpotifyAlbumOrPlaylistTracks(
                             input,
                             this.client,
@@ -102,7 +102,7 @@ export class MusicManager {
                         );
                         break;
 
-                    case InputType.SpotifyPlaylist:
+                    case TrackType.SpotifyPlaylist:
                         [playlist, tracks] = await getSpotifyAlbumOrPlaylistTracks(
                             input,
                             this.client,
@@ -116,12 +116,12 @@ export class MusicManager {
                         );
                         break;
 
-                    case InputType.DirectFile:
+                    case TrackType.DirectFile:
                         const imageUrl = await getLogoUrlfromUrl(this.client, input);
 
                         track = new Track(
-                            InputType.DirectFile,
-                            InputType.DirectFile,
+                            TrackType.DirectFile,
+                            TrackType.DirectFile,
                             input,
                             'Unknown File',
                             interaction.user.username,

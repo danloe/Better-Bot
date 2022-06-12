@@ -1,7 +1,8 @@
 export interface Config {
-    hostUserId: string,
-    debug: boolean,
-    verbose: boolean,
+    hostUserId: string;
+    debug: boolean;
+    verboseLogging: boolean;
+    disableWriteLog: boolean;
     prefix: string;
     activityName: string;
     activityType: string;

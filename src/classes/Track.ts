@@ -3,8 +3,8 @@ import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 
 export class Track {
-    inputType: InputType;
-    audiotype: InputType;
+    inputType: TrackType;
+    audiotype: TrackType;
     url: string;
     title: string;
     requestor: string;
@@ -17,8 +17,8 @@ export class Track {
     uploaded: string;
 
     constructor(
-        inputType: InputType,
-        audiotype: InputType,
+        inputType: TrackType,
+        audioType: TrackType,
         url: string,
         title: string,
         requestor: string,
@@ -31,7 +31,7 @@ export class Track {
         uploaded: string = 'Unknown'
     ) {
         this.inputType = inputType;
-        this.audiotype = audiotype;
+        this.audiotype = audioType;
         this.url = url;
         this.title = title;
         this.requestor = requestor;
@@ -49,7 +49,7 @@ export class Track {
             try {
                 let stream: any;
                 switch (this.audiotype) {
-                    case InputType.YouTube:
+                    case TrackType.YouTube:
                         stream = ytdl(this.url, {
                             filter: 'audioonly',
                             highWaterMark: 1 << 22
@@ -65,7 +65,7 @@ export class Track {
                         });
                         return;
 
-                    case InputType.SoundCloud:
+                    case TrackType.SoundCloud:
                         stream = await scdl.downloadFormat(
                             this.url,
                             scdl.FORMATS.MP3
@@ -82,11 +82,11 @@ export class Track {
                         });
                         return;
 
-                    case InputType.Newgrounds:
+                    case TrackType.Newgrounds:
                         stream = this.url;
                         break;
 
-                    case InputType.DirectFile:
+                    case TrackType.DirectFile:
                         stream = this.url;
                         break;
                 }
@@ -103,7 +103,7 @@ export class Track {
     }
 }
 
-export enum InputType {
+export enum TrackType {
     DirectFile,
     YouTube,
     YouTubePlaylist,
