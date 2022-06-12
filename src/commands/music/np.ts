@@ -159,6 +159,14 @@ export async function startNowPlayingCollector(
                             embeds: [msgembed],
                             components: []
                         });
+                    } else if (subscription.lastNowPlayingMessage) {
+                        let msg = await subscription.lastNowPlayingMessage.fetch().catch((_) => {
+                            return null;
+                        });
+                        msg.edit({
+                            embeds: [msgembed],
+                            components: []
+                        });
                     }
                 } else {
                     let msg = await message.fetchReply().catch((_) => {
@@ -166,6 +174,14 @@ export async function startNowPlayingCollector(
                     });
                     if (msg !== null) {
                         safeReply(client, message, {
+                            embeds: [msgembed],
+                            components: []
+                        });
+                    } else if (subscription.lastNowPlayingMessage) {
+                        let msg = await subscription.lastNowPlayingMessage.fetch().catch((_) => {
+                            return null;
+                        });
+                        msg.edit({
                             embeds: [msgembed],
                             components: []
                         });
