@@ -1,4 +1,4 @@
-import { MessageActionRow, MessageButton, MessageEmbed, MessagePayload } from 'discord.js';
+import { MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { MusicSubscription } from './MusicSubscription';
 import { Track } from './Track';
 
@@ -80,7 +80,7 @@ export class Queue extends Array<Track> {
             if (subscription.currentTrack) {
                 embedmsg
                     .addField(
-                        'Now playing:',
+                        '🔺 Now playing:',
                         '`' +
                             subscription.currentTrack.title +
                             '`\n' +
@@ -93,7 +93,7 @@ export class Queue extends Array<Track> {
         }
 
         if (this.length > 0) {
-            embedmsg.addField('\u200B', '**Tracks in queue:**');
+            embedmsg.addField('\u200B', '🔺 **Tracks in queue:**');
 
             for (let i = this.currentPage * 10 - 10; i < this.currentPage * 10; i++) {
                 if (i == this.length) break;
@@ -107,7 +107,7 @@ export class Queue extends Array<Track> {
                 embedmsg.addField('\u200B', '`∑ ' + String(this.length) + ' Tracks`');
             }
         } else {
-            embedmsg.addField('\u200B', '`The queue is empty.`');
+            embedmsg.addField('\u200B', '`🔺 The queue is empty.`');
         }
         return embedmsg;
     }
@@ -120,8 +120,16 @@ export class Queue extends Array<Track> {
                 .setStyle('SECONDARY')
                 .setDisabled(this.currentPage <= 1),
             new MessageButton().setCustomId('queue_skip').setEmoji('⏭️').setStyle('SECONDARY'),
-            new MessageButton().setCustomId('queue_clear').setEmoji('🚮').setStyle('DANGER'),
-            new MessageButton().setCustomId('queue_shuffle').setEmoji('🔀').setStyle('SECONDARY'),
+            new MessageButton()
+                .setCustomId('queue_clear')
+                .setEmoji('🚮')
+                .setStyle('DANGER')
+                .setDisabled(!this.hasTracks()),
+            new MessageButton()
+                .setCustomId('queue_shuffle')
+                .setEmoji('🔀')
+                .setStyle('SECONDARY')
+                .setDisabled(this.length < 2),
             new MessageButton()
                 .setCustomId('queue_next')
                 .setEmoji('➡️')

@@ -100,23 +100,17 @@ export const command: Command = {
                         limit
                     );
 
+                    const subscription = client.musicManager.getSubscription(interaction);
+                    const queue = subscription.queue;
+
                     let addedText = '';
                     if (result instanceof Track) {
                         if (skip) {
-                            addedText =
-                                '`🔺 Track is playing now [' +
-                                (client.musicManager.queues.get(interaction.guildId!)!.length - 1) +
-                                ' in queue]`';
+                            addedText = '`🔺 Track is playing now [' + (queue.length - 1) + ' in queue]`';
                         } else if (next) {
-                            addedText =
-                                '`🔺 Track is next in queue [' +
-                                client.musicManager.queues.get(interaction.guildId!)!.length +
-                                ' in queue]`';
+                            addedText = '`🔺 Track is next in queue [' + queue.length + ' in queue]`';
                         } else {
-                            addedText =
-                                '`🔺 Track was added [' +
-                                client.musicManager.queues.get(interaction.guildId!)!.length +
-                                ' in queue]`';
+                            addedText = '`🔺 Track was added [' + queue.length + ' in queue]`';
                         }
                         await safeReply(
                             client,
@@ -144,20 +138,11 @@ export const command: Command = {
                     } else {
                         // Playlist
                         if (skip) {
-                            addedText =
-                                '`🔺 Playlist added and is playing now [' +
-                                (client.musicManager.queues.get(interaction.guildId!)!.length - 1) +
-                                ' in queue]`';
+                            addedText = '`🔺 Playlist added and is playing now [' + (queue.length - 1) + ' in queue]`';
                         } else if (next) {
-                            addedText =
-                                '`🔺 Playlist is next in queue [' +
-                                client.musicManager.queues.get(interaction.guildId!)!.length +
-                                ' in queue]`';
+                            addedText = '`🔺 Playlist is next in queue [' + queue.length + ' in queue]`';
                         } else {
-                            addedText =
-                                '`🔺 Playlist was added [' +
-                                client.musicManager.queues.get(interaction.guildId!)!.length +
-                                ' in queue]`';
+                            addedText = '`🔺 Playlist was added [' + queue.length + ' in queue]`';
                         }
                         await safeReply(
                             client,
@@ -195,7 +180,6 @@ export const command: Command = {
                         );
                     }
 
-                    let subscription = client.musicManager.getSubscription(interaction, false);
                     if (!subscription.lastChannel || subscription.lastChannel?.id != interaction.channel?.id) {
                         subscription.lastChannel = <GuildTextBasedChannel>interaction.channel;
                         await safeReply(

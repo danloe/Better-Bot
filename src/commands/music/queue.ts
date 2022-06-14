@@ -19,8 +19,8 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction) {
                 try {
-                    const queue = client.musicManager.getQueue(interaction);
-                    const subscription = client.musicManager.getSubscription(interaction, false);
+                    const subscription = client.musicManager.getSubscription(interaction);
+                    const queue = subscription.queue;
 
                     if (queue.length === 0) {
                         await safeReply(client, interaction, createErrorEmbed('🔺 The queue is empty', true));

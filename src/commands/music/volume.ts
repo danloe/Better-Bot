@@ -23,7 +23,7 @@ export const command: Command = {
                     let input =
                         interaction instanceof CommandInteraction ? interaction.options.getInteger('set') : null;
 
-                    const subscription = client.musicManager.getSubscription(interaction, false);
+                    const subscription = client.musicManager.getSubscription(interaction);
 
                     if (input) {
                         let vol = input / 100;

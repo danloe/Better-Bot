@@ -21,7 +21,7 @@ export const command: Command = {
                         await safeReply(
                             client,
                             interaction,
-                            createEmbed('Shuffled', '`🔺 The Queue is no longer in OOOORDER.`', true)
+                            createEmbed('Shuffled', '`🔺 The queue is no longer in OOOORDER.`', true)
                         );
                     }
 

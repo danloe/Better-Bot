@@ -2,8 +2,6 @@ import { Command } from '../../interfaces';
 import {
     ButtonInteraction,
     CommandInteraction,
-    GuildTextBasedChannel,
-    Interaction,
     Message,
     MessageActionRow,
     MessageButton,
@@ -27,8 +25,8 @@ import { command as skip } from './skip';
 import { command as repeat } from './repeat';
 import { command as queueCommand } from './queue';
 import { MusicSubscription } from '../../classes';
-import { AudioPlayerStatus } from '@discordjs/voice';
 import { APIMessage } from 'discord-api-types/v10';
+import { AudioPlayerStatus } from '@discordjs/voice';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -54,7 +52,7 @@ export const command: Command = {
                             ? interaction.options.getChannel('channel')
                             : undefined;
 
-                    const subscription = client.musicManager.getSubscription(interaction, false);
+                    const subscription = client.musicManager.getSubscription(interaction);
 
                     let msgText = '';
 
@@ -77,7 +75,7 @@ export const command: Command = {
                             await safeReply(
                                 client,
                                 interaction,
-                                createEmbed('Now Playing Message', '🔺 There is nothing being played', true),
+                                createEmbed('Error', '🔺 There is nothing being played', true),
                                 true
                             );
                         } else {
@@ -257,7 +255,7 @@ export function getNowPlayingMessage(subscription: MusicSubscription): [message:
     }
 
     if (subscription.queue.length > 0) {
-        embedmsg.addField('\u200B', '**Next:**');
+        embedmsg.addField('\u200B', '🔺 **Next:**');
 
         for (let i = 0; i < 2; i++) {
             if (i + 1 > subscription.queue.length) break;

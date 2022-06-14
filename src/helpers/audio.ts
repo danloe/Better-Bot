@@ -410,7 +410,7 @@ export function getSpotifyAlbumOrPlaylistTracks(
             responseTracks.shift();
 
             // Load other tracks in background
-            const queue = client.musicManager.getQueue(interaction);
+            const queue = client.musicManager.getSubscription(interaction).queue;
             loadAndQueueAsync(client, interaction, playlist, queue, responseTracks, announce, next);
 
             resolve([playlist, tracks]);

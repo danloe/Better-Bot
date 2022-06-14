@@ -11,7 +11,12 @@ export function getYouTubeSuggestions(query: string) {
                 rawData += chunk;
             });
             res.on('end', () => {
-                const parsedData = JSON.parse(rawData);
+                let parsedData: any;
+                try {
+                    parsedData = JSON.parse(rawData);
+                } catch (error) {
+                    resolve('»No results found«');
+                }
                 resolve(parsedData[1]);
             });
         }).on('error', function (e) {
