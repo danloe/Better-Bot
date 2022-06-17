@@ -1,0 +1,6 @@
+node_modules
+dist
+.env
+app.yaml
+.gcloudignore
+logs.txt
