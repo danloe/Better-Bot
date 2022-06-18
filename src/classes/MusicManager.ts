@@ -87,7 +87,8 @@ export class MusicManager {
                             shuffle,
                             skip || next,
                             offset,
-                            limit
+                            limit,
+                            interaction
                         );
                         break;
 
@@ -102,7 +103,8 @@ export class MusicManager {
                             shuffle,
                             skip || next,
                             offset,
-                            limit
+                            limit,
+                            interaction
                         );
                         break;
 

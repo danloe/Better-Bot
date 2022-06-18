@@ -7,8 +7,10 @@ export interface Config {
     activityName: string;
     activityType: string;
     status: string;
+    errorEmbedMessage: string;
     defaultVolume: number;
     voiceVolumeMultiplier: number;
+    gameLobbyInteractionTimeout: number;
     ticTacToe_thumbnail: string;
     ticTacToe_charField: string;
     ticTacToe_charX: string;
@@ -19,4 +21,16 @@ export interface Config {
     fourWins_charYellow: string;
     trivia_thumbnail: string;
     findTheEmoji_thumbnail: string;
+    trackDescriptionLengthLimit: number;
+    nowPlayingTrackBarSize: number;
+    loadingBarSize: number;
+    postAnnouncementChance: number;
+    announcements: string[];
+    postAnnouncements: string[];
+    youTubeGeneratedLists: YouTubePlaylist[];
+}
+
+interface YouTubePlaylist {
+    name: string;
+    id: string;
 }

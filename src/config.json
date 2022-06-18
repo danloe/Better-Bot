@@ -7,8 +7,10 @@
     "activityName": "🦄",
     "activityType": "WATCHING",
     "status": "dnd",
+    "errorEmbedMessage": "Error",
     "defaultVolume": 1.0,
     "voiceVolumeMultiplier": 2.0,
+    "gameLobbyInteractionTimeout": 60,
     "ticTacToe_thumbnail": "https://www.dropbox.com/s/fkqrplz0duuqto9/ttt.png?dl=1",
     "ticTacToe_charField": "🔳",
     "ticTacToe_charX": "❌",
@@ -18,5 +20,70 @@
     "fourWins_charRed": "🔴",
     "fourWins_charYellow": "🟡",
     "trivia_thumbnail": "https://opentdb.com/images/logo-banner.png",
-    "findTheEmoji_thumbnail": "https://www.dropbox.com/s/4z3kjx5pe2kbdlw/fte.jpg?dl=1"
+    "findTheEmoji_thumbnail": "https://www.dropbox.com/s/4z3kjx5pe2kbdlw/fte.jpg?dl=1",
+    "trackDescriptionLengthLimit": 500,
+    "nowPlayingTrackBarSize": 20,
+    "loadingBarSize": 20,
+    "postAnnouncementChance": 0.4,
+    "announcements": [
+        "Next track is ",
+        "Next up, ",
+        "Now playing, ",
+        "Coming up next is ",
+        "Listen closely to ",
+        "Now coming, ",
+        "Shut up, here is ",
+        "Stop talking, this is ",
+        "Hey Listen",
+        "Rythm's not up, let me give you a hug. ",
+        "Rythm's gone, my time has come. ",
+        "Alright, Rythms lazy, listen to me baby. ",
+        "Rythm's not doing shit, let me play this hit. ",
+        "Hey Listen",
+        "Rhytm who? Nothing that I can't do! ",
+        "I don't wanna anounce this, I do it anyways. "
+    ],
+    "postAnnouncements": [
+        ", listen closely.",
+        ", don't laugh.",
+        ", I love that.",
+        ", oh god not again.",
+        ", groovy!",
+        ", why do you do this?",
+        ", that's my jam!"
+    ],
+    "youTubeGeneratedLists": [
+        {
+            "name": "The Hit List",
+            "id": "RDCLAK5uy_mkLtojKLOUUGwnu3ZnN5AaODijlieB-aQ"
+        },
+        {
+            "name": "RELEASED",
+            "id": "RDCLAK5uy_lx_HcGQ3dqhBbBk3aaZPWoy2trdcdhfio"
+        },
+        {
+            "name": "I Feel House",
+            "id": "RDCLAK5uy_kLwgLlrxA4-_EchctXgTyHR4rwRaRv1wk"
+        },
+        {
+            "name": "Pop Fresh",
+            "id": "RDCLAK5uy_nOwL35BM_GUTEbdbw_9FmvQhPWWdd3sAg"
+        },
+        {
+            "name": "SAY NO MORE.",
+            "id": "RDCLAK5uy_lMXERBY0Uw6-9ZW1DVmMu8cicbwkkg15Q"
+        },
+        {
+            "name": "Alt-Frequencies",
+            "id": "RDCLAK5uy_k0KkqT3D_36qFNHE9rq_Iz8VT-ZV7Jt0o"
+        },
+        {
+            "name": "Hits Remixed",
+            "id": "RDCLAK5uy_l2zLaMIWOqWSePvTSmt49GcuR8460ZR10"
+        },
+        {
+            "name": "Luxe Life",
+            "id": "RDCLAK5uy_kumKEaPpcfaAOpnEdpjtp4jyLoiqZdRnU"
+        }
+    ]
 }

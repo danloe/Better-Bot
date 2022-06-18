@@ -21,6 +21,9 @@ class BotterinoClient extends Client {
         this.login(process.env.BOT_TOKEN);
         //connect(process.env.MONGODB_URI);
 
+        // config to global
+        global.config = this.config;
+
         // Commands
         const commandPath = path.join(__dirname, '..', 'commands');
         readdirSync(commandPath).forEach((dir) => {

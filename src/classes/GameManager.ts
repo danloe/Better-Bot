@@ -45,10 +45,14 @@ export class GameManager {
         });
     }
 
-    destroyLobby(host: User) {
+    destroyLobby(host: User, gameLobby: GameLobby) {
         let lobby = this.games.get(host.id);
-        this.client.logger.info(`[${lobby!.name}: ${host.username}] lobby destroyed`);
-        this.games.delete(host.id);
+        if (lobby) {
+            if (lobby.id == gameLobby.id) {
+                this.client.logger.info(`[${lobby!.name}: ${host.username}] lobby destroyed`);
+                this.games.delete(host.id);
+            }
+        }
     }
 }
 

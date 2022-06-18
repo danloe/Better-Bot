@@ -12,18 +12,20 @@ import EventEmitter from 'node:events';
 import BotterinoClient from '../client';
 
 export class GameLobby extends EventEmitter {
-    public client: BotterinoClient;
-    public game: GameType;
-    public host: User;
-    public players: User[] = [];
-    public channel: TextBasedChannel;
-    public state: GameState = GameState.Waiting;
-    public minPlayers = 1;
-    public maxPlayers = 1;
-    public winners: User[] = [];
-    public interactionTimeout = 60_000;
+    public readonly id: string;
+    public readonly client: BotterinoClient;
+    public readonly game: GameType;
+    public readonly host: User;
+    public readonly channel: TextBasedChannel;
+    public readonly minPlayers: number;
+    public readonly maxPlayers: number;
+    public readonly interactionTimeout: number;
+
     public name = '';
     public thumbnail = '';
+    public state: GameState = GameState.Waiting;
+    public players: User[] = [];
+    public winners: User[] = [];
 
     public constructor(
         client: BotterinoClient,
@@ -32,10 +34,11 @@ export class GameLobby extends EventEmitter {
         channel: TextBasedChannel,
         minPlayers: number,
         maxPlayers: number,
-        interactionTimeout: number = 60_000
+        interactionTimeout: number = global.config.gameLobbyInteractionTimeout * 1000 || 60_000
     ) {
         super();
 
+        this.id = host.id + String(new Date().getTime());
         this.client = client;
         this.game = game;
         this.host = host;

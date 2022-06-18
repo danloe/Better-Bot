@@ -31,7 +31,12 @@ export function createEmbed(
 
 export function createErrorEmbed(message: string, ephemeral: boolean = true) {
     return {
-        embeds: [new MessageEmbed().setColor('#951020').setTitle('Error').setDescription(message)],
+        embeds: [
+            new MessageEmbed()
+                .setColor('#951020')
+                .setTitle(global.config.errorEmbedMessage || 'Error')
+                .setDescription(message)
+        ],
         ephemeral: ephemeral
     };
 }
@@ -125,7 +130,7 @@ export function secondsToDurationString(seconds: number): string {
     var hrs = Math.floor(seconds / 3600);
     var mins = Math.floor((seconds - hrs * 3600) / 60);
     var secs = seconds - hrs * 3600 - mins * 60;
-    var hs, ms, ss: string;
+    var hs: string, ms: string, ss: string;
     if (hrs < 10) {
         hs = '0' + String(hrs);
     } else {
@@ -150,7 +155,7 @@ export function secondsToDurationString(seconds: number): string {
 export function secondsToColonsString(seconds: number): string {
     var mins = Math.floor(seconds / 60);
     var secs = seconds - mins * 60;
-    var ms, ss: string;
+    var ms: string, ss: string;
     if (mins < 10) {
         ms = '0' + String(mins);
     } else {
@@ -164,8 +169,9 @@ export function secondsToColonsString(seconds: number): string {
     return ms + ':' + ss;
 }
 
-export function checkEmbedString(string: string, limit: number = 300): string {
+export function checkEmbedString(string: string, limit: number = 500): string {
     try {
+        limit = global.config.trackDescriptionLengthLimit || limit;
         if (string == null || string == undefined || string == '') return 'Unknown';
         if (string == 'null') return 'No description.';
         if (string.length > limit) {
@@ -178,43 +184,14 @@ export function checkEmbedString(string: string, limit: number = 300): string {
     }
 }
 
-const announcements = [
-    'Next track is ',
-    'Next up, ',
-    'Now playing, ',
-    'Coming up next is ',
-    'Listen closely to ',
-    'Now coming, ',
-    'Shut up, here is ',
-    'Stop talking, this is ',
-    'Hey Listen',
-    "Rythm's not up, let me give you a hug. ",
-    "Rythm's gone, my time has come. ",
-    'Alright, Rythms lazy, listen to me baby. ',
-    "Rythm's not doing shit, let me play this hit. ",
-    'Hey Listen',
-    "Rhytm who? Nothing that I can't do! ",
-    "I don't wanna anounce this, I do it anyways. "
-];
-
-const postAnnouncements = [
-    ', listen closely.',
-    ", don't laugh.",
-    ', I love that.',
-    ', oh god not again.',
-    ', groovy!',
-    ', why do you do this?',
-    ", that's my jam!"
-];
-
 export function getAnnouncementString(trackName: string): string {
     let i = 0;
-    if (Math.random() > 0.4) {
-        i = Math.floor(Math.random() * announcements.length);
-        return announcements[i] + trackName;
+    if (Math.random() > global.config.postAnnouncementChance || 0.4) {
+        i = Math.floor(Math.random() * global.config.announcements.length);
+        return global.config.announcements[i] + trackName;
     } else {
-        i = Math.floor(Math.random() * postAnnouncements.length);
-        return trackName + postAnnouncements[i];
+        i = Math.floor(Math.random() * global.config.postAnnouncements.length);
+        return trackName + global.config.postAnnouncements[i];
     }
 }
 
@@ -230,6 +207,7 @@ export async function getLogoUrlfromUrl(client: BotterinoClient, url: string): P
 }
 
 export function getLoadingString(actual: number, total: number, style = 0, size = 20): string {
+    size = global.config.loadingBarSize || size;
     let p = Math.floor((actual / total) * 100);
     let bars = ['⣀⣄⣤⣦⣶⣷⣿', '▁▂▃▄▅▆▇█'];
     var full: number,
@@ -254,6 +232,7 @@ export function getLoadingString(actual: number, total: number, style = 0, size 
 }
 
 export function getTrackBarString(actual: number, total: number, size = 20) {
+    size = global.config.nowPlayingTrackBarSize || size;
     let percentPlayed = actual / total;
     let barPercent = Math.floor(percentPlayed * size);
     //|■■■■■▣□□□□□|

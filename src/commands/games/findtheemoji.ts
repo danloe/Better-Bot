@@ -98,7 +98,7 @@ export const command: Command = {
                                     await button.deferUpdate();
                                     if (button.customId === 'join_cancel') {
                                         let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
-                                        client.gameManager.destroyLobby(interaction.user);
+                                        client.gameManager.destroyLobby(interaction.user, game);
                                         await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                     } else {
                                         game.join(button.user);
@@ -110,7 +110,8 @@ export const command: Command = {
                                         game.join(button.user);
                                         collector.stop();
                                     } else if (button.customId === 'join_cancel') {
-                                        await safeReply(client, 
+                                        await safeReply(
+                                            client,
                                             button,
                                             createErrorEmbed('`⛔ Only the host can cancel the game.`', true)
                                         );
@@ -128,7 +129,7 @@ export const command: Command = {
                                     (game.state === GameState.Waiting || game.state === GameState.Ready)
                                 ) {
                                     let embedmsg = game.getLobbyMessageEmbed('`The game lobby timed out.`');
-                                    client.gameManager.destroyLobby(interaction.user);
+                                    client.gameManager.destroyLobby(interaction.user, game);
                                     await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                 }
                             } catch (err: any) {
@@ -160,7 +161,7 @@ export const command: Command = {
                                         game.start();
                                     } else if (button.customId === 'ready_cancel') {
                                         let embedmsg = game.getLobbyMessageEmbed('`The game was canceled.`');
-                                        client.gameManager.destroyLobby(interaction.user);
+                                        client.gameManager.destroyLobby(interaction.user, game);
                                         await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                     } else {
                                         game.join(button.user);
@@ -173,7 +174,8 @@ export const command: Command = {
                                             game.join(button.user);
                                             collector.stop();
                                         } else {
-                                            await safeReply(client, 
+                                            await safeReply(
+                                                client,
                                                 button,
                                                 createErrorEmbed(
                                                     '`⛔ Only the host can cancel or start the game.`',
@@ -197,7 +199,7 @@ export const command: Command = {
                                     (game.state === GameState.Waiting || game.state === GameState.Ready)
                                 ) {
                                     let embedmsg = game.getLobbyMessageEmbed('`The game lobby timed out.`');
-                                    client.gameManager.destroyLobby(interaction.user);
+                                    client.gameManager.destroyLobby(interaction.user, game);
                                     await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                 }
                             } catch (err: any) {
@@ -231,7 +233,8 @@ export const command: Command = {
                                 } else {
                                     try {
                                         if (game.answerGiven.includes(button.user)) {
-                                            await safeReply(client, 
+                                            await safeReply(
+                                                client,
                                                 button,
                                                 createErrorEmbed(
                                                     "`💤 You're out of tries. Wait for your opponents.`",
@@ -239,7 +242,8 @@ export const command: Command = {
                                                 )
                                             );
                                         } else {
-                                            await safeReply(client, 
+                                            await safeReply(
+                                                client,
                                                 button,
                                                 createErrorEmbed("`⛔ These buttons aren't for you.`", true)
                                             );
@@ -285,7 +289,7 @@ export const command: Command = {
                         //             collector.stop();
                         //         } else {
                         //             try {
-                        //                 await safeReply(client, 
+                        //                 await safeReply(client,
                         //                     button,
                         //                     createErrorEmbed('`⛔ Only the host can cancel the game.`', true)
                         //                 );
@@ -312,7 +316,7 @@ export const command: Command = {
                     // GAME OVER
                     lobby.on('end', async (game: FindTheEmojiGame) => {
                         const gameMessage = game.getGameOverMessage();
-                        client.gameManager.destroyLobby(interaction.user);
+                        client.gameManager.destroyLobby(interaction.user, game);
                         await safeReply(client, interaction, gameMessage);
                     });
 
@@ -320,7 +324,8 @@ export const command: Command = {
                     lobby.open();
                     done();
                 } catch (err: any) {
-                    await safeReply(client, 
+                    await safeReply(
+                        client,
                         interaction,
                         createErrorEmbed('🚩 Error creating a Find The Emoji game: `' + err + '`', true)
                     );
