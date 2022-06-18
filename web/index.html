@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <meta charset="UTF-8" />
+    <meta name="google" content="notranslate" />
+    <meta http-equiv="Content-Language" content="en" />
+    <head>
+        <title>Botterino</title>
+        <link rel="stylesheet" href="/styles.css" />
+    </head>
+    <body>
+        <div class="bg"></div>
+        <div id="stars"></div>
+        <div id="stars2"></div>
+        <div id="stars3"></div>
+        <div id="botterino">
+            <img
+                src="https://images.weserv.nl/?url=https://unsplash.com/photos/N2zxMUDwT4I/download?ixid=MnwxMjA3fDB8MXxhbGx8N3x8fHx8fDJ8fDE2NTMyNzQzOTk&force=true&w=640?v=4&fit=cover&mask=circle&maxage=7d&con=-15&mod=1.2"
+                alt="Botterino"
+            />
+        </div>
+        <div id="morphcontainer">
+            <span id="text1"></span>
+            <span id="text2"></span>
+        </div>
+        <svg id="filters">
+            <defs>
+                <filter id="threshold">
+                    <feColorMatrix
+                        in="SourceGraphic"
+                        type="matrix"
+                        values="1 0 0 0 0
+									0 1 0 0 0
+									0 0 1 0 0
+									0 0 0 255 -140"
+                    />
+                </filter>
+            </defs>
+        </svg>
+        <script>
+            const texts = ['Botterino', 'is', 'online.', ''];
+        </script>
+        <script src="/morphText.js"></script>
+    </body>
+</html>
