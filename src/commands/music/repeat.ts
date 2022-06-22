@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BotterinoClient from '../../client';
-import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
+import { createEmbed, createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -34,7 +34,11 @@ export const command: Command = {
                         message = '`🔺 Is turned ' + (status ? 'on`' : 'off`');
                     }
 
-                    await safeReply(client, interaction, createEmbed('Repeat', message, true));
+                    if (interaction instanceof CommandInteraction) {
+                        await safeReply(client, interaction, createEmbed('Repeat', message, true));
+                    } else {
+                        await safeDeferReply(client, interaction);
+                    }
 
                     done();
                 } catch (err) {

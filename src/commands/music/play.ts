@@ -90,6 +90,24 @@ export const command: Command = {
                     if (!limit) limit = Number.POSITIVE_INFINITY;
 
                     await safeDeferReply(client, interaction);
+
+                    const subscription = client.musicManager.getSubscription(interaction.guildId!);
+                    const queue = subscription.queue;
+
+                    if (!subscription.lastChannel || subscription.lastChannel?.id != interaction.channel?.id) {
+                        subscription.lastChannel = <GuildTextBasedChannel>interaction.channel;
+                        await safeReply(
+                            client,
+                            interaction,
+                            createEmbed(
+                                'Now Playing Message',
+                                '`🔺 The now playing message is now bound to #' + subscription.lastChannel.name + '`',
+                                true
+                            ),
+                            true
+                        );
+                    }
+
                     const result: Track | Playlist = await client.musicManager.play(
                         interaction.guildId!,
                         <GuildMember>interaction.member,
@@ -103,9 +121,6 @@ export const command: Command = {
                         limit,
                         <CommandInteraction>interaction
                     );
-
-                    const subscription = client.musicManager.getSubscription(interaction.guildId!);
-                    const queue = subscription.queue;
 
                     let addedText = '';
                     if (result instanceof Track) {
@@ -181,20 +196,6 @@ export const command: Command = {
                                     iconURL: interaction.user.avatarURL() || undefined
                                 }
                             )
-                        );
-                    }
-
-                    if (!subscription.lastChannel || subscription.lastChannel?.id != interaction.channel?.id) {
-                        subscription.lastChannel = <GuildTextBasedChannel>interaction.channel;
-                        await safeReply(
-                            client,
-                            interaction,
-                            createEmbed(
-                                'Now Playing Message',
-                                '`🔺 The now playing message is now bound to #' + subscription.lastChannel.name + '`',
-                                true
-                            ),
-                            true
                         );
                     }
 

@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, GuildMember, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BotterinoClient from '../../client';
-import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
+import { createEmbed, createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -23,16 +23,24 @@ export const command: Command = {
                 if (!input) input = 0;
 
                 try {
-                    const subscription = await client.musicManager.skip(interaction.guildId!, <GuildMember>interaction.member, input);
+                    const subscription = await client.musicManager.skip(
+                        interaction.guildId!,
+                        <GuildMember>interaction.member,
+                        input
+                    );
                     let msg = '';
                     if (subscription.queue.length == 0) {
                         msg = '`No more tracks in queue. Audio has stopped playing.`';
                     } else {
                         msg = '`🔺 ' + String(input) + (input == 1 ? ' track' : ' tracks') + ' skipped';
                         if (input == 0) msg = '`🔺 Skipped to the next track';
-                        msg = msg + ' [' + (subscription.queue.length) + ' more in queue]`';
+                        msg = msg + ' [' + subscription.queue.length + ' more in queue]`';
                     }
-                    await safeReply(client, interaction, createEmbed('Skipped', msg, true));
+                    if (interaction instanceof CommandInteraction) {
+                        await safeReply(client, interaction, createEmbed('Skipped', msg, true));
+                    } else {
+                        await safeDeferReply(client, interaction);
+                    }
 
                     done();
                 } catch (err) {

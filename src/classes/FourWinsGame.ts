@@ -23,10 +23,10 @@ export class FourWinsGame extends GameLobby {
     public constructor(client: BotterinoClient, host: User, channel: TextBasedChannel) {
         super(client, GameType.FourWins, host, channel, 2, 2);
         this.name = 'Four Wins';
-        this.thumbnail = client.config.fourWins_thumbnail;
-        this.charField = client.config.ticTacToe_charField;
-        this.charRed = client.config.fourWins_charRed;
-        this.charYellow = client.config.fourWins_charYellow;
+        this.thumbnail = client.config.games.fourWins_thumbnail;
+        this.charField = client.config.games.ticTacToe_charField;
+        this.charRed = client.config.games.fourWins_charRed;
+        this.charYellow = client.config.games.fourWins_charYellow;
 
         this.createGameField();
         this.state = GameState.Waiting;

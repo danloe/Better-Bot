@@ -22,17 +22,19 @@ import { command as stop } from './stop';
 import { command as pause } from './pause';
 import { command as resume } from './resume';
 import { command as skip } from './skip';
+import { command as shuffle } from './shuffle';
 import { command as repeat } from './repeat';
 import { command as queueCommand } from './queue';
-import { MusicSubscription } from '../../classes';
+import { MusicSubscription, PlayerStatus } from '../../classes';
 import { APIMessage } from 'discord-api-types/v10';
-import { AudioPlayerStatus } from '@discordjs/voice';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
         .setName('np')
-        .setDescription('Enable/Disable now playing message when a song starts.')
-        .addBooleanOption((option) => option.setName('set').setDescription('Enable?').setRequired(false))
+        .setDescription('Shows the title currently being played.')
+        .addBooleanOption((option) =>
+            option.setName('set').setDescription('Enable Now Playing Message?').setRequired(false)
+        )
         .addChannelOption((option) =>
             option.setName('channel').setDescription('Bind message to a specific channel.').setRequired(false)
         ),
@@ -73,7 +75,11 @@ export const command: Command = {
                     if (input !== null || channel) {
                         await safeReply(client, interaction, createEmbed('Now Playing Message', msgText, true), true);
                     } else {
-                        if (!subscription.currentTrack && !subscription.audioResource && !subscription.isPlaying()) {
+                        if (
+                            !subscription.currentTrack &&
+                            !subscription.audioResource &&
+                            subscription.playerStatus != PlayerStatus.Playing
+                        ) {
                             await safeReply(
                                 client,
                                 interaction,
@@ -81,7 +87,7 @@ export const command: Command = {
                                 true
                             );
                         } else {
-                            startNowPlayingCollector(client, interaction, subscription);
+                            startNowPlayingCollector(client, subscription, interaction);
                         }
                     }
 
@@ -100,10 +106,10 @@ export const command: Command = {
 
 export async function startNowPlayingCollector(
     client: BotterinoClient,
-    message: Message | CommandInteraction | ButtonInteraction,
-    subscription: MusicSubscription
+    subscription: MusicSubscription,
+    interaction?: CommandInteraction | ButtonInteraction
 ) {
-    const collector = message.channel!.createMessageComponentCollector({
+    const collector = subscription.lastChannel!.createMessageComponentCollector({
         componentType: 'BUTTON',
         time: 60000
     });
@@ -115,30 +121,37 @@ export async function startNowPlayingCollector(
             switch (button.customId) {
                 case 'np_restart':
                     await restart.run(subscription.client, button);
-                    startNowPlayingCollector(client, subscription.lastNowPlayingMessage, subscription);
+                    startNowPlayingCollector(client, subscription);
                     break;
                 case 'np_stop':
                     await stop.run(subscription.client, button);
-                    startNowPlayingCollector(client, subscription.lastNowPlayingMessage, subscription);
+                    startNowPlayingCollector(client, subscription);
                     break;
                 case 'np_pauseresume':
-                    if (subscription.isPaused()) {
+                    if (
+                        subscription.playerStatus == PlayerStatus.Stopped ||
+                        subscription.playerStatus == PlayerStatus.Paused
+                    ) {
                         await resume.run(subscription.client, button);
                     } else {
                         await pause.run(subscription.client, button);
                     }
-                    startNowPlayingCollector(client, subscription.lastNowPlayingMessage, subscription);
+                    startNowPlayingCollector(client, subscription);
                     break;
                 case 'np_skip':
                     await skip.run(subscription.client, button);
                     break;
+                case 'np_shuffle':
+                    await shuffle.run(subscription.client, button);
+                    startNowPlayingCollector(client, subscription);
+                    break;
                 case 'np_repeat':
                     await repeat.run(subscription.client, button);
-                    startNowPlayingCollector(client, subscription.lastNowPlayingMessage, subscription);
+                    startNowPlayingCollector(client, subscription);
                     break;
                 case 'np_queue':
                     await queueCommand.run(subscription.client, button);
-                    startNowPlayingCollector(client, subscription.lastNowPlayingMessage, subscription);
+                    startNowPlayingCollector(client, subscription);
                     break;
             }
         } catch (err: any) {
@@ -149,51 +162,17 @@ export async function startNowPlayingCollector(
     collector.on('end', async (_, reason) => {
         if (reason === 'time') {
             try {
-                const [msgembed, row] = getNowPlayingMessage(subscription);
-                if (message instanceof Message) {
-                    let msg = await message.fetch().catch((_) => {
-                        return null;
-                    });
-                    if (msg !== null) {
-                        message.edit({
-                            embeds: [msgembed],
-                            components: []
-                        });
-                    } else if (subscription.lastNowPlayingMessage) {
-                        await subscription.lastNowPlayingMessage
-                            .fetch()
-                            .then((msg) => {
-                                msg.edit({
-                                    embeds: [msgembed],
-                                    components: []
-                                });
-                            })
-                            .catch((_) => {
-                                return null;
+                if (subscription.lastNowPlayingMessage) {
+                    const [msgembed, _] = getNowPlayingMessage(subscription);
+                    await subscription.lastNowPlayingMessage
+                        .fetch()
+                        .then((msg) => {
+                            msg.edit({
+                                embeds: [msgembed],
+                                components: []
                             });
-                    }
-                } else {
-                    let msg = await message.fetchReply().catch((_) => {
-                        return null;
-                    });
-                    if (msg !== null) {
-                        safeReply(client, message, {
-                            embeds: [msgembed],
-                            components: []
-                        });
-                    } else if (subscription.lastNowPlayingMessage) {
-                        await subscription.lastNowPlayingMessage
-                            .fetch()
-                            .then((msg) => {
-                                msg.edit({
-                                    embeds: [msgembed],
-                                    components: []
-                                });
-                            })
-                            .catch((_) => {
-                                return null;
-                            });
-                    }
+                        })
+                        .catch();
                 }
             } catch (err: any) {
                 client.logger.debug(err);
@@ -201,37 +180,33 @@ export async function startNowPlayingCollector(
         }
     });
 
-    const [msgembed, row] = getNowPlayingMessage(subscription);
+    const [msgembed, rows] = getNowPlayingMessage(subscription);
 
     let lastMessage!: Message | APIMessage;
-
-    if (message instanceof Message) {
-        let msg = await message?.channel?.messages?.fetch(message.id).catch((_) => {
-            return null;
-        });
-        if (msg !== null) {
+    await subscription.lastNowPlayingMessage
+        ?.fetch()
+        .then(async (msg) => {
             if (msg?.deletable) await msg.delete();
-        }
-        lastMessage = await subscription.lastChannel.send({
+        })
+        .catch();
+
+    if (interaction) {
+        lastMessage = <Message>await safeReply(client, interaction, {
             embeds: [msgembed],
-            components: [row]
+            components: [...rows]
         });
     } else {
-        let msg = await subscription.lastNowPlayingMessage?.fetch().catch((_) => {
-            return null;
-        });
-        if (msg !== null) {
-            if (msg?.deletable) await msg.delete();
-        }
-        lastMessage = <Message>await safeReply(client, message, {
+        lastMessage = await subscription.lastChannel.send({
             embeds: [msgembed],
-            components: [row]
+            components: [...rows]
         });
     }
     subscription.lastNowPlayingMessage = lastMessage;
 }
 
-export function getNowPlayingMessage(subscription: MusicSubscription): [message: MessageEmbed, row: MessageActionRow] {
+export function getNowPlayingMessage(
+    subscription: MusicSubscription
+): [message: MessageEmbed, rows: MessageActionRow[]] {
     let embedmsg = new MessageEmbed().setColor('#403075');
 
     if (subscription.currentTrack) {
@@ -278,19 +253,42 @@ export function getNowPlayingMessage(subscription: MusicSubscription): [message:
             );
         }
     }
-    const row = new MessageActionRow().addComponents([
+    const row1 = new MessageActionRow().addComponents([
         new MessageButton().setCustomId('np_restart').setEmoji('⏮️').setStyle('SECONDARY'),
         new MessageButton().setCustomId('np_stop').setEmoji('⏹️').setStyle('SECONDARY'),
         new MessageButton()
             .setCustomId('np_pauseresume')
-            .setEmoji(subscription.audioPlayer.state.status === AudioPlayerStatus.Paused ? '▶️' : '⏸️')
+            .setEmoji(
+                subscription.playerStatus == PlayerStatus.Stopped ||
+                    subscription.playerStatus == PlayerStatus.Paused ||
+                    subscription.playerStatus == PlayerStatus.Idle
+                    ? '▶️'
+                    : '⏸️'
+            )
             .setStyle('SECONDARY'),
-        new MessageButton().setCustomId('np_skip').setEmoji('⏭️').setStyle('SECONDARY'),
+        new MessageButton()
+            .setCustomId('np_skip')
+            .setEmoji('⏭️')
+            .setDisabled(!subscription.queue.hasTracks())
+            .setStyle('SECONDARY')
+    ]);
+
+    const row2 = new MessageActionRow().addComponents([
+        new MessageButton()
+            .setCustomId('np_queue')
+            .setEmoji('🔢')
+            .setStyle('SECONDARY')
+            .setDisabled(!subscription.queue.hasTracks()),
+        new MessageButton()
+            .setCustomId('np_shuffle')
+            .setEmoji('🔀')
+            .setStyle('SECONDARY')
+            .setDisabled(subscription.queue.length < 2),
         new MessageButton()
             .setCustomId('np_repeat')
             .setEmoji('🔂')
             .setStyle(subscription.repeat ? 'SUCCESS' : 'SECONDARY')
     ]);
 
-    return [embedmsg, row];
+    return [embedmsg, [row1, row2]];
 }

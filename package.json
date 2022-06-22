@@ -42,7 +42,6 @@
     "googlethis": "^1.2.9",
     "jsdom": "^19.0.0",
     "libsodium-wrappers": "^0.7.10",
-    "mongoose": "^6.3.4",
     "node-emoji": "^1.11.0",
     "node-fetch": "^2.6.7",
     "open-trivia-db": "^1.0.1",

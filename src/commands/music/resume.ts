@@ -15,13 +15,17 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction) {
                 try {
-                    await safeDeferReply(client, interaction);
                     await client.musicManager.resume(interaction.guildId!, <GuildMember>interaction.member);
-                    await safeReply(
-                        client,
-                        interaction,
-                        createEmbed('Resumed', '`🔺 The audio has been resumed.`', true)
-                    );
+
+                    if (interaction instanceof CommandInteraction) {
+                        await safeReply(
+                            client,
+                            interaction,
+                            createEmbed('Resumed', '`🔺 The audio has been resumed.`', true)
+                        );
+                    } else {
+                        safeDeferReply(client, interaction);
+                    }
 
                     done();
                 } catch (err) {

@@ -43,7 +43,7 @@ export class TriviaGame extends GameLobby {
     public constructor(client: BotterinoClient, host: User, channel: TextBasedChannel, maxPlayers: number) {
         super(client, GameType.Trivia, host, channel, 1, maxPlayers);
         this.name = 'Trivia';
-        this.thumbnail = client.config.trivia_thumbnail;
+        this.thumbnail = client.config.games.trivia_thumbnail;
     }
 
     async getQuestions(): Promise<Question[]> {

@@ -42,7 +42,7 @@ export const event: Event = {
                         } else if (String(focusedOption.value).trim() === '') {
                             // Nothing entered, suggest YouTube generated lists
                             let response: any = [];
-                            client.config.youTubeGeneratedLists?.forEach(({ name, id }) => {
+                            client.config.music.youTubeGeneratedLists?.forEach(({ name, id }) => {
                                 response.push({ name: name, value: 'https://youtube.com/playlist?list=' + id });
                             });
                             await interaction.respond(response);

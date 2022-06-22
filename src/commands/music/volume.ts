@@ -9,7 +9,7 @@ export const command: Command = {
         .setName('volume')
         .setDescription('Shows or sets the audio volume.')
         .addIntegerOption((option) =>
-            option.setName('set').setDescription('What percentage?').setMinValue(1).setMaxValue(300).setRequired(false)
+            option.setName('set').setDescription('What percentage?').setMinValue(1).setRequired(false)
         ),
     run: (
         client: BotterinoClient,
@@ -26,12 +26,19 @@ export const command: Command = {
                     const subscription = client.musicManager.getSubscription(interaction.guildId!);
 
                     if (input) {
-                        let vol = input / 100;
-                        subscription.volume = vol;
+                        let vol = Math.min(
+                            Math.max(Math.trunc(input), client.config.music.minVolume),
+                            client.config.music.maxVolume
+                        );
+                        subscription.volume = vol / 100;
                         await safeReply(
                             client,
                             interaction,
-                            createEmbed('Volume', '`🔺 The audio volume has been set to ' + String(input) + '%`', true)
+                            createEmbed(
+                                'Volume',
+                                '`🔺 The audio volume has been set to ' + String(vol) + '%`',
+                                true
+                            )
                         );
                     } else {
                         let vol = subscription.volume;

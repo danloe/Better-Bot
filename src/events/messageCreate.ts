@@ -7,19 +7,19 @@ import path from 'path';
 export const event: Event = {
     name: 'messageCreate',
     run: async (client: BotterinoClient, message: Message) => {
-        if (message.author.bot || !message.content.startsWith(client.config.prefix)) return;
+        if (message.author.bot || !message.content.startsWith(client.config.general.prefix)) return;
 
-        const args = message.content.slice(client.config.prefix.length).trim().split(/ +/g);
+        const args = message.content.slice(client.config.general.prefix.length).trim().split(/ +/g);
 
         const cmd = args.shift()?.toLowerCase();
         if (!cmd) return;
 
-        if (cmd === 'deploy' && message.author.id === client.config.hostUserId) {
+        if (cmd === 'deploy' && message.author.id === client.config.general.hostUserId) {
             await setCommands(message);
             return;
         }
 
-        if (cmd === 'clearcommands' && message.author.id === client.config.hostUserId) {
+        if (cmd === 'clearcommands' && message.author.id === client.config.general.hostUserId) {
             await clearCommands(message);
             return;
         }

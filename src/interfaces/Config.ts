@@ -1,15 +1,36 @@
 export interface Config {
+    general: GeneralSettings;
+    games: GamesSettings;
+    music: MusicSettings;
+}
+
+interface GeneralSettings {
     hostUserId: string;
-    debug: boolean;
-    verboseLogging: boolean;
-    disableWriteLog: boolean;
     prefix: string;
     activityName: string;
     activityType: string;
     status: string;
     errorEmbedMessage: string;
+    debug: boolean;
+    verboseLogging: boolean;
+    disableWriteLog: boolean;
+}
+
+interface MusicSettings {
     defaultVolume: number;
+    minVolume: number;
+    maxVolume: number;
     voiceVolumeMultiplier: number;
+    trackDescriptionLengthLimit: number;
+    nowPlayingTrackBarSize: number;
+    loadingBarSize: number;
+    postAnnouncementChance: number;
+    announcements: string[];
+    postAnnouncements: string[];
+    youTubeGeneratedLists: YouTubePlaylist[];
+}
+
+interface GamesSettings {
     gameLobbyInteractionTimeout: number;
     ticTacToe_thumbnail: string;
     ticTacToe_charField: string;
@@ -21,13 +42,6 @@ export interface Config {
     fourWins_charYellow: string;
     trivia_thumbnail: string;
     findTheEmoji_thumbnail: string;
-    trackDescriptionLengthLimit: number;
-    nowPlayingTrackBarSize: number;
-    loadingBarSize: number;
-    postAnnouncementChance: number;
-    announcements: string[];
-    postAnnouncements: string[];
-    youTubeGeneratedLists: YouTubePlaylist[];
 }
 
 interface YouTubePlaylist {

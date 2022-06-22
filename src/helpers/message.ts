@@ -34,7 +34,7 @@ export function createErrorEmbed(message: string, ephemeral: boolean = true) {
         embeds: [
             new MessageEmbed()
                 .setColor('#951020')
-                .setTitle(global.config.errorEmbedMessage || 'Error')
+                .setTitle(global.config.general.errorEmbedMessage || 'Error')
                 .setDescription(message)
         ],
         ephemeral: ephemeral
@@ -171,7 +171,7 @@ export function secondsToColonsString(seconds: number): string {
 
 export function checkEmbedString(string: string, limit: number = 500): string {
     try {
-        limit = global.config.trackDescriptionLengthLimit || limit;
+        limit = global.config.music.trackDescriptionLengthLimit || limit;
         if (string == null || string == undefined || string == '') return 'Unknown';
         if (string == 'null') return 'No description.';
         if (string.length > limit) {
@@ -186,12 +186,12 @@ export function checkEmbedString(string: string, limit: number = 500): string {
 
 export function getAnnouncementString(trackName: string): string {
     let i = 0;
-    if (Math.random() > global.config.postAnnouncementChance || 0.4) {
-        i = Math.floor(Math.random() * global.config.announcements.length);
-        return global.config.announcements[i] + trackName;
+    if (Math.random() > global.config.music.postAnnouncementChance || 0.4) {
+        i = Math.floor(Math.random() * global.config.music.announcements.length);
+        return global.config.music.announcements[i] + trackName;
     } else {
-        i = Math.floor(Math.random() * global.config.postAnnouncements.length);
-        return trackName + global.config.postAnnouncements[i];
+        i = Math.floor(Math.random() * global.config.music.postAnnouncements.length);
+        return trackName + global.config.music.postAnnouncements[i];
     }
 }
 
@@ -207,7 +207,7 @@ export async function getLogoUrlfromUrl(client: BotterinoClient, url: string): P
 }
 
 export function getLoadingString(actual: number, total: number, style = 0, size = 20): string {
-    size = global.config.loadingBarSize || size;
+    size = global.config.music.loadingBarSize || size;
     let p = Math.floor((actual / total) * 100);
     let bars = ['⣀⣄⣤⣦⣶⣷⣿', '▁▂▃▄▅▆▇█'];
     var full: number,
@@ -232,7 +232,7 @@ export function getLoadingString(actual: number, total: number, style = 0, size 
 }
 
 export function getTrackBarString(actual: number, total: number, size = 20) {
-    size = global.config.nowPlayingTrackBarSize || size;
+    size = global.config.music.nowPlayingTrackBarSize || size;
     let percentPlayed = actual / total;
     let barPercent = Math.floor(percentPlayed * size);
     //|■■■■■▣□□□□□|

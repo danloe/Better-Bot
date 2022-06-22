@@ -12,7 +12,7 @@ import {
 } from '../helpers';
 import { CommandInteraction, GuildMember, Snowflake } from 'discord.js';
 import BotterinoClient from '../client';
-import { MusicSubscription } from './MusicSubscription';
+import { MusicSubscription, PlayerStatus } from './MusicSubscription';
 import { Track, TrackType } from './Track';
 import { createAudioResource, entersState, StreamType, VoiceConnectionStatus } from '@discordjs/voice';
 import { Playlist } from '../interfaces';
@@ -274,8 +274,7 @@ export class MusicManager {
             try {
                 const subscription = this.getSubscription(guildId);
                 const queue = subscription.queue;
-
-                if (!queue.hasTracks() && !subscription.isPaused()) {
+                if (!queue.hasTracks() && subscription.playerStatus != PlayerStatus.Paused) {
                     error('Nothing to play.');
                     return;
                 }

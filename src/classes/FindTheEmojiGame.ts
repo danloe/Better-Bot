@@ -40,7 +40,7 @@ export class FindTheEmojiGame extends GameLobby {
     public constructor(client: BotterinoClient, host: User, channel: TextBasedChannel, maxPlayers: number) {
         super(client, GameType.FindTheEmoji, host, channel, 1, maxPlayers);
         this.name = 'Find The Emoji';
-        this.thumbnail = client.config.findTheEmoji_thumbnail;
+        this.thumbnail = client.config.games.findTheEmoji_thumbnail;
     }
 
     selectEmoji(player: User, index: number) {

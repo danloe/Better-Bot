@@ -2,7 +2,7 @@ import { Command } from '../../interfaces';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BotterinoClient from '../../client';
-import { createEmbed, createErrorEmbed, safeReply } from '../../helpers';
+import { createEmbed, createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('restart').setDescription('Restart the current track.'),
@@ -17,11 +17,15 @@ export const command: Command = {
                 try {
                     await client.musicManager.restart(interaction.guildId!);
 
-                    await safeReply(
-                        client,
-                        interaction,
-                        createEmbed('Restarted', '`🔺 The current track is now playing again.`', true)
-                    );
+                    if (interaction instanceof CommandInteraction) {
+                        await safeReply(
+                            client,
+                            interaction,
+                            createEmbed('Restarted', '`🔺 The current track is now playing again.`', true)
+                        );
+                    } else {
+                        await safeDeferReply(client, interaction);
+                    }
 
                     done();
                 } catch (err) {

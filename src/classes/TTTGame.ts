@@ -38,10 +38,10 @@ export class TTTGame extends GameLobby {
     public constructor(client: BotterinoClient, host: User, channel: TextBasedChannel) {
         super(client, GameType.TicTacToe, host, channel, 2, 2);
         this.name = 'Tic Tac Toe';
-        this.thumbnail = client.config.ticTacToe_thumbnail;
-        this.charField = client.config.ticTacToe_charField;
-        this.charX = client.config.ticTacToe_charX;
-        this.charO = client.config.ticTacToe_charO;
+        this.thumbnail = client.config.games.ticTacToe_thumbnail;
+        this.charField = client.config.games.ticTacToe_charField;
+        this.charX = client.config.games.ticTacToe_charX;
+        this.charO = client.config.games.ticTacToe_charO;
 
         this.createGameField();
         this.state = GameState.Waiting;

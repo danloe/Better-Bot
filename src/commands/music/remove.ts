@@ -32,7 +32,6 @@ export const command: Command = {
                         .map((item) => parseInt(item.trim(), 10))
                         .filter((item) => !isNaN(item));
 
-                    await safeDeferReply(client, interaction);
                     await client.musicManager.remove(interaction.guildId!, items);
                     await safeReply(
                         client,

@@ -33,6 +33,7 @@ export class MusicSubscription {
     public readonly voicePlayer!: AudioPlayer;
 
     public queue: Queue;
+    public playerStatus: PlayerStatus;
     public voiceConnection!: VoiceConnection;
     public currentTrack!: Track | undefined;
     public lastChannel!: GuildTextBasedChannel;
@@ -59,7 +60,8 @@ export class MusicSubscription {
     set volume(value: number) {
         this._volume = value;
         if (this.audioResource) this.audioResource.volume?.setVolume(value);
-        if (this.voiceResource) this.voiceResource.volume?.setVolume(value * this.client.config.voiceVolumeMultiplier);
+        if (this.voiceResource)
+            this.voiceResource.volume?.setVolume(value * this.client.config.music.voiceVolumeMultiplier);
     }
 
     get repeat(): boolean {
@@ -84,7 +86,8 @@ export class MusicSubscription {
         this.queue = new Queue();
         this.audioPlayer = createAudioPlayer();
         this.voicePlayer = createAudioPlayer();
-        this._volume = client.config.defaultVolume;
+        this._volume = client.config.music.defaultVolume / 100;
+        this.playerStatus = PlayerStatus.Idle;
     }
 
     public createVoiceConnection(channel: VoiceBasedChannel) {
@@ -135,6 +138,7 @@ export class MusicSubscription {
                      */
                     this.audioPlayer.pause();
                     this.voicePlayer.pause();
+                    this.playerStatus = PlayerStatus.Paused;
                 } else if (
                     !this.readyLock &&
                     (newState.status === VoiceConnectionStatus.Connecting ||
@@ -172,6 +176,7 @@ export class MusicSubscription {
                     if (this.autoplay && (this._repeat || this.restartTrack)) {
                         this.audioResource = await this.currentTrack!.createAudioResource();
                         this.audioPlayer.play(this.audioResource);
+                        this.playerStatus = PlayerStatus.Playing;
                     } else if (this.autoplay) {
                         this.processQueue();
                     }
@@ -206,6 +211,7 @@ export class MusicSubscription {
                 } else if (this.announcement) {
                     this.announcement = false;
                     this.audioPlayer.play(this.audioResource!);
+                    this.playerStatus = PlayerStatus.Playing;
                 }
             } else if (newState.status === AudioPlayerStatus.Playing) {
                 // If the Playing state has been entered, then a new track has started playback.
@@ -256,6 +262,7 @@ export class MusicSubscription {
     public stop() {
         this.autoplay = false;
         this.audioPlayer.stop();
+        this.playerStatus = PlayerStatus.Stopped;
         this.voiceConnection.disconnect();
     }
 
@@ -264,19 +271,22 @@ export class MusicSubscription {
      */
     public pause() {
         this.audioPlayer.pause();
+        this.playerStatus = PlayerStatus.Paused;
     }
 
     /**
      * Skips current audio playback.
      */
     public skip() {
-        if (this.isIdle()) {
+        if (this.playerStatus === PlayerStatus.Idle) {
             this.play();
-        } else if (this.isPaused()) {
+        } else if (this.playerStatus === PlayerStatus.Paused) {
             this.audioPlayer.unpause();
             this.audioPlayer.stop();
+            this.playerStatus = PlayerStatus.Stopped;
         } else {
             this.audioPlayer.stop();
+            this.playerStatus = PlayerStatus.Stopped;
         }
     }
 
@@ -284,7 +294,7 @@ export class MusicSubscription {
      * Plays audio.
      */
     public play() {
-        if (this.isPaused()) {
+        if (this.playerStatus === PlayerStatus.Paused) {
             this.audioPlayer.unpause();
         } else {
             this.pausedForVoice = false;
@@ -304,36 +314,16 @@ export class MusicSubscription {
      * Plays voice audio.
      */
     public playVoice(resource: AudioResource) {
-        if (this.isPlaying()) {
+        if (this.playerStatus === PlayerStatus.Playing) {
             this.pausedForVoice = true;
             this.voiceResource = resource;
             this.voiceResource.volume?.setVolume(this._volume * 1.5);
             this.audioPlayer.pause();
+            this.playerStatus = PlayerStatus.Paused;
         } else {
             this.voiceConnection.subscribe(this.voicePlayer!);
             this.voicePlayer.play(resource);
         }
-    }
-
-    /**
-     * Tells if the audioplayer is paused.
-     */
-    public isPaused(): boolean {
-        return this.audioPlayer?.state?.status == AudioPlayerStatus.Paused;
-    }
-
-    /**
-     * Tells if the audioplayer is idling.
-     */
-    public isIdle(): boolean {
-        return this.audioPlayer?.state?.status == AudioPlayerStatus.Idle;
-    }
-
-    /**
-     * Tells if the audioplayer is playing.
-     */
-    public isPlaying(): boolean {
-        return this.audioPlayer?.state?.status == AudioPlayerStatus.Playing;
     }
 
     /**
@@ -342,7 +332,11 @@ export class MusicSubscription {
     private async processQueue(): Promise<void> {
         try {
             // If the queue is locked (already being processed), is empty, or the audio player is already playing something, return
-            if (this.queueLock || this.audioPlayer.state.status !== AudioPlayerStatus.Idle) {
+            if (
+                this.queueLock ||
+                (this.audioPlayer.state.status !== AudioPlayerStatus.Idle &&
+                    this.audioPlayer.state.status !== AudioPlayerStatus.AutoPaused)
+            ) {
                 return;
             }
             // If the queue is empty, set current track to undefined and return
@@ -369,13 +363,14 @@ export class MusicSubscription {
                         inputType: StreamType.Arbitrary,
                         inlineVolume: true
                     });
-                    this.voiceResource.volume?.setVolume(this._volume * this.client.config.voiceVolumeMultiplier);
+                    this.voiceResource.volume?.setVolume(this._volume * this.client.config.music.voiceVolumeMultiplier);
 
                     this.voiceConnection.subscribe(this.voicePlayer!);
                     this.voicePlayer.play(this.voiceResource);
                     this.announcement = true;
                 } else {
                     this.audioPlayer.play(this.audioResource);
+                    this.playerStatus = PlayerStatus.Playing;
                 }
                 this.currentTrack = nextTrack;
                 this.showNowPlayingMessage();
@@ -393,13 +388,22 @@ export class MusicSubscription {
     private async showNowPlayingMessage() {
         if (this._displayNowPlayingMessage) {
             if (!this.lastNowPlayingMessage) {
-                const [msgembed, row] = getNowPlayingMessage(this);
-                this.lastNowPlayingMessage = await this.lastChannel.send({
-                    embeds: [msgembed],
-                    components: [row]
-                });
+                const [msgembed, rows] = getNowPlayingMessage(this);
+                this.lastNowPlayingMessage = await this.lastChannel
+                    .send({
+                        embeds: [msgembed],
+                        components: [...rows]
+                    })
+                    .catch();
             }
-            startNowPlayingCollector(this.client, this.lastNowPlayingMessage, this);
+            startNowPlayingCollector(this.client, this);
         }
     }
+}
+
+export enum PlayerStatus {
+    Idle,
+    Playing,
+    Paused,
+    Stopped
 }

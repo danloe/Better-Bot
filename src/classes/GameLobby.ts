@@ -34,7 +34,7 @@ export class GameLobby extends EventEmitter {
         channel: TextBasedChannel,
         minPlayers: number,
         maxPlayers: number,
-        interactionTimeout: number = global.config.gameLobbyInteractionTimeout * 1000 || 60_000
+        interactionTimeout: number = global.config.games.gameLobbyInteractionTimeout * 1000 || 60_000
     ) {
         super();
 

@@ -24,17 +24,17 @@ export class Logger {
     }
 
     info(message: string, ...args: any[]) {
-        if (this.client.config.debug || this.client.config.verboseLogging)
+        if (this.client.config.general.debug || this.client.config.general.verboseLogging)
             console.info(`${chalk.bgWhite.black('[INFO]')} ${this.getMessage(message)}`, ...args);
     }
 
     debug(message: string, ...args: any[]) {
-        if (this.client.config.debug)
+        if (this.client.config.general.debug)
             console.debug(`${chalk.bgCyanBright('[DEBUG]')} ${this.getMessage(message)}`, ...args);
     }
 
     trace(message: string, ...args: any[]) {
-        if (this.client.config.debug)
+        if (this.client.config.general.debug)
             console.trace(`${chalk.bgBlueBright('[TRACE]')} ${this.getMessage(message)}`, ...args);
     }
 
@@ -43,7 +43,7 @@ export class Logger {
     }
 
     private writeToFile(message: string) {
-        if(this.client.config.disableWriteLog) return;
+        if(this.client.config.general.disableWriteLog) return;
         return new Promise<void>((resolve, reject) => {
             const fs = require('fs');
             fs.appendFile('logs.txt', `[${new Date().toLocaleString()}] ${message}\n`, (err: any) => {

@@ -9,11 +9,11 @@ export const event: Event = {
         client.user!.setPresence({
             activities: [
                 {
-                    name: client.config.activityName,
-                    type: <ExcludeEnum<typeof ActivityTypes, 'CUSTOM'>>client.config.activityType
+                    name: client.config.general.activityName,
+                    type: <ExcludeEnum<typeof ActivityTypes, 'CUSTOM'>>client.config.general.activityType
                 }
             ],
-            status: <ClientPresenceStatus>client.config.status
+            status: <ClientPresenceStatus>client.config.general.status
         });
 
         client.logger.log(`${client.user!.tag} is ready.`);

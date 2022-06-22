@@ -15,13 +15,25 @@ export const command: Command = {
         new Promise<void>(async (done, error) => {
             if (interaction) {
                 try {
-                    await safeDeferReply(client, interaction);
                     await client.musicManager.clear(interaction.guildId!);
-                    await safeReply(client, interaction, createEmbed('Cleared', '`🔺 The Queue is now empty.`', true));
-                    
+
+                    if (interaction instanceof CommandInteraction) {
+                        await safeReply(
+                            client,
+                            interaction,
+                            createEmbed('Cleared', '`🔺 The Queue is now empty.`', true)
+                        );
+                    } else {
+                        await safeDeferReply(client, interaction);
+                    }
+
                     done();
                 } catch (err) {
-                    await safeReply(client, interaction, createErrorEmbed('🚩 Error clearing queue: `' + err + '`', true));
+                    await safeReply(
+                        client,
+                        interaction,
+                        createErrorEmbed('🚩 Error clearing queue: `' + err + '`', true)
+                    );
                     error(err);
                 }
             }
