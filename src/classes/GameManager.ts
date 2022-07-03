@@ -5,6 +5,7 @@ import { TTTGame } from './TTTGame';
 import { FourWinsGame } from './FourWinsGame';
 import { TriviaGame } from './TriviaGame';
 import { FindTheEmojiGame } from './FindTheEmojiGame';
+import { FastTyperGame } from './FastTyperGame';
 
 export class GameManager {
     client: BotterinoClient;
@@ -35,6 +36,9 @@ export class GameManager {
                     case GameType.FindTheEmoji:
                         lobby = new FindTheEmojiGame(this.client, host, interaction.channel!, maxPlayers);
                         break;
+                    case GameType.FastTyper:
+                        lobby = new FastTyperGame(this.client, host, interaction.channel!, maxPlayers);
+                        break;
                 }
                 this.games.set(host.id, lobby!);
                 this.client.logger.info(`[${lobby!.name}: ${host.username}] lobby created`);
@@ -60,5 +64,6 @@ export enum GameType {
     TicTacToe,
     FourWins,
     Trivia,
-    FindTheEmoji
+    FindTheEmoji,
+    FastTyper
 }

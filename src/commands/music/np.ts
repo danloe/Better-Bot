@@ -26,7 +26,6 @@ import { command as shuffle } from './shuffle';
 import { command as repeat } from './repeat';
 import { command as queueCommand } from './queue';
 import { MusicSubscription, PlayerStatus } from '../../classes';
-import { APIMessage } from 'discord-api-types/v10';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -96,7 +95,7 @@ export const command: Command = {
                     await safeReply(
                         client,
                         interaction,
-                        createErrorEmbed('🚩 Error setting the volume: `' + err + '`', true)
+                        createErrorEmbed('🚩 Error showing the now playing message: `' + err + '`', true)
                     );
                     error(err);
                 }
@@ -240,6 +239,7 @@ export function getNowPlayingMessage(
     subscription: MusicSubscription
 ): [message: MessageEmbed, rows: MessageActionRow[]] {
     let embedmsg = new MessageEmbed().setColor('#403075');
+    let rows = [];
 
     if (subscription.currentTrack) {
         embedmsg
@@ -247,80 +247,83 @@ export function getNowPlayingMessage(
             .setURL(subscription.currentTrack.displayUrl)
             .setThumbnail(subscription.currentTrack.artworkUrl)
             .setDescription('`is now playing, requested by ' + subscription.currentTrack.requestor + '`');
-    }
 
-    if (!isNaN(subscription.currentTrack?.duration!) && subscription.currentTrack?.duration! > 0) {
-        embedmsg.addField(
-            '\u200B',
-            '`' +
-                secondsToColonsString(Math.floor(subscription.audioResource.playbackDuration / 1000)) +
-                ' ' +
-                getTrackBarString(
-                    subscription.audioResource.playbackDuration / 1000,
-                    subscription.currentTrack!.duration!,
-                    20
-                ) +
-                ' ' +
-                secondsToColonsString(subscription.currentTrack!.duration!) +
-                '`'
-        );
-    } else if (subscription.audioResource?.playbackDuration > 0) {
-        embedmsg.addField(
-            '\u200B',
-            '`Track is running since: ' + String(subscription.audioResource.playbackDuration / 1000) + ' seconds`'
-        );
-    }
-
-    if (subscription.queue.length > 0) {
-        embedmsg.addField('\u200B', '🔺 **Next:**');
-
-        for (let i = 0; i < 2; i++) {
-            if (i + 1 > subscription.queue.length) break;
+        if (!isNaN(subscription.currentTrack?.duration!) && subscription.currentTrack?.duration! > 0) {
             embedmsg.addField(
-                i + 1 + ': `' + subscription.queue[i].title + '`',
-                subscription.queue[i].requestor +
-                    (subscription.queue[i].announce ? ' 📣' : '') +
-                    ' | ' +
-                    subscription.queue[i].displayUrl
+                '\u200B',
+                '`' +
+                    secondsToColonsString(Math.floor(subscription.audioResource.playbackDuration / 1000)) +
+                    ' ' +
+                    getTrackBarString(
+                        subscription.audioResource.playbackDuration / 1000,
+                        subscription.currentTrack!.duration!,
+                        20
+                    ) +
+                    ' ' +
+                    secondsToColonsString(subscription.currentTrack!.duration!) +
+                    '`'
+            );
+        } else if (subscription.audioResource?.playbackDuration > 0) {
+            embedmsg.addField(
+                '\u200B',
+                '`Track is running since: ' + String(subscription.audioResource.playbackDuration / 1000) + ' seconds`'
             );
         }
+
+        if (subscription.queue.length > 0) {
+            embedmsg.addField('\u200B', '🔺 **Next:**');
+
+            for (let i = 0; i < 2; i++) {
+                if (i + 1 > subscription.queue.length) break;
+                embedmsg.addField(
+                    i + 1 + ': `' + subscription.queue[i].title + '`',
+                    subscription.queue[i].requestor +
+                        (subscription.queue[i].announce ? ' 📣' : '') +
+                        ' | ' +
+                        subscription.queue[i].displayUrl
+                );
+            }
+        }
+        const row1 = new MessageActionRow().addComponents([
+            new MessageButton().setCustomId('np_restart').setEmoji('⏮️').setStyle('SECONDARY'),
+            new MessageButton().setCustomId('np_stop').setEmoji('⏹️').setStyle('SECONDARY'),
+            new MessageButton()
+                .setCustomId('np_pauseresume')
+                .setEmoji(
+                    subscription.playerStatus == PlayerStatus.Stopped ||
+                        subscription.playerStatus == PlayerStatus.Paused ||
+                        subscription.playerStatus == PlayerStatus.Idle
+                        ? '▶️'
+                        : '⏸️'
+                )
+                .setStyle('SECONDARY'),
+            new MessageButton()
+                .setCustomId('np_skip')
+                .setEmoji('⏭️')
+                .setDisabled(!subscription.queue.hasTracks())
+                .setStyle('SECONDARY')
+        ]);
+
+        const row2 = new MessageActionRow().addComponents([
+            new MessageButton()
+                .setCustomId('np_queue')
+                .setEmoji('🔢')
+                .setStyle('SECONDARY')
+                .setDisabled(!subscription.queue.hasTracks()),
+            new MessageButton()
+                .setCustomId('np_shuffle')
+                .setEmoji('🔀')
+                .setStyle('SECONDARY')
+                .setDisabled(subscription.queue.length < 2),
+            new MessageButton()
+                .setCustomId('np_repeat')
+                .setEmoji('🔂')
+                .setStyle(subscription.repeat ? 'SUCCESS' : 'SECONDARY')
+        ]);
+        rows = [row1, row2];
+    } else {
+        embedmsg.setTitle('Now Playing').setDescription('`🔺 Currently, no track is playing`');
     }
-    const row1 = new MessageActionRow().addComponents([
-        new MessageButton().setCustomId('np_restart').setEmoji('⏮️').setStyle('SECONDARY'),
-        new MessageButton().setCustomId('np_stop').setEmoji('⏹️').setStyle('SECONDARY'),
-        new MessageButton()
-            .setCustomId('np_pauseresume')
-            .setEmoji(
-                subscription.playerStatus == PlayerStatus.Stopped ||
-                    subscription.playerStatus == PlayerStatus.Paused ||
-                    subscription.playerStatus == PlayerStatus.Idle
-                    ? '▶️'
-                    : '⏸️'
-            )
-            .setStyle('SECONDARY'),
-        new MessageButton()
-            .setCustomId('np_skip')
-            .setEmoji('⏭️')
-            .setDisabled(!subscription.queue.hasTracks())
-            .setStyle('SECONDARY')
-    ]);
 
-    const row2 = new MessageActionRow().addComponents([
-        new MessageButton()
-            .setCustomId('np_queue')
-            .setEmoji('🔢')
-            .setStyle('SECONDARY')
-            .setDisabled(!subscription.queue.hasTracks()),
-        new MessageButton()
-            .setCustomId('np_shuffle')
-            .setEmoji('🔀')
-            .setStyle('SECONDARY')
-            .setDisabled(subscription.queue.length < 2),
-        new MessageButton()
-            .setCustomId('np_repeat')
-            .setEmoji('🔂')
-            .setStyle(subscription.repeat ? 'SUCCESS' : 'SECONDARY')
-    ]);
-
-    return [embedmsg, [row1, row2]];
+    return [embedmsg, rows];
 }

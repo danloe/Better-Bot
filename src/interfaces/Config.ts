@@ -43,6 +43,7 @@ interface GamesSettings {
     fourWins_charYellow: string;
     trivia_thumbnail: string;
     findTheEmoji_thumbnail: string;
+    fastTyper_thumbnail: string;
 }
 
 interface YouTubePlaylist {

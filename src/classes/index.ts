@@ -1,3 +1,4 @@
+export * from './FastTyperGame';
 export * from './FindTheEmojiGame';
 export * from './FourWinsGame';
 export * from './GameLobby';
