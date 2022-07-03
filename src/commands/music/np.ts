@@ -188,25 +188,51 @@ export async function startNowPlayingCollector(
 
     const [msgembed, rows] = getNowPlayingMessage(subscription);
 
-    let lastMessage!: Message | APIMessage;
-    await subscription.lastNowPlayingMessage
-        ?.fetch()
-        .then(async (msg) => {
-            if (msg?.deletable) await msg.delete();
-        })
-        .catch();
-
+    let lastMessage!: Message<boolean>;
     if (interaction) {
-        lastMessage = <Message>await safeReply(client, interaction, {
+        // when the command is issued from an interaction, delete the old message
+        await subscription.lastNowPlayingMessage
+            ?.fetch()
+            .then(async (msg) => {
+                if (msg?.deletable) await msg.delete();
+            })
+            .catch();
+
+        lastMessage = <Message<boolean>>await safeReply(client, interaction, {
             embeds: [msgembed],
             components: [...rows]
         });
     } else {
-        lastMessage = await subscription.lastChannel.send({
-            embeds: [msgembed],
-            components: [...rows]
-        });
+        // when the command is self triggered, just edit the old message
+        if (subscription.lastNowPlayingMessage) {
+            // check if lastNowPlayingMessage is latest message in text channel
+            const messages = await subscription.lastNowPlayingMessage.channel.messages.fetch({ limit: 1 });
+            if (messages) {
+                let latestMessage = messages.first();
+                if (latestMessage.id === subscription.lastNowPlayingMessage.id) {
+                    // if it is the last message in channel, edit it
+                    lastMessage = await subscription.lastNowPlayingMessage.edit({
+                        embeds: [msgembed],
+                        components: [...rows]
+                    });
+                } else {
+                    // delete old message first
+                    await subscription.lastNowPlayingMessage
+                        ?.fetch()
+                        .then(async (msg) => {
+                            if (msg?.deletable) await msg.delete();
+                        })
+                        .catch();
+                    // send new message
+                    lastMessage = await subscription.lastChannel!.send({
+                        embeds: [msgembed],
+                        components: [...rows]
+                    });
+                }
+            }
+        }
     }
+
     subscription.lastNowPlayingMessage = lastMessage;
 }
 

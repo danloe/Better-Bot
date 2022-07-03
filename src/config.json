@@ -29,7 +29,7 @@
         "maxVolume": 300,
         "voiceVolumeMultiplier": 1.8,
         "trackDescriptionLengthLimit": 300,
-        "nowPlayingMessageInteractionTimeout": 30,
+        "nowPlayingMessageInteractionTimeout": 12,
         "nowPlayingTrackBarSize": 20,
         "loadingBarSize": 20,
         "postAnnouncementChance": 0.4,

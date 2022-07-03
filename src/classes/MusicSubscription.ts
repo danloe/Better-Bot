@@ -19,7 +19,15 @@ import {
 import { promisify } from 'node:util';
 import { Track } from './Track';
 import { Queue } from './Queue';
-import { ButtonInteraction, CacheType, GuildTextBasedChannel, InteractionCollector, Message, Snowflake, VoiceBasedChannel } from 'discord.js';
+import {
+    ButtonInteraction,
+    CacheType,
+    GuildTextBasedChannel,
+    InteractionCollector,
+    Message,
+    Snowflake,
+    VoiceBasedChannel
+} from 'discord.js';
 import { getAnnouncementString, getVoiceStream } from '../helpers';
 import { getNowPlayingMessage, startNowPlayingCollector } from '../commands/music/np';
 import BotterinoClient from '../client';
@@ -297,6 +305,7 @@ export class MusicSubscription {
     public play() {
         if (this.playerStatus === PlayerStatus.Paused) {
             this.audioPlayer.unpause();
+            this.playerStatus = PlayerStatus.Playing;
         } else {
             this.pausedForVoice = false;
             this.processQueue();
