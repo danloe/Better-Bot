@@ -19,7 +19,7 @@ import {
 import { promisify } from 'node:util';
 import { Track } from './Track';
 import { Queue } from './Queue';
-import { GuildTextBasedChannel, Message, Snowflake, VoiceBasedChannel } from 'discord.js';
+import { ButtonInteraction, CacheType, GuildTextBasedChannel, InteractionCollector, Message, Snowflake, VoiceBasedChannel } from 'discord.js';
 import { getAnnouncementString, getVoiceStream } from '../helpers';
 import { getNowPlayingMessage, startNowPlayingCollector } from '../commands/music/np';
 import BotterinoClient from '../client';
@@ -40,6 +40,7 @@ export class MusicSubscription {
     public lastNowPlayingMessage!: Message;
     public audioResource!: AudioResource<Track>;
     public voiceResource!: AudioResource;
+    public npCollector!: InteractionCollector<ButtonInteraction<CacheType>>;
 
     private connectionTimeoutObj!: NodeJS.Timeout;
 

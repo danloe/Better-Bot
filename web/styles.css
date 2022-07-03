@@ -45,8 +45,6 @@ body {
     height: 80pt;
     top: 200px;
     bottom: 0;
-
-    /* This filter is a lot of the magic, try commenting it out to see how the morphing works! */
     filter: url(#threshold) blur(0.6px);
 }
 
@@ -57,8 +55,6 @@ body {
     height: 80pt;
     top: 0;
     bottom: 0;
-
-    /* This filter is a lot of the magic, try commenting it out to see how the morphing works! */
     filter: url(#threshold) blur(0.6px);
 }
 

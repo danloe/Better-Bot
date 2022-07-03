@@ -76,8 +76,8 @@ export const command: Command = {
                         await safeReply(client, interaction, createEmbed('Now Playing Message', msgText, true), true);
                     } else {
                         if (
-                            !subscription.currentTrack &&
-                            !subscription.audioResource &&
+                            !subscription.currentTrack ||
+                            !subscription.audioResource ||
                             subscription.playerStatus != PlayerStatus.Playing
                         ) {
                             await safeReply(
@@ -109,15 +109,17 @@ export async function startNowPlayingCollector(
     subscription: MusicSubscription,
     interaction?: CommandInteraction | ButtonInteraction
 ) {
-    const collector = subscription.lastChannel!.createMessageComponentCollector({
-        componentType: 'BUTTON',
-        time: 60000
-    });
+    if (!subscription.npCollector || subscription.npCollector?.ended) {
+        subscription.npCollector = subscription.lastChannel!.createMessageComponentCollector({
+            componentType: 'BUTTON',
+            time: client.config.music.nowPlayingMessageInteractionTimeout * 1000
+        });
+    }
 
-    collector.on('collect', async (button) => {
+    subscription.npCollector.on('collect', async (button) => {
         try {
             await safeDeferReply(client, button);
-            collector.stop();
+            subscription.npCollector.stop();
             switch (button.customId) {
                 case 'np_restart':
                     await restart.run(subscription.client, button);
@@ -159,20 +161,24 @@ export async function startNowPlayingCollector(
         }
     });
 
-    collector.on('end', async (_, reason) => {
+    subscription.npCollector.on('end', async (_, reason) => {
         if (reason === 'time') {
             try {
-                if (subscription.lastNowPlayingMessage) {
-                    const [msgembed, _] = getNowPlayingMessage(subscription);
-                    await subscription.lastNowPlayingMessage
-                        .fetch()
-                        .then((msg) => {
-                            msg.edit({
-                                embeds: [msgembed],
-                                components: []
-                            });
-                        })
-                        .catch();
+                if (subscription.playerStatus == PlayerStatus.Playing) {
+                    startNowPlayingCollector(client, subscription);
+                } else {
+                    if (subscription.lastNowPlayingMessage) {
+                        const [msgembed, _] = getNowPlayingMessage(subscription);
+                        await subscription.lastNowPlayingMessage
+                            .fetch()
+                            .then((msg) => {
+                                msg.edit({
+                                    embeds: [msgembed],
+                                    components: []
+                                });
+                            })
+                            .catch();
+                    }
                 }
             } catch (err: any) {
                 client.logger.debug(err);

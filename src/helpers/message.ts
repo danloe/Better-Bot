@@ -187,11 +187,11 @@ export function checkEmbedString(string: string, limit: number = 500): string {
 export function getAnnouncementString(trackName: string): string {
     let i = 0;
     if (Math.random() > global.config.music.postAnnouncementChance || 0.4) {
-        i = Math.floor(Math.random() * global.config.music.announcements.length);
-        return global.config.music.announcements[i] + trackName;
+        i = Math.floor(Math.random() * global.config.music.preTrackAnnouncements.length);
+        return global.config.music.preTrackAnnouncements[i] + trackName;
     } else {
-        i = Math.floor(Math.random() * global.config.music.postAnnouncements.length);
-        return trackName + global.config.music.postAnnouncements[i];
+        i = Math.floor(Math.random() * global.config.music.postTrackAnnouncements.length);
+        return trackName + global.config.music.postTrackAnnouncements[i];
     }
 }
 

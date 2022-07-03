@@ -1,3 +1,6 @@
+<!-- markdownlint-disable-file MD033 -->
+<!-- markdownlint-disable-file MD041 -->
+
 <div id="top"></div>
 
 <div align="center">
@@ -138,32 +141,38 @@ npm i -g npm@latest
 1. Clone this repo or download the [latest release](https://github.com/danloe/Botterino/releases/)
 
 2. Install the required npm packages
+
     > Run the following command in a terminal in the repo folder:
 
-```sh
-npm i
-```
+    ```sh
+    npm i
+    ```
 
 3. Create a file named `.env` in the root directory
+
     > Add the following lines:
 
-```sh
-BOT_TOKEN="YOURTOKEN"
-GOOGLE_API_KEY="YOURKEY"
-SPOTIFY_CLIENT_ID="YOURCLIENTID"
-SPOTIFY_CLIENT_SECRET="YOURCLIENTSECRET"
-```
+    ```sh
+    BOT_TOKEN="YOURTOKEN"
+    GOOGLE_API_KEY="YOURKEY"
+    SPOTIFY_CLIENT_ID="YOURCLIENTID"
+    SPOTIFY_CLIENT_SECRET="YOURCLIENTSECRET"
+    PORT=53134
+    ```
 
 4. Replace `YOURTOKEN` with your [Discord Bot Token](https://discord.com/developers/applications)
 
 5. _(optional)_ Replace `YOURKEY` with your [Google API Key for YouTube Data API v3](https://console.cloud.google.com/marketplace/product/google/youtube.googleapis.com)[^googleapi]
-   [^googleapi]:required for playlist search; free for up to 10,000 searches per day
+  [^googleapi]:required for playlist search; free for up to 10,000 searches per day
 
 6. _(optional)_ Replace `YOURCLIENTID` and `YOURCLIENTSECRET` with your [Spotify API Credentials](https://developer.spotify.com/dashboard/)[^spotifyapi]
-   [^spotifyapi]:required to search for spotify content; free of charge for appropriate, rate limited use
+  [^spotifyapi]:required to search for spotify content; free of charge for appropriate, rate limited use
 
-7. Add the bot to your server via the [OAuth2 > URL Generator](https://discord.com/developers/applications). Select `bot` as scope and insert the permissions integer in the `GENERATED URL`
-    > Minimum [permissions integer](https://discordapi.com/permissions.html#294242221120):[^permissions]
+7. _(optional)_ Change the `PORT` for the webserver as desired
+
+8. Add the bot to your server via the [OAuth2 > URL Generator](https://discord.com/developers/applications). Select `bot` as scope and insert the permissions integer in the `GENERATED URL`
+
+> Minimum [permissions integer](https://discordapi.com/permissions.html#294242221120):[^permissions]
 
 ```sh
 294242221120
@@ -179,7 +188,7 @@ SPOTIFY_CLIENT_SECRET="YOURCLIENTSECRET"
 
 Run the `start.bat` file to start the bot in a terminal
 
-**or**
+#### or
 
 > run the following command in a terminal:
 
@@ -198,7 +207,7 @@ npm run dev
 ### Deploy guild slash commands
 
 Enter your Discord client id as `hostUserId` in the `config.json` file.
-    
+
 >To find your client id: `Discord Settings > Advanced > Enable Developer Mode`. Then right-click yourself and choose `Copy ID`.
 
 Guild slash commands are only available in the guild in which they were deployed, but are available immediately.

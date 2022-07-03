@@ -22,11 +22,12 @@ interface MusicSettings {
     maxVolume: number;
     voiceVolumeMultiplier: number;
     trackDescriptionLengthLimit: number;
+    nowPlayingMessageInteractionTimeout: number;
     nowPlayingTrackBarSize: number;
     loadingBarSize: number;
     postAnnouncementChance: number;
-    announcements: string[];
-    postAnnouncements: string[];
+    preTrackAnnouncements: string[];
+    postTrackAnnouncements: string[];
     youTubeGeneratedLists: YouTubePlaylist[];
 }
 

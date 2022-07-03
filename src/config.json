@@ -28,11 +28,12 @@
         "minVolume": 1,
         "maxVolume": 300,
         "voiceVolumeMultiplier": 1.8,
-        "trackDescriptionLengthLimit": 500,
+        "trackDescriptionLengthLimit": 300,
+        "nowPlayingMessageInteractionTimeout": 30,
         "nowPlayingTrackBarSize": 20,
         "loadingBarSize": 20,
         "postAnnouncementChance": 0.4,
-        "announcements": [
+        "preTrackAnnouncements": [
             "Next track is ",
             "Next up, ",
             "Now playing, ",
@@ -41,16 +42,15 @@
             "Now coming, ",
             "Shut up, here is ",
             "Stop talking, this is ",
-            "Hey Listen",
             "Rythm's not up, let me give you a hug. ",
             "Rythm's gone, my time has come. ",
             "Alright, Rythms lazy, listen to me baby. ",
             "Rythm's not doing shit, let me play this hit. ",
-            "Hey Listen",
             "Rhytm who? Nothing that I can't do! ",
+            "Hey Listen, ",
             "I don't wanna anounce this, I do it anyways. "
         ],
-        "postAnnouncements": [
+        "postTrackAnnouncements": [
             ", listen closely.",
             ", don't laugh.",
             ", I love that.",
