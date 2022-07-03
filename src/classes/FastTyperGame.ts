@@ -31,7 +31,7 @@ export class FastTyperGame extends GameLobby {
     public constructor(client: BotterinoClient, host: User, channel: TextBasedChannel, maxPlayers: number) {
         super(client, GameType.FastTyper, host, channel, 1, maxPlayers);
         this.currentWord = this.words[0];
-        this.name = 'Find The Emoji';
+        this.name = 'Fast Typer';
         this.thumbnail = client.config.games.fastTyper_thumbnail;
     }
 
@@ -46,6 +46,8 @@ export class FastTyperGame extends GameLobby {
                 let playerScore = this.score.get(player);
                 if (playerScore) {
                     playerScore += this.currentWord.length;
+                } else {
+                    playerScore = this.currentWord.length;
                 }
                 this.score.set(player, playerScore);
                 this.displayAnswer();
