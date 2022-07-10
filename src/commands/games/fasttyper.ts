@@ -213,8 +213,8 @@ export const command: Command = {
 
                         collector.on('collect', async (message) => {
                             try {
-                                if (game.answerTries.has(message.member.user)) {
-                                    game.answer(message.member.user, message.content);
+                                if (game.answerTries.has(message.member!.user)) {
+                                    game.answer(message.member!.user, message.content);
                                     collector.stop();
                                 }
                             } catch (err: any) {

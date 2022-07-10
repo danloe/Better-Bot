@@ -5,10 +5,10 @@
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "start": "ts-node ./src/index.ts",
-    "dev": "tsc && ts-node-dev ./src/index.ts",
-    "deploy": "tsc && ts-node ./src/deploy/deployApplication.ts",
-    "clear": "tsc && ts-node ./src/deploy/clearApplication.ts",
+    "start": "ts-node --files ./src/index.ts",
+    "dev": "tsc && ts-node-dev --files ./src/index.ts",
+    "deploy": "tsc && ts-node --files ./src/deploy/deployApplication.ts",
+    "clear": "tsc && ts-node --files ./src/deploy/clearApplication.ts",
     "build": "tsc",
     "gcp-build": "tsc -p ."
   },
@@ -29,7 +29,7 @@
   "homepage": "https://github.com/danloe/Botterino#readme",
   "dependencies": {
     "@discordjs/builders": "^0.14.0",
-    "@discordjs/opus": "^0.7.0",
+    "@discordjs/opus": "^0.8.0",
     "@discordjs/rest": "^0.5.0",
     "@discordjs/voice": "^0.10.0",
     "chalk": "^4.1.2",

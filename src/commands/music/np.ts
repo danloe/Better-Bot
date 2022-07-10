@@ -208,7 +208,7 @@ export async function startNowPlayingCollector(
             const messages = await subscription.lastNowPlayingMessage.channel.messages.fetch({ limit: 1 });
             if (messages) {
                 let latestMessage = messages.first();
-                if (latestMessage.id === subscription.lastNowPlayingMessage.id) {
+                if (latestMessage?.id === subscription.lastNowPlayingMessage.id) {
                     // if it is the last message in channel, edit it
                     lastMessage = await subscription.lastNowPlayingMessage.edit({
                         embeds: [msgembed],
@@ -239,7 +239,7 @@ export function getNowPlayingMessage(
     subscription: MusicSubscription
 ): [message: MessageEmbed, rows: MessageActionRow[]] {
     let embedmsg = new MessageEmbed().setColor('#403075');
-    let rows = [];
+    let rows: MessageActionRow[] = [];
 
     if (subscription.currentTrack) {
         embedmsg

@@ -196,12 +196,6 @@ Run the `start.bat` file to start the bot in a terminal
 npm start
 ```
 
-> For development:
-
-```sh
-npm run dev
-```
-
 <p align="right"><a href="#top">&uarr;</a></p>
 
 ### Deploy guild slash commands
