@@ -1,4 +1,4 @@
-import { MessageEmbed, MessagePayload, TextBasedChannel, User, WebhookEditMessageOptions } from 'discord.js';
+import { Message, MessageEmbed, MessagePayload, TextBasedChannel, User, WebhookEditMessageOptions } from 'discord.js';
 import { GameType } from './GameManager';
 import { GameLobby, GameState } from './GameLobby';
 import BotterinoClient from '../client';
@@ -27,6 +27,7 @@ export class FastTyperGame extends GameLobby {
     answerTries: Map<User, number> = new Map<User, number>();
     answerGiven: User[] = [];
     answeredCorrectly: User | null = null;
+    lastGameMessage!: Message;
 
     public constructor(client: BotterinoClient, host: User, channel: TextBasedChannel, maxPlayers: number) {
         super(client, GameType.FastTyper, host, channel, 1, maxPlayers);
@@ -113,7 +114,7 @@ export class FastTyperGame extends GameLobby {
         return randomWords;
     }
 
-    getLobbyMessageEmbed(message: string) {
+    getLobbyMessageEmbed(description: string) {
         let players = '';
         this.players.forEach((player) => {
             players = players + '<@' + player.id + '> ';
@@ -121,7 +122,7 @@ export class FastTyperGame extends GameLobby {
         let embedmsg = new MessageEmbed()
             .setColor('#403075')
             .setTitle(this.name)
-            .setDescription(message)
+            .setDescription(description)
             .setThumbnail(this.thumbnail);
 
         embedmsg.addField('Rounds:', String(this.rounds), true);
@@ -148,7 +149,8 @@ export class FastTyperGame extends GameLobby {
         let embedmsg = new MessageEmbed()
             .setColor('#DDD620')
             .setTitle(this.name)
-            .setDescription('Current Word: ' + this.currentWord)
+            .setDescription('Current Word: `' + this.currentWord + '`')
+            .setThumbnail(this.thumbnail)
             .addField('Round:', String(this.round) + ' of ' + String(this.rounds), true)
             .addField('Time:', String(this.typingTime / 1000) + ' seconds', true)
             .addField('Answer awaited:', requiredPlayers, false)
@@ -164,7 +166,7 @@ export class FastTyperGame extends GameLobby {
     getAnswerMessage(): string | MessagePayload | WebhookEditMessageOptions {
         let correctUserString = '';
         if (this.answeredCorrectly) {
-            correctUserString = '<@' + this.answeredCorrectly.id + '> 1️⃣🆙';
+            correctUserString = '🚀 <@' + this.answeredCorrectly.id + '>';
         } else {
             correctUserString = '`No one has answered correctly!`';
         }
@@ -173,6 +175,7 @@ export class FastTyperGame extends GameLobby {
             .setColor('#403075')
             .setTitle(this.name)
             .setDescription('Word: ' + this.currentWord)
+            .setThumbnail(this.thumbnail)
             .addField('Round:', String(this.round) + ' of ' + String(this.rounds), true)
             .addField('Fastest User', correctUserString, false);
 

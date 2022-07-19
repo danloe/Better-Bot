@@ -123,7 +123,9 @@ export const command: Command = {
                             }
                         });
 
-                        await safeReply(client, interaction, { embeds: [embedmsg], components: [row] });
+                        game.lastGameMessage = <Message<boolean>>(
+                            await safeReply(client, interaction, { embeds: [embedmsg], components: [row] })
+                        );
                     });
 
                     // GAME READY TO START
@@ -192,7 +194,9 @@ export const command: Command = {
                                 client.logger.error(err);
                             }
                         });
-                        await safeReply(client, interaction, { embeds: [embedmsg], components: [row] });
+                        game.lastGameMessage = <Message<boolean>>(
+                            await safeReply(client, interaction, { embeds: [embedmsg], components: [row] })
+                        );
                     });
 
                     // GAME START
@@ -203,7 +207,7 @@ export const command: Command = {
                     // GAME TYPE
                     lobby.on('type', async (game: FastTyperGame) => {
                         const gameMessage = game.getTypeMessage();
-                        await safeReply(client, interaction, gameMessage);
+                        game.lastGameMessage = await game.lastGameMessage.edit(gameMessage).catch();
 
                         const filter = (m: Message<boolean>) => game.players.some((p) => p.id === m.author.id);
                         const collector = interaction.channel!.createMessageCollector({
@@ -235,8 +239,9 @@ export const command: Command = {
 
                     // GAME ANSWER
                     lobby.on('answer', async (game: FastTyperGame) => {
+                        await game.lastGameMessage.delete().catch();
                         const gameMessage = game.getAnswerMessage();
-                        await safeReply(client, interaction, gameMessage);
+                        game.lastGameMessage = await game.lastGameMessage.channel.send(gameMessage);
 
                         const collector = interaction.channel!.createMessageComponentCollector({
                             componentType: 'BUTTON',
@@ -256,9 +261,10 @@ export const command: Command = {
 
                     // GAME OVER
                     lobby.on('end', async (game: FastTyperGame) => {
+                        await game.lastGameMessage.delete().catch();
                         const gameMessage = game.getGameOverMessage();
+                        game.lastGameMessage = await game.lastGameMessage.channel.send(gameMessage);
                         client.gameManager.destroyLobby(interaction.user, game);
-                        await safeReply(client, interaction, gameMessage);
                     });
 
                     // open game lobby

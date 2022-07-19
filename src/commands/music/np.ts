@@ -193,7 +193,7 @@ export async function startNowPlayingCollector(
         await subscription.lastNowPlayingMessage
             ?.fetch()
             .then(async (msg) => {
-                if (msg?.deletable) await msg.delete();
+                if (msg?.deletable) await msg.delete().catch();
             })
             .catch();
 
@@ -219,7 +219,7 @@ export async function startNowPlayingCollector(
                     await subscription.lastNowPlayingMessage
                         ?.fetch()
                         .then(async (msg) => {
-                            if (msg?.deletable) await msg.delete();
+                            if (msg?.deletable) await msg.delete().catch();
                         })
                         .catch();
                     // send new message

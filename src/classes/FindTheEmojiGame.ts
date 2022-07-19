@@ -186,6 +186,7 @@ export class FindTheEmojiGame extends GameLobby {
             .setColor('#DDD620')
             .setTitle(this.name)
             .setDescription('Search: ' + emojiString)
+            .setThumbnail(this.thumbnail)
             .addField('Round:', String(this.round) + ' of ' + String(this.rounds), true)
             .addField('Difficulty:', this.difficulty, true)
             .addField('Time:', String(this.emojiSearchTime / 1000) + ' seconds', true)
@@ -231,6 +232,7 @@ export class FindTheEmojiGame extends GameLobby {
             .setColor('#403075')
             .setTitle(this.name)
             .setDescription('Emoji: ' + this.emojiWanted.emoji + ' `(' + this.emojiWanted.key + ')`')
+            .setThumbnail(this.thumbnail)
             .addField('Round:', String(this.round) + ' of ' + String(this.rounds), true)
             .addField('Fastest User', correctUserString, false);
 

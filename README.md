@@ -148,9 +148,7 @@ npm i -g npm@latest
     npm i
     ```
 
-3. Create a file named `.env` in the root directory
-
-    > Add the following lines:
+3. Rename the file `.env.example` to `.env` in the root directory
 
     ```sh
     BOT_TOKEN="YOURTOKEN"

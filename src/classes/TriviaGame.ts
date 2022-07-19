@@ -150,6 +150,7 @@ export class TriviaGame extends GameLobby {
             .setColor('#403075')
             .setTitle(this.name)
             .setDescription('Question: `' + this.question!.value + '`')
+            .setThumbnail(this.thumbnail)
             .addField('Category:', this.question!.category, true)
             .addField('Difficulty:', this.question!.difficulty, true)
             .addField('Time:', String(this.questionAnswerTime / 1000) + ' seconds', true)
@@ -179,7 +180,8 @@ export class TriviaGame extends GameLobby {
             .setTitle(this.name)
             .setDescription(
                 'Question: `' + this.question!.value + '`\n' + 'Answer: `' + this.question!.correctAnswer + '`'
-            );
+            )
+            .setThumbnail(this.thumbnail);
         const row = new MessageActionRow().addComponents([
             new MessageButton().setCustomId('answer_cancel').setLabel('Cancel Game').setStyle('DANGER')
         ]);
