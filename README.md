@@ -138,7 +138,7 @@ npm i -g npm@latest
 
 ### Installation
 
-1. Clone this repo for the latest (unstable) changes or download the [latest release](https://github.com/danloe/Botterino/releases/)
+1. Clone this repo for the latest changes or download the [latest release](https://github.com/danloe/Botterino/releases/)
 
 2. Install the required npm packages
 
