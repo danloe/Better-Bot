@@ -53,14 +53,8 @@ export const command: Command = {
                                 client,
                                 interaction,
                                 createEmbed(
-                                    ' ',
-                                    '`🚮 Deleted ' +
-                                        bulk.size +
-                                        ' messages by` ' +
-                                        `${user}` +
-                                        (bulk.size < amount!
-                                            ? '\n`⚠️ Messages older than 14 days cannot be bulk deleted.`'
-                                            : '`'),
+                                    '',
+                                    `\`🚮 Deleted ${bulk.size} messages by ${user}.${bulk.size < amount! ? '\n\`⚠️ Messages older than 14 days cannot be bulk deleted.' : ''}`,
                                     true
                                 )
                             );
@@ -71,13 +65,8 @@ export const command: Command = {
                                 client,
                                 interaction,
                                 createEmbed(
-                                    ' ',
-                                    '`🚮 Deleted ' +
-                                        bulk.size +
-                                        ' messages.' +
-                                        (bulk.size < amount!
-                                            ? '\n⚠️ Messages older than 14 days cannot be bulk deleted.`'
-                                            : '`'),
+                                    '',
+                                    `\`🚮 Deleted ${bulk.size} messages by ${user}.${bulk.size < amount! ? '\n\`⚠️ Messages older than 14 days cannot be bulk deleted.' : ''}`,
                                     true
                                 )
                             );
