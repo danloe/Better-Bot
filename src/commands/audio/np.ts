@@ -25,7 +25,7 @@ import { command as skip } from './skip';
 import { command as shuffle } from './shuffle';
 import { command as repeat } from './repeat';
 import { command as queueCommand } from './queue';
-import { MusicSubscription, PlayerStatus } from '../../classes';
+import { Logger, MusicSubscription, PlayerStatus } from '../../classes';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -156,7 +156,7 @@ export async function startNowPlayingCollector(
                     break;
             }
         } catch (err: any) {
-            client.logger.debug(err);
+            Logger.debug(err);
         }
     });
 
@@ -180,7 +180,7 @@ export async function startNowPlayingCollector(
                     }
                 }
             } catch (err: any) {
-                client.logger.debug(err);
+                Logger.debug(err);
             }
         }
     });

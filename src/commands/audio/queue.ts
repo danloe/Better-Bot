@@ -6,7 +6,7 @@ import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
 import { command as skip } from './skip';
 import { command as clear } from './clear';
 import { command as shuffle } from './shuffle';
-import { MusicSubscription, Queue } from '../../classes';
+import { Logger, MusicSubscription } from '../../classes';
 
 export const command: Command = {
     data: new SlashCommandBuilder().setName('queue').setDescription('Show the Queue.'),
@@ -78,7 +78,7 @@ async function startCollector(
             collector.stop();
             startCollector(client, interaction, subscription);
         } catch (err: any) {
-            client.logger.debug(err);
+            Logger.debug(err);
         }
     });
 
@@ -90,7 +90,7 @@ async function startCollector(
                     components: []
                 });
             } catch (err: any) {
-                client.logger.debug(err);
+                Logger.debug(err);
             }
         }
     });

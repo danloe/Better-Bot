@@ -1,5 +1,5 @@
 import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
-import { Track, TrackType } from '../classes';
+import { Logger, Track, TrackType } from '../classes';
 import google from 'googlethis';
 import BotterinoClient from '../client';
 import { EmbedFooterData } from '@discordjs/builders';
@@ -201,7 +201,7 @@ export async function getLogoUrlfromUrl(client: BotterinoClient, url: string): P
         let images = await google.image(domainName + ' logo | icon', { safe: false });
         return images[0].url;
     } catch (err: any) {
-        client.logger.debug(err);
+        Logger.debug(err);
         return '';
     }
 }

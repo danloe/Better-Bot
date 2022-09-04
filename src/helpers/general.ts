@@ -6,6 +6,7 @@ import {
     Message,
     MessagePayload
 } from 'discord.js';
+import { Logger } from '../classes';
 import BotterinoClient from '../client';
 
 export async function safeReply(
@@ -44,7 +45,7 @@ export async function safeReply(
             }
         }
     } catch (err: any) {
-        client.logger.error(err);
+        Logger.error(err);
     }
 }
 
@@ -64,7 +65,7 @@ export async function safeDeferReply(
             }
         }
     } catch (err: any) {
-        client.logger.error(err);
+        Logger.error(err);
     }
 }
 

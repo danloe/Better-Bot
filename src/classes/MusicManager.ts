@@ -16,6 +16,7 @@ import { MusicSubscription, PlayerStatus } from './MusicSubscription';
 import { Track, TrackType } from './Track';
 import { createAudioResource, entersState, StreamType, VoiceConnectionStatus } from '@discordjs/voice';
 import { Playlist } from '../interfaces';
+import { Logger } from './Logger';
 
 export class MusicManager {
     client: BotterinoClient;
@@ -164,7 +165,7 @@ export class MusicManager {
                 }
 
                 await entersState(subscription.voiceConnection!, VoiceConnectionStatus.Ready, 20e3).catch((_) => {
-                    this.client.logger.warn("Could not enter voice connection state 'ready'.");
+                    Logger.warn("Could not enter voice connection state 'ready'.");
                     reject('Failed to join voice channel within 20 seconds, please try again later!');
                     return;
                 });
@@ -176,10 +177,10 @@ export class MusicManager {
                 }
 
                 if (playlist) {
-                    this.client.logger.info(`Playlist ${playlist.name} queued.`);
+                    Logger.info(`Playlist ${playlist.name} queued.`);
                     resolve(playlist!);
                 } else {
-                    this.client.logger.info(`Track ${track!.title} queued.`);
+                    Logger.info(`Track ${track!.title} queued.`);
                     resolve(track!);
                 }
             } catch (err) {
@@ -207,7 +208,7 @@ export class MusicManager {
                 try {
                     await entersState(subscription.voiceConnection!, VoiceConnectionStatus.Ready, 20e3);
                 } catch (err) {
-                    this.client.logger.warn("Could not enter voice connection state 'ready'.");
+                    Logger.warn("Could not enter voice connection state 'ready'.");
                     error('Failed to join voice channel within 20 seconds, please try again later!');
                     return;
                 }
@@ -288,7 +289,7 @@ export class MusicManager {
                 try {
                     await entersState(subscription.voiceConnection!, VoiceConnectionStatus.Ready, 20e3);
                 } catch (err) {
-                    this.client.logger.warn("Could not enter voice connection state 'ready'.");
+                    Logger.warn("Could not enter voice connection state 'ready'.");
                     error('Failed to join voice channel within 20 seconds, please try again later!');
                     return;
                 }
@@ -328,7 +329,7 @@ export class MusicManager {
                 try {
                     await entersState(subscription.voiceConnection!, VoiceConnectionStatus.Ready, 20e3);
                 } catch (err) {
-                    this.client.logger.warn("Could not enter voice connection state 'ready'.");
+                    Logger.warn("Could not enter voice connection state 'ready'.");
                     error('Failed to join voice channel within 20 seconds, please try again later!');
                     return;
                 }

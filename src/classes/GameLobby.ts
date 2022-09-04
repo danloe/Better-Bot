@@ -10,6 +10,7 @@ import {
 import { GameType } from './GameManager';
 import EventEmitter from 'node:events';
 import BotterinoClient from '../client';
+import { Logger } from './Logger';
 
 export class GameLobby extends EventEmitter {
     public readonly id: string;
@@ -53,7 +54,7 @@ export class GameLobby extends EventEmitter {
         if (this.players.length >= this.minPlayers && this.players.length <= this.maxPlayers) {
             this.state = GameState.Ready;
             this.emit('ready', this);
-            this.client.logger.info(`[${this.name}: ${this.host.username}] ready`);
+            Logger.info(`[${this.name}: ${this.host.username}] ready`);
         } else {
             this.state = GameState.Waiting;
             this.emit('join', this);
@@ -64,7 +65,7 @@ export class GameLobby extends EventEmitter {
         if (this.state !== GameState.Waiting && this.state !== GameState.Ready) return;
         if (!this.players.includes(user)) {
             if (this.players.length < this.maxPlayers) this.players.push(user);
-            this.client.logger.info(`[${this.name}: ${this.host.username}] ${user.username} joined`);
+            Logger.info(`[${this.name}: ${this.host.username}] ${user.username} joined`);
         }
         this.open();
     }
@@ -73,7 +74,7 @@ export class GameLobby extends EventEmitter {
         if (this.state === GameState.Ready) {
             this.state = GameState.Started;
             this.emit('start', this);
-            this.client.logger.info(`[${this.name}: ${this.host.username}] started`);
+            Logger.info(`[${this.name}: ${this.host.username}] started`);
         }
     }
 

@@ -29,8 +29,9 @@ import {
     VoiceBasedChannel
 } from 'discord.js';
 import { getAnnouncementString, getVoiceStream } from '../helpers';
-import { getNowPlayingMessage, startNowPlayingCollector } from '../commands/music/np';
+import { getNowPlayingMessage, startNowPlayingCollector } from '../commands/audio/np';
 import BotterinoClient from '../client';
+import { Logger } from './Logger';
 
 const wait = promisify(setTimeout);
 
@@ -231,11 +232,11 @@ export class MusicSubscription {
         });
 
         this.audioPlayer.on('error', (error: { resource: any }) => {
-            this.client.logger.error(error.resource);
+            Logger.error(error.resource);
             this.processQueue();
         });
 
-        this.voicePlayer.on('error', (error: { resource: any }) => this.client.logger.error(error.resource));
+        this.voicePlayer.on('error', (error: { resource: any }) => Logger.error(error.resource));
 
         this.voiceConnection.subscribe(this.audioPlayer!);
 
@@ -391,7 +392,7 @@ export class MusicSubscription {
                 return this.processQueue();
             }
         } catch (err: any) {
-            this.client.logger.debug(err);
+            Logger.debug(err);
         }
     }
 

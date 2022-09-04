@@ -1,55 +1,48 @@
 import chalk from 'chalk';
-import BotterinoClient from '../client';
 
 export class Logger {
-    client!: BotterinoClient;
-
-    constructor(client?: BotterinoClient) {
-        if (client) this.client = client;
+    static log(message: string, ...args: any[]) {
+        console.log(getMessage(message), ...args);
+        writeToFile(`[LOG] ${message}`);
     }
 
-    log(message: string, ...args: any[]) {
-        console.log(this.getMessage(message), ...args);
-        this.writeToFile(`[LOG] ${message}`);
+    static error(message: string, ...args: any[]) {
+        console.trace(`${chalk.bgRed.black('[ERROR]')} ${getMessage(message)}`, ...args);
+        writeToFile(`[ERROR] ${message}`);
     }
 
-    error(message: string, ...args: any[]) {
-        console.error(`${chalk.bgRed.black('[ERROR]')} ${this.getMessage(message)}`, ...args);
-        this.writeToFile(`[ERROR] ${message}`);
+    static warn(message: string, ...args: any[]) {
+        console.warn(`${chalk.bgYellow.black('[WARN]')} ${getMessage(message)}`, ...args);
+        writeToFile(`[WARN] ${message}`);
     }
 
-    warn(message: string, ...args: any[]) {
-        console.warn(`${chalk.bgYellow.black('[WARN]')} ${this.getMessage(message)}`, ...args);
-        this.writeToFile(`[WARN] ${message}`);
+    static info(message: string, ...args: any[]) {
+        if (global.config.general.debug || global.config.general.verboseLogging)
+            console.info(`${chalk.bgWhite.black('[INFO]')} ${getMessage(message)}`, ...args);
     }
 
-    info(message: string, ...args: any[]) {
-        if (this.client.config.general.debug || this.client.config.general.verboseLogging)
-            console.info(`${chalk.bgWhite.black('[INFO]')} ${this.getMessage(message)}`, ...args);
+    static debug(message: string, ...args: any[]) {
+        if (global.config.general.debug)
+            console.debug(`${chalk.bgCyanBright('[DEBUG]')} ${getMessage(message)}`, ...args);
     }
 
-    debug(message: string, ...args: any[]) {
-        if (this.client.config.general.debug)
-            console.debug(`${chalk.bgCyanBright('[DEBUG]')} ${this.getMessage(message)}`, ...args);
+    static trace(message: string, ...args: any[]) {
+        if (global.config.general.debug)
+            console.trace(`${chalk.bgBlueBright('[TRACE]')} ${getMessage(message)}`, ...args);
     }
+}
 
-    trace(message: string, ...args: any[]) {
-        if (this.client.config.general.debug)
-            console.trace(`${chalk.bgBlueBright('[TRACE]')} ${this.getMessage(message)}`, ...args);
-    }
+function getMessage(message: string) {
+    return `[${new Date().toLocaleString()}] ${message}`;
+}
 
-    private getMessage(message: string) {
-        return `[${new Date().toLocaleString()}] ${message}`;
-    }
-
-    private writeToFile(message: string) {
-        if(this.client.config.general.disableWriteLog) return;
-        return new Promise<void>((resolve, reject) => {
-            const fs = require('fs');
-            fs.appendFile('logs.txt', `[${new Date().toLocaleString()}] ${message}\n`, (err: any) => {
-                if (err) reject(err);
-                else resolve();
-            });
+function writeToFile(message: string) {
+    if (global.config.general.disableWriteLog) return;
+    return new Promise<void>((resolve, reject) => {
+        const fs = require('fs');
+        fs.appendFile('logs.txt', `[${new Date().toLocaleString()}] ${message}\n`, (err: any) => {
+            if (err) reject(err);
+            else resolve();
         });
-    }
+    });
 }

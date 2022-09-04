@@ -3,6 +3,7 @@ import { Message } from 'discord.js';
 import BotterinoClient from '../client';
 import { readdirSync } from 'fs';
 import path from 'path';
+import { Logger } from '../classes';
 
 export const event: Event = {
     name: 'messageCreate',
@@ -26,7 +27,7 @@ export const event: Event = {
 
         const command = client.commands.get(cmd);
         if (command) {
-            client.logger.info(`${message.author.username} triggered an interaction. [${command.data.name}]`);
+            Logger.info(`${message.author.username} triggered an interaction. [${command.data.name}]`);
             (command as Command).run(client, undefined, message, args);
         }
     }
@@ -42,7 +43,7 @@ async function setCommands(message: Message) {
         for (const file of dirs) {
             const { command } = require(`${commandPath}/${dir}/${file}`);
             // if (!regex.test(command.data.name)) {
-            //     client.logger.info(command.data.name + ' failed the regex check.');
+            //     Logger.info(command.data.name + ' failed the regex check.');
             //     passed = false;
             // }
             commands.push(command.data.toJSON());

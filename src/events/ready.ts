@@ -1,5 +1,6 @@
 import { ClientPresenceStatus, ExcludeEnum, PresenceStatusData } from 'discord.js';
 import { ActivityTypes } from 'discord.js/typings/enums';
+import { Logger } from '../classes';
 import BotterinoClient from '../client';
 import { Event } from '../interfaces';
 
@@ -16,10 +17,10 @@ export const event: Event = {
             status: <ClientPresenceStatus>client.config.general.status
         });
 
-        client.logger.log(`${client.user!.tag} is ready.`);
+        Logger.log(`${client.user!.tag} is ready.`);
 
         if (!process.env.GOOGLE_API_KEY || process.env.GOOGLE_API_KEY!.length < 30) {
-            client.logger.warn(
+            Logger.warn(
                 `Google API Key seems to be missing! Functionalities limited. Add GOOGLE_API_KEY="YOURKEY" to .env file.`
             );
         }
@@ -29,7 +30,7 @@ export const event: Event = {
             !process.env.SPOTIFY_CLIENT_SECRET ||
             process.env.SPOTIFY_CLIENT_SECRET!.length < 30
         ) {
-            client.logger.warn(
+            Logger.warn(
                 `Spotify Credentials seem to be missing! Functionalities limited. Add SPOTIFY_CLIENT_ID="YOURCLIENTID" & SPOTIFY_CLIENT_SECRET="YOURCLIENTSECRET" to .env file.`
             );
         }

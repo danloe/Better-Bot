@@ -3,7 +3,7 @@ import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Messa
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BotterinoClient from '../../client';
 import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
-import { GameType, GameState, GameDifficulty, FindTheEmojiGame } from '../../classes';
+import { GameType, GameState, GameDifficulty, FindTheEmojiGame, Logger } from '../../classes';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -118,7 +118,7 @@ export const command: Command = {
                                     }
                                 }
                             } catch (err: any) {
-                                client.logger.debug(err);
+                                Logger.debug(err);
                             }
                         });
 
@@ -133,7 +133,7 @@ export const command: Command = {
                                     await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
 
@@ -184,11 +184,11 @@ export const command: Command = {
                                             );
                                         }
                                     } catch (err: any) {
-                                        client.logger.error(err);
+                                        Logger.error(err);
                                     }
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
 
@@ -203,7 +203,7 @@ export const command: Command = {
                                     await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
                         await safeReply(client, interaction, { embeds: [embedmsg], components: [row] });
@@ -249,11 +249,11 @@ export const command: Command = {
                                             );
                                         }
                                     } catch (err: any) {
-                                        client.logger.error(err);
+                                        Logger.error(err);
                                     }
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
 
@@ -263,7 +263,7 @@ export const command: Command = {
                                     game.displayAnswer();
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
                     });
@@ -294,11 +294,11 @@ export const command: Command = {
                         //                     createErrorEmbed('`⛔ Only the host can cancel the game.`', true)
                         //                 );
                         //             } catch (err: any) {
-                        //                 client.logger.error(err);
+                        //                 Logger.error(err);
                         //             }
                         //         }
                         //     } catch (err: any) {
-                        //         client.logger.error(err);
+                        //         Logger.error(err);
                         //     }
                         // });
 
@@ -308,7 +308,7 @@ export const command: Command = {
                                     game.nextRound();
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
                     });

@@ -1,5 +1,6 @@
 import BotterinoClient from '../client';
 import fetch from 'node-fetch';
+import { Logger } from '../classes';
 
 export async function getSpotifyAuthorizationToken(client: BotterinoClient, reject: (reason?: any) => void) {
     await fetch('https://accounts.spotify.com/api/token?grant_type=client_credentials', {
@@ -18,7 +19,7 @@ export async function getSpotifyAuthorizationToken(client: BotterinoClient, reje
             client.SpotifyAuthorizationTimeout = new Date(new Date().getTime() + data.expires_in * 1000);
         })
         .catch((reason) => {
-            client.logger.error(reason);
+            Logger.error(reason);
             reject(reason);
         });
 }
@@ -42,7 +43,7 @@ export async function getSpotifyTracksApiResponse(
     });
     response = await response.json();
     if (response!.error) {
-        client.logger.error(response.error);
+        Logger.error(response.error);
         reject('Track not found. Is it available in our market?');
     }
     return response;
@@ -67,7 +68,7 @@ export async function getSpotifyAlbumsApiResponse(
     });
     response = await response.json();
     if (response!.error) {
-        client.logger.error(response.error);
+        Logger.error(response.error);
         reject('Album not found. Is it available in our market?');
     }
     return response;
@@ -94,7 +95,7 @@ export async function getSpotifyPlaylistsApiResponse(
     });
     response = await response.json();
     if (response!.error) {
-        client.logger.error(response.error);
+        Logger.error(response.error);
         reject('Playlist not found. Is it private?');
     }
     return response;
@@ -123,7 +124,7 @@ export async function getSpotifyPlaylistsItemsApiResponse(
     });
     response = await response.json();
     if (response!.error) {
-        client.logger.error(response.error);
+        Logger.error(response.error);
         reject('Playlist not found. Is it private?');
     }
     return response;

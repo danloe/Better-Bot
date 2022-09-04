@@ -6,6 +6,7 @@ import { FourWinsGame } from './FourWinsGame';
 import { TriviaGame } from './TriviaGame';
 import { FindTheEmojiGame } from './FindTheEmojiGame';
 import { FastTyperGame } from './FastTyperGame';
+import { Logger } from './Logger';
 
 export class GameManager {
     client: BotterinoClient;
@@ -41,7 +42,7 @@ export class GameManager {
                         break;
                 }
                 this.games.set(host.id, lobby!);
-                this.client.logger.info(`[${lobby!.name}: ${host.username}] lobby created`);
+                Logger.info(`[${lobby!.name}: ${host.username}] lobby created`);
                 done(lobby!);
             } catch (err) {
                 error(err);
@@ -53,7 +54,7 @@ export class GameManager {
         let lobby = this.games.get(host.id);
         if (lobby) {
             if (lobby.id == gameLobby.id) {
-                this.client.logger.info(`[${lobby!.name}: ${host.username}] lobby destroyed`);
+                Logger.info(`[${lobby!.name}: ${host.username}] lobby destroyed`);
                 this.games.delete(host.id);
             }
         }

@@ -10,7 +10,6 @@ import { Logger } from '../classes';
 class BotterinoClient extends Client {
     public commands: Collection<string, Command> = new Collection();
     public events: Collection<string, Event> = new Collection();
-    public logger: Logger = new Logger(this);
     public config: Config = ConfigJson;
     public musicManager: MusicManager = new MusicManager(this);
     public gameManager: GameManager = new GameManager(this);

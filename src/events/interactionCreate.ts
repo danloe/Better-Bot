@@ -1,20 +1,21 @@
 import { Command, Event } from '../interfaces';
 import BotterinoClient from '../client';
 import { getYouTubeSuggestions } from '../helpers/autocomplete';
+import { Logger } from '../classes';
 
 export const event: Event = {
     name: 'interactionCreate',
     run: async (client: BotterinoClient, interaction: any) => {
         // COMMAND
         if (interaction.isCommand()) {
-            client.logger.info(`${interaction.user.tag} triggered an interaction [${interaction.commandName}]`);
+            Logger.info(`${interaction.user.tag} triggered an interaction [${interaction.commandName}]`);
 
             const command = client.commands.get(interaction.commandName);
             if (!command) return;
             try {
                 await (command as Command).run(client, interaction);
             } catch (error: any) {
-                client.logger.error(error);
+                Logger.error(error);
                 console.log(error);
             }
 
@@ -29,7 +30,7 @@ export const event: Event = {
                             !(String(focusedOption.value).trim() === '') &&
                             !String(focusedOption.value).startsWith('http')
                         ) {
-                            client.logger.info(
+                            Logger.info(
                                 `${interaction.user.tag} triggered an autocomplete [${interaction.commandName}: ${focusedOption.value}]`
                             );
                             let choices: any;
@@ -50,7 +51,7 @@ export const event: Event = {
                     }
                 }
             } catch (error: any) {
-                client.logger.error(error);
+                Logger.error(error);
             }
         }
 
@@ -58,7 +59,7 @@ export const event: Event = {
         else if (interaction.isButton()) {
             try {
             } catch (error: any) {
-                client.logger.error(error);
+                Logger.error(error);
             }
         }
 
@@ -66,7 +67,7 @@ export const event: Event = {
         else if (interaction.isSelectMenu()) {
             try {
             } catch (error: any) {
-                client.logger.error(error);
+                Logger.error(error);
             }
         } else {
             return;

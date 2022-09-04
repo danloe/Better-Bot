@@ -1,7 +1,7 @@
 import scdl from 'soundcloud-downloader';
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
-import { Track, TrackType, Queue } from '../classes';
+import { Track, TrackType, Queue, Logger } from '../classes';
 import { getLoadingString } from './message';
 import { Playlist, PlaylistType } from '../interfaces';
 import BotterinoClient from '../client';
@@ -82,7 +82,7 @@ export function getYouTubeTrack(
 
             resolve(track);
         } catch (error: any) {
-            client.logger.error(error);
+            Logger.error(error);
             reject('Could not load video. Check URL and privacy status or try again later.');
         }
     });
@@ -164,7 +164,7 @@ export function getYoutubePlaylistTracks(
                         reject('Google ' + response!.error!.message);
                         return;
                     }
-                    client.logger.error(response!.error);
+                    Logger.error(response!.error);
                     reject('Playlist Tracks not found. Are they private?');
                     return;
                 }
@@ -477,7 +477,7 @@ function loadAndQueueAsync(
                         }
                         await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                     } catch (err: any) {
-                        client.logger.error(err);
+                        Logger.error(err);
                     }
                 });
 

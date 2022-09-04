@@ -12,7 +12,7 @@ import {
 import { SlashCommandBuilder } from '@discordjs/builders';
 import BotterinoClient from '../../client';
 import { createErrorEmbed, safeDeferReply, safeReply } from '../../helpers';
-import { FourWinsGame, GameType, GameState } from '../../classes';
+import { FourWinsGame, GameType, GameState, Logger } from '../../classes';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -78,7 +78,7 @@ export const command: Command = {
                                     }
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
 
@@ -93,7 +93,7 @@ export const command: Command = {
                                     await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
 
@@ -144,11 +144,11 @@ export const command: Command = {
                                             );
                                         }
                                     } catch (err: any) {
-                                        client.logger.error(err);
+                                        Logger.error(err);
                                     }
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
 
@@ -163,7 +163,7 @@ export const command: Command = {
                                     await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
 
@@ -206,11 +206,11 @@ export const command: Command = {
                                             );
                                         }
                                     } catch (err: any) {
-                                        client.logger.error(err);
+                                        Logger.error(err);
                                     }
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
 
@@ -226,7 +226,7 @@ export const command: Command = {
                                     await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
                     });
@@ -264,11 +264,11 @@ export const command: Command = {
                                             );
                                         }
                                     } catch (err: any) {
-                                        client.logger.error(err);
+                                        Logger.error(err);
                                     }
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
 
@@ -284,7 +284,7 @@ export const command: Command = {
                                     await safeReply(client, interaction, { embeds: [embedmsg], components: [] });
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
                     });
@@ -357,11 +357,11 @@ export const command: Command = {
                                             createErrorEmbed("`⛔ These buttons aren't for you.`", true)
                                         );
                                     } catch (err: any) {
-                                        client.logger.error(err);
+                                        Logger.error(err);
                                     }
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
 
@@ -379,7 +379,7 @@ export const command: Command = {
                                     });
                                 }
                             } catch (err: any) {
-                                client.logger.error(err);
+                                Logger.error(err);
                             }
                         });
                     } else {
