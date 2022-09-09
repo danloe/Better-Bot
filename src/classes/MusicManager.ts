@@ -17,6 +17,7 @@ import { Track, TrackType } from './Track';
 import { createAudioResource, entersState, StreamType, VoiceConnectionStatus } from '@discordjs/voice';
 import { Playlist } from '../interfaces';
 import { Logger } from './Logger';
+import path from 'node:path';
 
 export class MusicManager {
     client: BotterinoClient;
@@ -226,6 +227,49 @@ export class MusicManager {
                     inputType: StreamType.Arbitrary,
                     inlineVolume: true
                 });
+                subscription!.playVoice(audioResource);
+                done();
+            } catch (err) {
+                error(err);
+            }
+        });
+    }
+
+    playSound(guildId: Snowflake, member: GuildMember, soundname: string) {
+        return new Promise<void>(async (done, error) => {
+            try {
+                const subscription = this.getSubscription(guildId);
+
+                if (!subscription.isVoiceConnectionReady()) {
+                    if (member instanceof GuildMember && member.voice.channel) {
+                        subscription.createVoiceConnection(member.voice.channel);
+                    } else {
+                        error(
+                            'Could not join a voice channel: You must first join a voice channel for me to follow you. ➡️ Then try the say command.'
+                        );
+                        return;
+                    }
+                }
+
+                try {
+                    await entersState(subscription.voiceConnection!, VoiceConnectionStatus.Ready, 20e3);
+                } catch (err) {
+                    Logger.warn("Could not enter voice connection state 'ready'.");
+                    error('Failed to join voice channel within 20 seconds, please try again later!');
+                    return;
+                }
+
+                if (!subscription.voiceConnection) {
+                    return;
+                }
+
+                const audioResource = createAudioResource(
+                    path.resolve(__dirname, `../commands/audio/resources/${soundname}.mp3`),
+                    {
+                        inputType: StreamType.Arbitrary,
+                        inlineVolume: true
+                    }
+                );
                 subscription!.playVoice(audioResource);
                 done();
             } catch (err) {

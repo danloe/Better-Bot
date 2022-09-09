@@ -1,11 +1,5 @@
 import { APIMessage } from 'discord-api-types/v10';
-import {
-    ButtonInteraction,
-    CommandInteraction,
-    InteractionReplyOptions,
-    Message,
-    MessagePayload
-} from 'discord.js';
+import { ButtonInteraction, CommandInteraction, InteractionReplyOptions, Message, MessagePayload } from 'discord.js';
 import { Logger } from '../classes';
 import BotterinoClient from '../client';
 
@@ -20,7 +14,6 @@ export async function safeReply(
             if (interaction.replied || interaction.deferred) {
                 return <APIMessage | Message<boolean>>(<unknown>await interaction.followUp(options));
             } else {
-                options;
                 return <APIMessage | Message<boolean>>(
                     (<unknown>await interaction.reply(Object.assign(options, { fetchReply: true })))
                 );

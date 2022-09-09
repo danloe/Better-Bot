@@ -1,4 +1,8 @@
 import http from 'node:http';
+import fs from 'fs';
+import { Logger } from '../classes';
+import { shuffleArray } from './general';
+import path from 'node:path';
 
 const YouTubeSuggestionsURL = 'http://suggestqueries.google.com/complete/search?client=firefox&ds=yt&q=';
 
@@ -23,4 +27,25 @@ export function getYouTubeSuggestions(query: string) {
             reject(e.message);
         });
     });
+}
+
+export function getSoundboardSuggestions(query: string) {
+    try {
+        const q = query.toLowerCase();
+        var files = fs.readdirSync(path.resolve(__dirname, '../commands/audio/resources/'), {
+            withFileTypes: false
+        }) as string[];
+
+        files = files.map((file) => file.replace('.mp3', ''));
+
+        if (query.length === 0) {
+            return shuffleArray(files).slice(0, 20);
+        } else {
+            return files
+                .filter((element: string) => element.toLowerCase().startsWith(q) || element.toLowerCase().includes(q))
+                .slice(0, 20);
+        }
+    } catch (error: any) {
+        Logger.error(error.message);
+    }
 }

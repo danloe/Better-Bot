@@ -1,6 +1,6 @@
 import { Command, Event } from '../interfaces';
 import BotterinoClient from '../client';
-import { getYouTubeSuggestions } from '../helpers/autocomplete';
+import { getSoundboardSuggestions, getYouTubeSuggestions } from '../helpers/autocomplete';
 import { Logger } from '../classes';
 
 export const event: Event = {
@@ -48,6 +48,17 @@ export const event: Event = {
                             });
                             await interaction.respond(response);
                         }
+                    }
+                } else if (interaction.commandName === 'soundboard') {
+                    const focusedOption = interaction.options.getFocused(true);
+                    if (focusedOption.name === 'input') {
+                        let choices: any;
+                        let response: any = [];
+                        choices = getSoundboardSuggestions(focusedOption.value);
+                        choices.forEach((choice: string) => {
+                            response.push({ name: choice, value: choice });
+                        });
+                        await interaction.respond(response);
                     }
                 }
             } catch (error: any) {
