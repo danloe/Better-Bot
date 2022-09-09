@@ -67,8 +67,10 @@
   - Newgrounds
   - Spotify Tracks, Albums & Playlists
   - Direct Link To File
+  - Soundboard
 - Autocomplete
   - YouTube search suggestions
+  - Local soundboard files
 - TTS over voice connection
   - Says any text :gb: :de: :netherlands: :fr: :es:
   - Announces music tracks
@@ -78,6 +80,7 @@
   - Four Wins
   - Trivia
   - Find The Emoji
+  - FastTyper
 - Administrator Role Commands
   - Delete Messages
 - General & Fun Commands
