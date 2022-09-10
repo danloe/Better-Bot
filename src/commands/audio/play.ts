@@ -13,7 +13,7 @@ import {
     getTrackTypeString,
     safeDeferReply
 } from '../../helpers';
-import { Track, TrackType } from '../../classes';
+import { Queue, Track, TrackType } from '../../classes';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -89,8 +89,6 @@ export const command: Command = {
                     if (!offset) offset = 0;
                     if (!limit) limit = Number.POSITIVE_INFINITY;
 
-                    await safeDeferReply(client, interaction);
-
                     const subscription = client.musicManager.getSubscription(interaction.guildId!);
                     const queue = subscription.queue;
 
@@ -106,9 +104,11 @@ export const command: Command = {
                             ),
                             true
                         );
+                    } else {
+                        await safeDeferReply(client, interaction);
                     }
 
-                    const result: Track | Playlist = await client.musicManager.play(
+                    const playResult: Track | Playlist = await client.musicManager.play(
                         interaction.guildId!,
                         <GuildMember>interaction.member,
                         input!,
@@ -123,79 +123,27 @@ export const command: Command = {
                     );
 
                     let addedText = '';
-                    if (result instanceof Track) {
-                        if (skip) {
-                            addedText = '`🔺 Track is playing now [' + (queue.length - 1) + ' in queue]`';
-                        } else if (next) {
-                            addedText = '`🔺 Track is next in queue [' + queue.length + ' in queue]`';
-                        } else {
-                            addedText = '`🔺 Track was added [' + queue.length + ' in queue]`';
-                        }
-                        await safeReply(
+                    if (playResult instanceof Track) {
+                        // Track
+                        addedText = await sendTrackResponse(
+                            skip,
+                            addedText,
+                            queue,
+                            next,
                             client,
                             interaction,
-                            createEmbed(
-                                result.title,
-                                addedText,
-                                false,
-                                getTrackTypeColor(result.inputType),
-                                [
-                                    { name: 'Description', value: getPrettyEmbedString(result.description) },
-                                    { name: 'Track Source', value: getTrackTypeString(result), inline: true },
-                                    { name: 'Audio Source', value: getTrackSourceString(result), inline: true },
-                                    { name: 'Duration', value: secondsToDurationString(result.duration), inline: true },
-                                    { name: 'Uploaded', value: getPrettyEmbedString(result.uploaded), inline: true }
-                                ],
-                                result.artworkUrl,
-                                result.displayUrl,
-                                {
-                                    text: `Requested by ${interaction.user.username}` + (result.announce ? ' 📣' : ''),
-                                    iconURL: interaction.user.avatarURL() || undefined
-                                }
-                            )
+                            playResult
                         );
                     } else {
                         // Playlist
-                        if (skip) {
-                            addedText = '`🔺 Playlist added and is playing now [' + (queue.length - 1) + ' in queue]`';
-                        } else if (next) {
-                            addedText = '`🔺 Playlist is next in queue [' + queue.length + ' in queue]`';
-                        } else {
-                            addedText = '`🔺 Playlist was added [' + queue.length + ' in queue]`';
-                        }
-                        await safeReply(
+                        addedText = await sendPlaylistResponse(
+                            skip,
+                            addedText,
+                            queue,
+                            next,
                             client,
                             interaction,
-                            createEmbed(
-                                result.name,
-                                addedText,
-                                false,
-                                getTrackTypeColor(
-                                    result.type === PlaylistType.YouTube
-                                        ? TrackType.YouTubePlaylist
-                                        : TrackType.SpotifyPlaylist
-                                ),
-                                [
-                                    { name: 'Description', value: getPrettyEmbedString(result.description) },
-                                    { name: 'Owner', value: getPrettyEmbedString(result.owner), inline: true },
-                                    {
-                                        name: result.type === PlaylistType.YouTube ? 'Videos' : 'Tracks',
-                                        value: getPrettyEmbedString(String(result.itemCount)),
-                                        inline: true
-                                    },
-                                    {
-                                        name: 'Published At',
-                                        value: getPrettyEmbedString(String(result.publishedAt).split('T')[0]),
-                                        inline: true
-                                    }
-                                ],
-                                result.thumbnailUrl,
-                                result.url,
-                                {
-                                    text: `Requested by ${interaction.user.username}` + (result.announce ? ' 📣' : ''),
-                                    iconURL: interaction.user.avatarURL() || undefined
-                                }
-                            )
+                            playResult
                         );
                     }
 
@@ -211,3 +159,96 @@ export const command: Command = {
             }
         })
 };
+
+async function sendPlaylistResponse(
+    skip: boolean,
+    addedText: string,
+    queue: Queue,
+    next: boolean,
+    client: BotterinoClient,
+    interaction: CommandInteraction | ButtonInteraction,
+    result: Playlist
+) {
+    if (skip) {
+        addedText = '`🔺 Playlist added and is playing now [' + (queue.length - 1) + ' in queue]`';
+    } else if (next) {
+        addedText = '`🔺 Playlist is next in queue [' + queue.length + ' in queue]`';
+    } else {
+        addedText = '`🔺 Playlist was added [' + queue.length + ' in queue]`';
+    }
+    await safeReply(
+        client,
+        interaction,
+        createEmbed(
+            result.name,
+            addedText,
+            false,
+            getTrackTypeColor(
+                result.type === PlaylistType.YouTube ? TrackType.YouTubePlaylist : TrackType.SpotifyPlaylist
+            ),
+            [
+                { name: 'Description', value: getPrettyEmbedString(result.description) },
+                { name: 'Owner', value: getPrettyEmbedString(result.owner), inline: true },
+                {
+                    name: result.type === PlaylistType.YouTube ? 'Videos' : 'Tracks',
+                    value: getPrettyEmbedString(String(result.itemCount)),
+                    inline: true
+                },
+                {
+                    name: 'Published At',
+                    value: getPrettyEmbedString(String(result.publishedAt).split('T')[0]),
+                    inline: true
+                }
+            ],
+            result.thumbnailUrl,
+            result.url,
+            {
+                text: `Requested by ${interaction.user.username}` + (result.announce ? ' 📣' : ''),
+                iconURL: interaction.user.avatarURL() || undefined
+            }
+        )
+    );
+    return addedText;
+}
+
+async function sendTrackResponse(
+    skip: boolean,
+    addedText: string,
+    queue: Queue,
+    next: boolean,
+    client: BotterinoClient,
+    interaction: CommandInteraction | ButtonInteraction,
+    result: Track
+) {
+    if (skip) {
+        addedText = '`🔺 Track is playing now [' + (queue.length - 1) + ' in queue]`';
+    } else if (next) {
+        addedText = '`🔺 Track is next in queue [' + queue.length + ' in queue]`';
+    } else {
+        addedText = '`🔺 Track was added [' + queue.length + ' in queue]`';
+    }
+    await safeReply(
+        client,
+        interaction,
+        createEmbed(
+            result.title,
+            addedText,
+            false,
+            getTrackTypeColor(result.inputType),
+            [
+                { name: 'Description', value: getPrettyEmbedString(result.description) },
+                { name: 'Track Source', value: getTrackTypeString(result), inline: true },
+                { name: 'Audio Source', value: getTrackSourceString(result), inline: true },
+                { name: 'Duration', value: secondsToDurationString(result.duration), inline: true },
+                { name: 'Uploaded', value: getPrettyEmbedString(result.uploaded), inline: true }
+            ],
+            result.artworkUrl,
+            result.displayUrl,
+            {
+                text: `Requested by ${interaction.user.username}` + (result.announce ? ' 📣' : ''),
+                iconURL: interaction.user.avatarURL() || undefined
+            }
+        )
+    );
+    return addedText;
+}
