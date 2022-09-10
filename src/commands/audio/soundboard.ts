@@ -28,7 +28,7 @@ export const command: Command = {
                         interaction instanceof CommandInteraction ? interaction.options.getString('input') : '';
                     await safeDeferReply(client, interaction, true);
                     await client.musicManager.playSound(interaction.guildId!, <GuildMember>interaction.member, input!);
-                    //await safeReply(client, interaction, '`🔊 ' + input + '`');
+                    await safeReply(client, interaction, '`🔊 ' + input + '`');
                     done();
                 } catch (err) {
                     await safeReply(client, interaction, createErrorEmbed('🚩 Error playing sound: `' + err + '`'));
